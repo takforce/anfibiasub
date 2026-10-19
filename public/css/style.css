@@ -176,88 +176,43 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 .meteo{display:block}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .meteo-home{padding:20px 0 90px}
-/* scena subacquea */
-.mt-scene{position:relative;overflow:hidden;border-radius:26px;padding:34px 34px 26px;border:1px solid rgba(120,200,210,.18);
-  background:
-    radial-gradient(60% 50% at 50% 0%,rgba(90,200,210,.30),transparent 70%),
-    radial-gradient(40% 30% at 15% 100%,rgba(40,90,80,.55),transparent 70%),
-    radial-gradient(40% 30% at 85% 100%,rgba(40,90,80,.55),transparent 70%),
-    linear-gradient(180deg,#0E4A57 0%,#0A3442 45%,#06202C 100%)}
-.mt-rays{position:absolute;inset:-20% -10% 30%;pointer-events:none;opacity:.55;
-  background:repeating-linear-gradient(100deg,rgba(255,255,255,0) 0 60px,rgba(190,240,245,.07) 60px 90px,rgba(255,255,255,0) 90px 170px);
-  -webkit-mask-image:linear-gradient(180deg,#000,transparent);mask-image:linear-gradient(180deg,#000,transparent)}
-.mt-scene::after{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;pointer-events:none;
-  background:radial-gradient(120% 100% at 50% 100%,rgba(150,130,95,.35),transparent 70%)}
-/* targa in ottone */
-.mt-plaque{position:relative;z-index:2;display:table;margin:0 auto 26px;padding:12px 34px;border-radius:12px;
-  background:linear-gradient(180deg,#14505A,#0B3540);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 0 0 4px #7A5A28,0 0 0 6px #D9B46A,0 0 0 9px #5A3F18,0 14px 30px rgba(0,0,0,.45)}
-.mt-plaque::before,.mt-plaque::after{content:"";position:absolute;top:50%;width:9px;height:9px;margin-top:-4.5px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#F3D99A,#7A5A28)}
-.mt-plaque::before{left:10px}.mt-plaque::after{right:10px}
-.mt-plaque span{font-size:clamp(22px,3vw,34px);font-weight:800;color:#fff;letter-spacing:.5px;text-shadow:0 2px 8px rgba(0,0,0,.5)}
-.mt-stage{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:34px;align-items:center}
-/* medusa con le bolle */
-.mt-jelly{position:relative;padding:26px 26px 0}
-.mt-dome{position:absolute;left:0;right:0;top:0;bottom:60px;border-radius:50% 50% 42% 42% / 58% 58% 42% 42%;
-  background:radial-gradient(70% 60% at 50% 30%,rgba(210,245,255,.20),rgba(150,210,230,.07) 60%,rgba(150,210,230,.02));
-  border:1px solid rgba(210,245,255,.30);box-shadow:inset 0 10px 40px rgba(210,245,255,.12),0 0 40px rgba(120,220,240,.12)}
-.mt-gears{position:absolute;left:-30px;top:-34px;width:52%;opacity:.85;z-index:1}
-.mt-gears .g1{animation:mt-spin 40s linear infinite}
-.mt-gears .g2{animation:mt-spin 24s linear infinite reverse}
-.mt-gears .g3{animation:mt-spin 28s linear infinite reverse}
-@keyframes mt-spin{to{transform:rotate(360deg)}}
-.mt-bubbles{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px}
-.mt-bub{position:relative;aspect-ratio:1;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;
-  background:radial-gradient(circle at 32% 24%,rgba(255,255,255,.55) 0 5%,rgba(255,255,255,.10) 16%,transparent 34%),
-             radial-gradient(circle at 50% 60%,rgba(120,220,230,.20),rgba(8,60,80,.60) 70%,rgba(4,30,45,.85));
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),inset 0 -14px 30px rgba(0,0,0,.35),0 0 0 5px #7A5A28,0 0 0 7px #D9B46A,0 0 0 9px #5A3F18,0 14px 30px rgba(0,0,0,.5)}
-.mt-fill{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,rgba(60,190,220,.55),rgba(20,110,150,.65));border-top:2px solid rgba(190,245,255,.6)}
-.mt-bub-in{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:12%;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.6)}
-.mt-bub-v{font-size:clamp(24px,2.6vw,34px);font-weight:800;line-height:1.05;margin-top:4px}
-.mt-bub-v small{font-size:.5em;font-weight:600}
-.mt-bub-s{font-size:12px;line-height:1.3;color:#D7EEF2}
-.mt-bub-l{font-size:12px;letter-spacing:2px;font-weight:700;text-transform:uppercase;color:#E9C77B;margin-top:4px}
-.b-wind .mt-arr{color:var(--lv)}
-.mt-tent{position:relative;z-index:0;display:block;width:80%;height:90px;margin:-6px auto 0}
-.mt-tent path{fill:none;stroke:rgba(210,245,255,.35);stroke-width:3;stroke-linecap:round;animation:mt-sway 6s ease-in-out infinite;transform-origin:50% 0}
-.mt-tent .t1,.mt-tent .t3{animation-duration:7.5s;animation-direction:reverse}
-@keyframes mt-sway{50%{transform:skewX(4deg)}}
-/* previsioni sui sassi */
-.mt-fc-h{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#E9C77B;font-weight:700;margin:0 0 64px 6px}
-.mt-rail{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;padding:16px 16px 18px;border-radius:70px;
-  background:linear-gradient(180deg,#D9B46A 0%,#9C7634 40%,#6B4B1F 100%);
-  box-shadow:inset 0 2px 0 rgba(255,240,200,.6),inset 0 -3px 0 rgba(0,0,0,.35),0 16px 30px rgba(0,0,0,.45)}
-.mt-st{display:flex;flex-direction:column;align-items:center;margin-top:-58px}
-.mt-st-ic{height:46px;display:flex;align-items:flex-end;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
-.mt-stone{width:100%;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:16px 6px;text-align:center;color:#fff;
-  text-shadow:0 1px 3px rgba(0,0,0,.75);border-radius:48% 52% 46% 54% / 56% 50% 50% 44%;
-  background:radial-gradient(circle at 34% 28%,#CDBB98 0%,#93805F 45%,#5C4E39 100%);
-  box-shadow:inset 0 -8px 18px rgba(0,0,0,.35),inset 0 6px 12px rgba(255,255,255,.18),0 6px 12px rgba(0,0,0,.4)}
-.mt-st:nth-child(2n) .mt-stone{border-radius:54% 46% 52% 48% / 50% 56% 44% 50%;background:radial-gradient(circle at 34% 28%,#BFC7B5 0%,#7F8A78 45%,#4C5649 100%)}
-.mt-stone b{font-size:15px;letter-spacing:.5px}
-.mt-st-t{font-size:18px;font-weight:700}
-.mt-st-t em{font-style:normal;font-weight:500;font-size:14px;opacity:.85}
-.mt-st-w{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:800;color:var(--lv);background:rgba(5,14,26,.62);border-radius:12px;padding:2px 8px;text-shadow:none}
-.mt-st-n{font-size:11px;line-height:1.3;opacity:.95}
-.mt-upd{position:relative;z-index:2;text-align:right;font-size:12.5px;color:#9FC6CF;margin-top:16px}
+/* meteo su immagine (meteo-banner.webp 2003x512): i dati sono posizionati sopra in percentuale */
+.mb-frame{position:relative;overflow:hidden;border-radius:22px;border:1px solid rgba(120,200,210,.2);background:#0A3442}
+.mb-art{position:relative;width:100%;aspect-ratio:2003/512;background:url(/img/meteo-banner.webp) center/100% 100% no-repeat;container-type:inline-size}
+.mb-plaque{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font-weight:800;color:#fff;font-size:2.15cqw;letter-spacing:.03em;text-shadow:0 2px 6px rgba(0,0,0,.7)}
+.mb-bub,.mb-stone{position:absolute;transform:translate(-50%,-50%);border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center}
+.mb-bub>div,.mb-stone>div{display:flex;flex-direction:column;align-items:center;gap:.25cqw}
+.mb-bub>div{max-width:86%}
+.mb-stone *{white-space:nowrap}
+.mb-bub{background:radial-gradient(circle,rgba(3,22,32,.62) 0%,rgba(3,22,32,.38) 48%,rgba(3,22,32,0) 72%);color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.85)}
+.mb-v{white-space:nowrap;display:inline-flex;align-items:center;gap:.3cqw;font-size:max(17px,2.1cqw);font-weight:800;line-height:1}
+.mb-v small{font-size:.5em;font-weight:700}
+.mb-s{font-size:max(10px,.72cqw);line-height:1.25;color:#E3F3F6}
+.mb-l{font-size:max(9px,.66cqw);letter-spacing:.18em;font-weight:800;text-transform:uppercase;color:#F0CF83;margin-top:.15cqw}
+.mb-wind .mb-v{color:#fff}
+.mb-wind .mt-arr{color:var(--lv);width:max(13px,1.1cqw);height:max(13px,1.1cqw)}
+.mb-stone{color:#13222B;text-shadow:0 1px 1px rgba(255,255,255,.35)}
+.mb-stone b{font-size:max(11px,.9cqw);font-weight:800;letter-spacing:.02em}
+.mb-t{display:inline-flex;align-items:center;gap:.25cqw;font-size:max(12px,1cqw);font-weight:800}
+.mb-t em{font-style:normal;font-weight:600;opacity:.75}
+.mb-t .mt-wx{width:max(14px,1.1cqw);height:max(14px,1.1cqw);filter:drop-shadow(0 1px 1px rgba(0,0,0,.4))}
+.mb-k{display:inline-flex;align-items:center;gap:.2cqw;font-size:max(10px,.78cqw);font-weight:800;color:var(--lv);background:rgba(8,26,38,.82);border-radius:20px;padding:.12cqw .55cqw;text-shadow:none}
+.mb-n{font-size:max(9px,.58cqw);font-weight:700;line-height:1.2;white-space:nowrap}
+.mb-upd{text-align:right;font-size:12.5px;color:var(--dim);margin-top:8px}
 .lv-ok{--lv:#5BF0B0}.lv-mid{--lv:#FFD45E}.lv-hi{--lv:#FF9A55}.lv-max{--lv:#FF5E6C}
 .mt-arr{flex:none}
-@media (prefers-reduced-motion:reduce){.mt-gears g,.mt-tent path{animation:none}}
-@media (max-width:1100px){
-  .mt-stage{grid-template-columns:minmax(0,1fr)}
-  .mt-jelly{max-width:520px;margin:0 auto;width:100%}
-  .mt-fc{margin-top:24px}
-}
-@media (max-width:640px){
-  .mt-scene{padding:24px 14px 18px;border-radius:20px}
-  .mt-jelly{padding:16px 10px 0}
-  .mt-bubbles{gap:18px}
-  .mt-bub-s{font-size:11px}
-  .mt-rail{display:flex;overflow-x:auto;padding:12px 14px 16px;border-radius:34px;scroll-snap-type:x mandatory}
-  .mt-st{flex:0 0 118px;margin-top:0;scroll-snap-align:start}
-  .mt-fc-h{margin-bottom:12px}
-  .mt-gears{left:-14px;top:-20px}
-  .mt-bub-in{padding:8%}
+/* cellulare: si mostra solo la parte centrale dell'immagine (sassi + medusa), ingrandita */
+@media (max-width:767px){
+  .mb-frame{aspect-ratio:1040/512;border-radius:16px}
+  .mb-art{position:absolute;top:0;width:192.6%;left:-46.15%}
+  .mb-x,.mb-n{display:none}
+  .mb-v{font-size:max(15px,2.1cqw)}
+  .mb-s{font-size:9.5px}
+  .mb-l{font-size:8.5px}
+  .mb-plaque{font-size:max(15px,2.1cqw)}
+  .mb-stone b{font-size:9.5px}
+  .mb-t{display:none}
+  .mb-k{font-size:9px;padding:1px 5px}
 }
 .cam-card{position:relative;display:block;border-radius:16px;overflow:hidden;max-width:900px;aspect-ratio:16/8;text-decoration:none;border:1px solid var(--line2)}
 .cam-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .4s}

@@ -54,7 +54,7 @@ SERVIZI = [
                  body=['After years of testing we developed a method to clean and descale propellers of any size directly in the water. No haul-out, no yard: costs are halved.',
                        'Algae and small shellfish on the underwater hull slow the boat down: you lose speed, burn more fuel and strain the engine. Like a visit to the dentist, regular maintenance costs little and pays for itself straight away in fuel savings.',
                        'Our system reduces the diver\'s effort and does not pollute the harbour water.'])),
-    dict(id='carenaggi', img='alaggi',  # provvisoria: in attesa dell'immagine IA 'carenaggi'
+    dict(id='carenaggi', img='carenaggi',
          it=dict(t='Carenaggi', short='Spugne morbide per la vela, più abrasive per il motore, macchinari dedicati per le navi.',
                  body=['Puliamo la carena in acqua scegliendo lo strumento in base allo scafo: spugne idonee per le barche a vela, spugne più abrasive per le barche a motore.',
                        'Per le navi usiamo macchinari specifici ad assetto variabile, che lavorano su grandi superfici in tempi ridotti.']),

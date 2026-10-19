@@ -73,7 +73,7 @@ def header(cur, lang, overlay):
 <header class="site-header{'' if overlay else ' solid'}">
 <div class="wrap nav-row">
 <a class="logo" href="{url('home', lang)}" aria-label="Anfibiasub, home">
-<img class="logo-img" src="/img/logo-anfibia-96.png" alt="" width="52" height="52">
+<img class="logo-img" src="/img/logo-casco-96.png" alt="" width="52" height="52">
 <span class="logo-txt"><span class="logo-name">ANFIBIA<span class="hl">SUB</span></span><span class="logo-sub">{U["tagline"]}</span></span>
 </a>
 <a class="btn nav-cta" href="{url('contatti', lang)}">{U["quote"]}</a>
@@ -94,7 +94,7 @@ def footer(lang):
 <div class="wrap">
 <div class="foot-grid">
 <div>
-<img src="/img/logo-anfibia-96.png" alt="Anfibiasub" width="72" height="72" style="border-radius:50%;margin-bottom:10px">
+<img src="/img/logo-casco-96.png" alt="Anfibiasub" width="72" height="72" style="border-radius:50%;margin-bottom:10px">
 <p style="margin-top:6px">{U["foot_about"]}</p>
 </div>
 <div>
@@ -126,7 +126,8 @@ def footer(lang):
 
 def page(key, lang, title, desc, body, overlay=False, og='porto-loano'):
     extra_head = '<link rel="stylesheet" href="/vendor/leaflet/leaflet.css">\n' if key == 'utilita' else ''
-    extra_js = f'<script src="/vendor/leaflet/leaflet.js"></script>\n<script src="/js/utilita.js?v={VER}"></script>\n' if key == 'utilita' else ''
+    extra_js = (f'<script src="/vendor/leaflet/leaflet.js"></script>\n<script src="/js/utilita.js?v={VER}"></script>\n' if key == 'utilita'
+                else f'<script src="/js/utilita.js?v={VER}"></script>\n' if key == 'home' else '')
     fname = PAGES[key][lang]
     alternates = ''.join(f'<link rel="alternate" hreflang="{l}" href="{SITE_URL + url(key, l)}">\n' for l in LANGS)
     locale = {'it': 'it_IT', 'en': 'en_GB', 'es': 'es_ES', 'de': 'de_DE'}[lang]
@@ -145,8 +146,8 @@ def page(key, lang, title, desc, body, overlay=False, og='porto-loano'):
 <meta property="og:image" content="{SITE_URL}/img/{og}.webp">
 <meta property="og:locale" content="{locale}">
 <meta name="theme-color" content="#050E1A">
-<link rel="icon" href="/favicon.png" type="image/png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" href="/favicon.png?v=2" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2">
 <link rel="preload" href="/fonts/montserrat-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css?v={VER}">
 {extra_head}</head>
@@ -283,6 +284,13 @@ def build_lang(lang):
 <a class="q-tile" href="{url('utilita', lang, 'meteo')}">{QI_METEO}<strong>{T('q_meteo')[0]}</strong><span>{T('q_meteo')[1]}</span></a>
 <a class="q-tile" href="{url('utilita', lang, 'gps')}">{QI_GPS}<strong>{T('q_gps')[0]}</strong><span>{T('q_gps')[1]}</span></a>
 </nav>
+
+<section class="meteo-home" aria-label="{dict(UTIL)['meteo'][lang]}">
+<div class="wrap">
+<div class="meteo" data-meteo data-lang="{lang}" data-title="{dict(UTIL)['meteo'][lang]}"><p class="hint">{T('meteo_loading')}</p></div>
+<p class="hint" style="margin-top:12px">{T('meteo_note')}</p>
+</div>
+</section>
 
 <section class="section m-hide" id="servizi" aria-labelledby="srv-t">
 <div class="wrap">
@@ -423,8 +431,8 @@ def utilita_html(lang):
     cat = table(T('chain_cols'), [(f'<b>{a}</b>', b, dec(c), dec(d), dec(x)) for a, b, c, d, x in CATENE], T('chain_cap'))
     anc = table(['Ø mm', 'CP 1-1b', 'CR 1-1b', 'CP 2', 'CR 2', 'CP 3', 'CR 3', T('anchor_join'), 'Kenter'],
                 [(f'<b>{r[0]}</b>',) + tuple(fmt(x, lang) for x in r[1:]) for r in CATENE_ANCORE], T('anchor_cap'))
-    live = f'''<section class="tool-sec" id="meteo"><h2 class="h2">{title['meteo'][lang]}</h2>
-<div class="meteo" data-meteo data-lang="{lang}"><p class="hint">{T('meteo_loading')}</p></div>
+    live = f'''<section class="tool-sec" id="meteo"><h2 class="vh">{title['meteo'][lang]}</h2>
+<div class="meteo" data-meteo data-lang="{lang}" data-title="{title['meteo'][lang]}"><p class="hint">{T('meteo_loading')}</p></div>
 <p class="hint" style="margin-top:12px">{T('meteo_note')}</p>
 </section>
 <section class="tool-sec" id="webcam"><h2 class="h2">{title['webcam'][lang]}</h2>

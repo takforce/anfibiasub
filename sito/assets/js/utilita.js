@@ -55,14 +55,26 @@
     var wicon = function (c, size) { var g = wg(c); return '<svg class="mt-wx" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" aria-label="' + esc(T.wx[g]) + '" role="img">' + ICONS[g] + '</svg>'; };
     // freccia: la direzione meteo indica da dove arriva il vento, la freccia punta dove soffia
     var arrow = function (deg, size) { return '<svg class="mt-arr" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" aria-hidden="true" style="transform:rotate(' + ((deg + 180) % 360) + 'deg)"><path d="M12 3l5 9h-3.5v9h-3v-9H7z" fill="currentColor"/></svg>'; };
-    var dial = function (deg, kn) {
-      var ticks = '';
-      for (var i = 0; i < 72; i++) { var long = i % 18 === 0; ticks += '<line x1="80" y1="' + (long ? 10 : 13) + '" x2="80" y2="19" transform="rotate(' + (i * 5) + ' 80 80)" stroke="' + (long ? '#C9D8E3' : 'rgba(201,216,227,.25)') + '" stroke-width="' + (long ? 2 : 1) + '"/>'; }
-      var card = T.dir.filter(function (_, i) { return i % 2 === 0; });
-      var lab = '<text x="80" y="34" text-anchor="middle">' + card[0] + '</text><text x="128" y="84" text-anchor="middle">' + card[1] + '</text><text x="80" y="134" text-anchor="middle">' + card[2] + '</text><text x="32" y="84" text-anchor="middle">' + card[3] + '</text>';
-      return '<svg class="mt-dial lv-' + lvl(kn) + '" viewBox="0 0 160 160" aria-hidden="true"><circle cx="80" cy="80" r="74" fill="#081A2C" stroke="rgba(34,184,240,.25)"/>' + ticks + '<g class="mt-card">' + lab + '</g>' +
-        '<g transform="rotate(' + ((deg + 180) % 360) + ' 80 80)"><path d="M80 22l9 20h-6v22h-6V42h-6z" class="mt-needle"/><path d="M80 138l-5-14h10z" fill="rgba(201,216,227,.45)"/></g>' +
-        '<circle cx="80" cy="80" r="30" fill="#0B2A44"/><text x="80" y="84" text-anchor="middle" class="mt-dial-n">' + Math.round(kn) + '</text><text x="80" y="100" text-anchor="middle" class="mt-dial-u">kn</text></svg>';
+    // ingranaggio decorativo in ottone
+    var gear = function (cx, cy, r, teeth, cls) {
+      var pts = [], n = teeth * 2;
+      for (var i = 0; i < n * 2; i++) {
+        var ang = Math.PI * 2 * i / (n * 2), rr = (Math.floor(i / 2) % 2 === 0) ? r : r * 0.82;
+        pts.push((cx + rr * Math.cos(ang)).toFixed(1) + ',' + (cy + rr * Math.sin(ang)).toFixed(1));
+      }
+      return '<g class="' + cls + '" style="transform-origin:' + cx + 'px ' + cy + 'px"><polygon points="' + pts.join(' ') + '" fill="url(#brass)" stroke="#4a3312" stroke-width="2"/>' +
+        '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r * 0.55) + '" fill="none" stroke="#4a3312" stroke-width="3"/><circle cx="' + cx + '" cy="' + cy + '" r="' + (r * 0.18) + '" fill="#4a3312"/></g>';
+    };
+    var GEARS = '<svg class="mt-gears" viewBox="0 0 300 300" aria-hidden="true"><defs><linearGradient id="brass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E9C77B"/><stop offset=".5" stop-color="#A27A35"/><stop offset="1" stop-color="#5E4119"/></linearGradient></defs>' +
+      gear(110, 110, 92, 14, 'g1') + gear(232, 70, 48, 9, 'g2') + gear(70, 240, 54, 10, 'g3') + '</svg>';
+    var TENT = '<svg class="mt-tent" viewBox="0 0 400 160" preserveAspectRatio="none" aria-hidden="true">' +
+      ['M60 0 C 40 50, 90 90, 60 160', 'M120 0 C 140 60, 90 100, 125 160', 'M200 0 C 185 55, 225 105, 200 160', 'M280 0 C 260 60, 310 100, 275 160', 'M340 0 C 360 50, 310 90, 345 160']
+        .map(function (d, i) { return '<path d="' + d + '" class="t' + i + '"/>'; }).join('') + '</svg>';
+    var BUOY = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#E9C77B" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 2v3M9 9l3-4 3 4M8 15l1.5-6h5L16 15z"/><path d="M3 19c2 0 2-1.5 4.5-1.5S10 19 12 19s2.5-1.5 4.5-1.5S19 19 21 19"/></svg>';
+    var THERMO = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#E9C77B" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M10 14V5a2 2 0 0 1 4 0v9a4 4 0 1 1-4 0z"/><circle cx="12" cy="17" r="1.6" fill="#FF7A59" stroke="none"/></svg>';
+    var bubble = function (cls, icon, main, sub, label, fill) {
+      return '<div class="mt-bub ' + cls + '">' + (fill != null ? '<i class="mt-fill" style="height:' + fill + '%"></i>' : '') +
+        '<div class="mt-bub-in">' + icon + '<div class="mt-bub-v">' + main + '</div>' + (sub ? '<div class="mt-bub-s">' + sub + '</div>' : '') + '<div class="mt-bub-l">' + label + '</div></div></div>';
     };
 
     var W = 'https://api.open-meteo.com/v1/forecast?latitude=44.1286&longitude=8.2589&current=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&wind_speed_unit=kn&timezone=Europe%2FRome&forecast_days=5';
@@ -75,37 +87,37 @@
       var sst = m && m.current ? m.current.sea_surface_temperature : null;
       var kn = c.wind_speed_10m, b = bft(kn);
       var time = (c.time || '').slice(11, 16);
-      var waveBar = wave != null ? Math.min(100, Math.round(wave / 4 * 100)) : 0;
-      var now =
-        '<div class="mt-head"><h3>' + T.now + '</h3><span>' + (time ? T.upd + ' ' + time : '') + '</span></div>' +
-        '<div class="mt-now">' +
-          '<div class="mt-wind lv-' + lvl(kn) + '">' + dial(c.wind_direction_10m, kn) +
-            '<div class="mt-wind-txt"><div class="m-label">' + T.wind + '</div>' +
-            '<div class="mt-big">' + T.force + ' ' + b + '</div>' +
-            '<div class="mt-sub">' + esc(T.bf[b]) + '</div>' +
-            '<div class="mt-chips"><span>' + T.from + ' ' + dir(c.wind_direction_10m) + '</span><span>' + T.gusts + ' ' + Math.round(c.wind_gusts_10m) + ' kn</span></div></div>' +
-          '</div>' +
-          '<div class="mt-side">' +
-            '<div class="mt-tile"><div class="m-label">' + T.sea + '</div><div class="mt-val">' + (wave != null ? num(wave, 1) + '<small> m</small>' : '—') + '</div>' +
-              '<div class="mt-sub">' + (wave != null ? esc(stato(wave)) : '') + '</div><div class="mt-bar"><i style="width:' + waveBar + '%"></i></div></div>' +
-            '<div class="mt-tile mt-row"><div><div class="m-label">' + T.air + '</div><div class="mt-val">' + Math.round(c.temperature_2m) + '°</div><div class="mt-sub">' + esc(T.wx[wg(c.weather_code)]) + '</div></div>' + wicon(c.weather_code, 54) + '</div>' +
-            '<div class="mt-tile"><div class="m-label">' + T.water + '</div><div class="mt-val">' + (sst != null ? Math.round(sst) + '°' : '—') + '</div></div>' +
-          '</div>' +
-        '</div>';
-      var days = '';
+      var title = box.getAttribute('data-title') || '';
+      var bubbles =
+        bubble('b-wind lv-' + lvl(kn), arrow(c.wind_direction_10m, 30), Math.round(kn) + '<small> kn ' + dir(c.wind_direction_10m) + '</small>',
+          T.gusts + ' ' + Math.round(c.wind_gusts_10m) + ' kn<br>' + T.force + ' ' + b + ' · ' + esc(T.bf[b]), T.wind) +
+        bubble('b-sea', BUOY, wave != null ? num(wave, 1) + '<small> m</small>' : '—', wave != null ? esc(stato(wave)) : '', T.sea, wave != null ? 22 + Math.min(40, Math.round(wave * 12)) : 25) +
+        bubble('b-air', wicon(c.weather_code, 34), Math.round(c.temperature_2m) + '°', esc(T.wx[wg(c.weather_code)]), T.air) +
+        bubble('b-water', THERMO, sst != null ? Math.round(sst) + '°' : '—', '', T.water, 48);
+      var stones = '';
       (w.daily.time || []).forEach(function (d, i) {
         var dt = new Date(d + 'T12:00:00');
         var wv = m && m.daily ? m.daily.wave_height_max[i] : null;
         var dk = w.daily.wind_speed_10m_max[i];
-        days += '<div class="mt-day">' +
-          '<b>' + (i === 0 ? T.today : T.days[dt.getDay()] + ' ' + dt.getDate()) + '</b>' +
-          wicon(w.daily.weather_code[i], 40) +
-          '<div class="mt-temp">' + Math.round(w.daily.temperature_2m_max[i]) + '° <span>' + Math.round(w.daily.temperature_2m_min[i]) + '°</span></div>' +
-          '<div class="mt-pill lv-' + lvl(dk) + '">' + arrow(w.daily.wind_direction_10m_dominant[i], 14) + Math.round(dk) + ' kn</div>' +
-          '<div class="m-note">' + T.gusts + ' ' + Math.round(w.daily.wind_gusts_10m_max[i]) + (wv != null ? '<br>' + T.sea + ' ' + num(wv, 1) + ' m' : '') + '</div>' +
-        '</div>';
+        stones += '<div class="mt-st">' +
+          '<div class="mt-st-ic">' + wicon(w.daily.weather_code[i], 34) + '</div>' +
+          '<div class="mt-stone">' +
+            '<b>' + (i === 0 ? T.today : T.days[dt.getDay()] + ' ' + dt.getDate()) + '</b>' +
+            '<span class="mt-st-t">' + Math.round(w.daily.temperature_2m_max[i]) + '° <em>' + Math.round(w.daily.temperature_2m_min[i]) + '°</em></span>' +
+            '<span class="mt-st-w lv-' + lvl(dk) + '">' + arrow(w.daily.wind_direction_10m_dominant[i], 13) + Math.round(dk) + ' kn ' + dir(w.daily.wind_direction_10m_dominant[i]) + '</span>' +
+            '<span class="mt-st-n">' + T.gusts + ' ' + Math.round(w.daily.wind_gusts_10m_max[i]) + (wv != null ? ' · ' + num(wv, 1) + ' m' : '') + '</span>' +
+          '</div></div>';
       });
-      box.innerHTML = now + '<div class="mt-head"><h3>' + T.next + '</h3></div><div class="mt-days">' + days + '</div>';
+      box.innerHTML =
+        '<div class="mt-scene">' +
+          '<div class="mt-rays" aria-hidden="true"></div>' +
+          (title ? '<div class="mt-plaque"><span>' + esc(title) + '</span></div>' : '') +
+          '<div class="mt-stage">' +
+            '<div class="mt-jelly"><div class="mt-dome" aria-hidden="true"></div>' + GEARS + '<div class="mt-bubbles">' + bubbles + '</div>' + TENT + '</div>' +
+            '<div class="mt-fc"><div class="mt-fc-h">' + T.next + '</div><div class="mt-rail">' + stones + '</div></div>' +
+          '</div>' +
+          (time ? '<p class="mt-upd">' + T.now + ' · ' + T.upd + ' ' + time + '</p>' : '') +
+        '</div>';
     }).catch(function () { box.innerHTML = '<p class="hint">' + esc(T.na) + '</p>'; });
   }
 

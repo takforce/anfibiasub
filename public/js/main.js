@@ -1,11 +1,11 @@
-// Menu mobile e menu a tendina
+// Menu principale e menu a tendina (si aprono cliccando sul nome)
 (function () {
   var btn = document.querySelector('.menu-btn');
   var nav = document.getElementById('nav');
-  if (!btn || !nav) return;
-  var mobile = function () { return window.matchMedia('(max-width: 960px)').matches; };
+  if (!nav) return;
+  var mobile = function () { return window.matchMedia('(max-width: 1240px)').matches; };
 
-  btn.addEventListener('click', function () {
+  if (btn) btn.addEventListener('click', function () {
     var open = nav.classList.toggle('open');
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
@@ -29,11 +29,10 @@
   document.addEventListener('click', function (e) { if (!nav.contains(e.target)) closeAll(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAll(); });
 
-  // Un link scelto chiude tutto (sul telefono anche il menu principale)
+  // Scelta una voce: chiudo la tendina (e sul telefono anche il menu)
   nav.addEventListener('click', function (e) {
     if (e.target.tagName !== 'A') return;
     closeAll();
-    if (mobile()) { nav.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
-    if (document.activeElement) document.activeElement.blur();
+    if (mobile() && btn) { nav.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
   });
 })();

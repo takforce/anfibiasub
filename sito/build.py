@@ -15,6 +15,9 @@ SITE_URL = 'https://www.anfibiasub.it'
 AREA = 'https://clienti.anfibiasub.it/area/login' if PROD else '/area/login'
 
 e = html.escape
+import hashlib
+_A = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets')
+VER = hashlib.md5(b''.join(open(os.path.join(_A, f), 'rb').read() for f in ('css/style.css', 'js/main.js', 'js/utilita.js'))).hexdigest()[:8]
 ARROW = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'
 LOGO = '<svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="9" r="5"/><circle cx="12" cy="9" r="2"/><path d="M3 18c2 0 2-1.5 4.5-1.5S9.5 18 12 18s2.5-1.5 4.5-1.5S19 18 21 18"/></svg>'
 LOCK = '<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'
@@ -35,19 +38,19 @@ def header(cur, lang, overlay):
     subs = {
         'servizi': [(s['id'], s[lang]['t']) for s in SERVIZI],
         'lavori': [(l['id'], l[lang]['toc']) for l in LAVORI],
-        'utilita': [('vento', 'Vento' if it else 'Wind'), ('cime', 'Cime' if it else 'Ropes'), ('cavi', 'Cavi in acciaio' if it else 'Steel wire'), ('catene', 'Catene' if it else 'Chains')],
+        'utilita': [(a, (b_it if it else b_en)) for a, b_it, b_en in UTIL_SEZIONI],
     }
+    tutti = {'servizi': ('Tutti i servizi', 'All services'), 'lavori': ('Tutti i lavori', 'All projects'), 'utilita': ('Tutte le utilità', 'All tools')}
     links = ''
     for k, t in U['nav']:
         cur_attr = ' aria-current="page"' if k == cur else ''
         if k not in subs:
             links += f'<a href="{url(k, lang)}"{cur_attr}>{t}</a>'
             continue
-        items = ''.join(f'<a href="{url(k, lang, a)}">{e(b)}</a>' for a, b in subs[k])
-        wide = ' dd-wide' if len(subs[k]) > 10 else ''
-        links += (f'<div class="dd"><a href="{url(k, lang)}"{cur_attr}>{t}</a>'
-                  f'<button class="dd-btn" type="button" aria-expanded="false" aria-label="{"Apri il sottomenu" if it else "Open submenu"} {t}">{CHEVRON}</button>'
-                  f'<div class="dd-menu{wide}">{items}</div></div>')
+        first = f'<a class="dd-all" href="{url(k, lang)}">{tutti[k][0 if it else 1]}</a>'
+        items = first + ''.join(f'<a href="{url(k, lang, a)}">{e(b)}</a>' for a, b in subs[k])
+        links += (f'<div class="dd"><button class="dd-btn" type="button" aria-expanded="false" aria-haspopup="true"{cur_attr.replace("page", "true")}>{t}{CHEVRON}</button>'
+                  f'<div class="dd-menu">{items}</div></div>')
     other = 'en' if lang == 'it' else 'it'
     return f'''<a class="skip" href="#main">{U["skip"]}</a>
 <header class="site-header{'' if overlay else ' solid'}">
@@ -100,10 +103,12 @@ def footer(lang):
 </div>
 </footer>
 <a class="wa" href="{WA}" target="_blank" rel="noopener" aria-label="{U["wa"]}">{WA_ICON}</a>
-<script src="/js/main.js"></script>'''
+<script src="/js/main.js?v={VER}"></script>'''
 
 
 def page(key, lang, title, desc, body, overlay=False, og='porto-loano'):
+    extra_head = '<link rel="stylesheet" href="/vendor/leaflet/leaflet.css">\n' if key == 'utilita' else ''
+    extra_js = f'<script src="/vendor/leaflet/leaflet.js"></script>\n<script src="/js/utilita.js?v={VER}"></script>\n' if key == 'utilita' else ''
     fname = PAGES[key][0 if lang == 'it' else 1]
     alt_it, alt_en = SITE_URL + url(key, 'it'), SITE_URL + url(key, 'en')
     robots = '' if PROD else '<meta name="robots" content="noindex, nofollow">\n'
@@ -125,15 +130,15 @@ def page(key, lang, title, desc, body, overlay=False, og='porto-loano'):
 <link rel="icon" href="/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/fonts/montserrat-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/style.css">
-</head>
+<link rel="stylesheet" href="/css/style.css?v={VER}">
+{extra_head}</head>
 <body>
 {header(key, lang, overlay)}
 <main id="main">
 {body}
 </main>
 {footer(lang)}
-</body>
+{extra_js}</body>
 </html>
 '''
     path = os.path.join(OUT, fname)
@@ -301,7 +306,7 @@ def build_lang(lang):
 <div>
 <p class="eyebrow">{'Novità · Area clienti' if it else 'New · Customer area'}</p>
 <h2 class="h2" id="area-t">{'La tua barca,<br><span class="hl">sempre sotto controllo</span>' if it else 'Your boat,<br><span class="hl">always under control</span>'}</h2>
-<p class="lead" style="margin-bottom:28px">{'Accedi con la tua password e trovi tutto in un posto: scheda della barca, storico delle pulizie con le foto dei nostri sub, registro anodi con promemoria, meteomare e webcam di Loano, posizione GPS da condividere.' if it else 'Sign in with your password and find everything in one place: boat details, cleaning history with photos from our divers, anode log with reminders, Loano marine weather and webcam, a shareable GPS position.'}</p>
+<p class="lead" style="margin-bottom:28px">{'Accedi con la tua password e trovi tutto in un posto: scheda della barca, storico delle pulizie con le foto dei nostri sub, registro anodi e promemoria via email.' if it else 'Sign in with your password and find everything in one place: boat details, cleaning history with photos from our divers, anode log and email reminders.'}</p>
 <a class="btn" href="{AREA}{'' if it else '?lang=en'}">{'ACCEDI ALL\'AREA CLIENTI' if it else 'SIGN IN TO THE CUSTOMER AREA'} {ARROW}</a>
 </div>
 <div class="modules">{moduli_html(lang)}</div>
@@ -347,8 +352,8 @@ def build_lang(lang):
 
     # UTILITÀ
     page('utilita', lang, N['utilita'] + ' · Anfibiasub',
-         'Scala Beaufort, carichi di rottura di cime, cavi in acciaio e catene: tabelle utili per chi va per mare.' if it else
-         'Beaufort scale, breaking loads of ropes, steel wire and chains: handy tables for anyone at sea.', utilita_html(lang), og='catenarie')
+         'Meteomare e webcam di Loano, marcatore GPS da condividere, scala Beaufort e carichi di rottura di cime, cavi e catene.' if it else
+         'Loano marine weather and webcam, shareable GPS marker, Beaufort scale and breaking loads of ropes, wire and chains.', utilita_html(lang), og='catenarie')
 
     # CONTATTI
     con = phero('catenarie', N['contatti'], 'Parliamone<br><span class="hl">prima di immergerci</span>' if it else "Let's talk<br><span class=\"hl\">before we dive in</span>",
@@ -372,16 +377,16 @@ def build_lang(lang):
     if it:
         pv = '''<h2>Titolare del trattamento</h2><p>Anfibiasub, P.I. 01326660097, Via Dufour 23, Carcare (SV). Email: termoclino@libero.it.</p>
 <h2>Sito pubblico</h2><p>Le pagine del sito non usano moduli di contatto, cookie di profilazione o strumenti di statistica. I caratteri tipografici sono ospitati sul nostro server: durante la navigazione nessun dato viene inviato a servizi esterni. Se ci scrivi via email, telefono o WhatsApp usiamo i tuoi dati solo per risponderti e preparare il preventivo.</p>
-<h2>Area clienti</h2><p>Per i clienti che ricevono un accesso conserviamo: nome, email, telefono, i dati dell'imbarcazione inseriti dal cliente, gli interventi eseguiti con le relative foto, il registro anodi e, se il cliente la imposta, la posizione dell'ormeggio. Servono a gestire le manutenzioni e a inviare i promemoria richiesti. L'area usa un solo cookie tecnico, necessario per restare collegati. I dati sono conservati su server nell'Unione Europea e non vengono ceduti a terzi; le email di servizio sono inviate tramite un fornitore europeo.</p>
+<h2>Area clienti</h2><p>Per i clienti che ricevono un accesso conserviamo: nome, email, telefono, i dati dell'imbarcazione inseriti dal cliente, gli interventi eseguiti con le relative foto, e il registro anodi. Servono a gestire le manutenzioni e a inviare i promemoria richiesti. L'area usa un solo cookie tecnico, necessario per restare collegati. I dati sono conservati su server nell'Unione Europea e non vengono ceduti a terzi; le email di servizio sono inviate tramite un fornitore europeo.</p>
 <p>Le foto di un intervento sono visibili solo al cliente, salvo che sia lui a condividerle con il link apposito.</p>
-<h2>Servizi esterni</h2><p>I link a WhatsApp e Google Maps aprono servizi di terze parti, che applicano le proprie informative. La mappa dell'area clienti usa OpenStreetMap; il meteo arriva da Open-Meteo.</p>
+<h2>Servizi esterni</h2><p>I link a WhatsApp e Google Maps aprono servizi di terze parti, che applicano le proprie informative. Nella pagina Utilità la mappa usa OpenStreetMap e il meteo arriva da Open-Meteo: la posizione che segni sulla mappa resta nel tuo browser e non viene salvata né inviata a noi.</p>
 <h2>I tuoi diritti</h2><p>Puoi chiedere in ogni momento accesso, rettifica o cancellazione dei tuoi dati scrivendo all'indirizzo email indicato sopra. Puoi anche presentare reclamo al Garante per la protezione dei dati personali.</p>'''
     else:
         pv = '''<h2>Data controller</h2><p>Anfibiasub, VAT IT01326660097, Via Dufour 23, Carcare (SV), Italy. Email: termoclino@libero.it.</p>
 <h2>Public website</h2><p>The website pages use no contact forms, tracking cookies or analytics. Fonts are hosted on our own server: no data is sent to third parties while you browse. If you contact us by email, phone or WhatsApp, we use your details only to reply and prepare a quote.</p>
-<h2>Customer area</h2><p>For customers who receive an account we store: name, email, phone, the boat details entered by the customer, the jobs carried out with their photos, the anode log and, if the customer sets it, the mooring position. We use them to manage maintenance and send the reminders requested. The area uses a single technical cookie, needed to stay signed in. Data is stored on servers in the European Union and is not shared with third parties; service emails are sent through a European provider.</p>
+<h2>Customer area</h2><p>For customers who receive an account we store: name, email, phone, the boat details entered by the customer, the jobs carried out with their photos, and the anode log. We use them to manage maintenance and send the reminders requested. The area uses a single technical cookie, needed to stay signed in. Data is stored on servers in the European Union and is not shared with third parties; service emails are sent through a European provider.</p>
 <p>Job photos are visible only to the customer, unless the customer shares them through the dedicated link.</p>
-<h2>Third-party services</h2><p>Links to WhatsApp and Google Maps open third-party services with their own privacy policies. The customer area map uses OpenStreetMap; weather data comes from Open-Meteo.</p>
+<h2>Third-party services</h2><p>Links to WhatsApp and Google Maps open third-party services with their own privacy policies. On the Tools page the map uses OpenStreetMap and weather data comes from Open-Meteo: the position you mark stays in your browser and is never saved or sent to us.</p>
 <h2>Your rights</h2><p>You can ask at any time to access, correct or delete your data by writing to the email address above. You may also lodge a complaint with the Italian Data Protection Authority (Garante).</p>'''
     priv = phero('catenarie', 'Privacy', U['privacy'], 'Come trattiamo i dati di chi visita il sito e dei nostri clienti.' if it else 'How we handle the data of website visitors and customers.')
     priv += f'<section class="section"><div class="wrap prose">{pv}<p style="color:var(--dim)">{"Aggiornata il" if it else "Last updated"} {datetime.date.today().strftime("%d/%m/%Y")}</p></div></section>'
@@ -394,8 +399,8 @@ def fmt(n):
 
 def utilita_html(lang):
     it = lang == 'it'
-    h = phero('catenarie', dict(UI[lang]['nav'])['utilita'], 'Tabelle utili<br><span class="hl">per chi va per mare</span>' if it else 'Handy tables<br><span class="hl">for life at sea</span>',
-              'Vento, cime, cavi e catene: i valori di riferimento che usiamo anche noi in cantiere.' if it else 'Wind, ropes, wire and chains: the reference values we use on our own jobs.')
+    h = phero('catenarie', dict(UI[lang]['nav'])['utilita'], 'Strumenti utili<br><span class="hl">per chi va per mare</span>' if it else 'Handy tools<br><span class="hl">for life at sea</span>',
+              'Meteo e webcam di Loano, un marcatore GPS da condividere e le tabelle di vento, cime, cavi e catene che usiamo anche noi in cantiere.' if it else 'Loano weather and webcam, a shareable GPS marker, and the wind, rope, wire and chain tables we use on our own jobs.')
     note = '<p class="hint" style="margin-top:12px">' + ('Valori indicativi, riportati dalle tabelle tecniche di riferimento. Per un carico reale chiedi sempre i dati certificati del produttore.' if it else 'Indicative values taken from reference technical tables. For a real load always ask for the manufacturer\'s certified data.') + '</p>'
 
     def table(head, rows, caption):
@@ -419,8 +424,32 @@ def utilita_html(lang):
                 [(f'<b>{r[0]}</b>',) + tuple(fmt(x) for x in r[1:]) for r in CATENE_ANCORE],
                 ('Catene a maglie con traversino per ancore. CP = carico di prova, CR = carico di rottura (kg), per grado 1-1b, 2 e 3. Ultime due colonne: peso minimo di una lunghezza di catena di 27,5 m (kg). Il grado 3 non è previsto sotto i 40 mm.' if it else
                  'Stud-link anchor chain. CP = proof load, CR = breaking load (kg), for grade 1-1b, 2 and 3. Last two columns: minimum weight of one 27.5 m length of chain (kg). Grade 3 is not available below 40 mm.'))
+    W = 'Vento' if it else 'Wind'
+    live = f'''<section class="tool-sec" id="meteo"><h2 class="h2">{'Meteomare Loano' if it else 'Loano marine weather'}</h2>
+<div class="meteo" data-meteo data-lang="{lang}"><p class="hint">{'Caricamento dati meteo…' if it else 'Loading weather data…'}</p></div>
+<p class="hint" style="margin-top:12px">{'Dati Open-Meteo per il tratto di mare davanti a Loano. Sono previsioni: prima di uscire controlla sempre il bollettino ufficiale.' if it else 'Open-Meteo data for the sea off Loano. These are forecasts: always check the official bulletin before going out.'}</p>
+</section>
+<section class="tool-sec" id="webcam"><h2 class="h2">{'Webcam Loano' if it else 'Loano webcam'}</h2>
+<a class="cam-card" href="{WEBCAM_URL}" target="_blank" rel="noopener">
+<img src="/img/rimorchiatore.webp" alt="" loading="lazy"><span class="cam-live">LIVE</span>
+<span class="cam-txt"><strong>{'Guarda il porto e il mare di Loano in diretta' if it else 'See Loano harbour and sea live'}</strong><span>{'Si apre la pagina delle webcam di Loano' if it else 'Opens the Loano webcams page'} →</span></span>
+</a>
+</section>
+<section class="tool-sec" id="gps"><h2 class="h2">{'Marcatore GPS' if it else 'GPS marker'}</h2>
+<p class="lead" style="margin-bottom:18px">{'Tocca la mappa per mettere il marcatore, oppure usa la posizione del telefono. Poi condividi il punto. Non salviamo nulla: la posizione resta sul tuo dispositivo.' if it else 'Tap the map to drop the marker, or use your phone location. Then share the point. Nothing is saved: the position stays on your device.'}</p>
+<div class="gps-map" data-gps data-lang="{lang}"></div>
+<p class="hint gps-coords" data-gps-coords>{'Nessun punto selezionato' if it else 'No point selected'}</p>
+<div class="gps-actions">
+<button class="btn btn-ghost" type="button" data-gps-locate>{'Usa la mia posizione' if it else 'Use my location'}</button>
+<a class="btn btn-ghost is-off" data-gps-link="gmaps" target="_blank" rel="noopener">Google Maps</a>
+<a class="btn btn-ghost is-off" data-gps-link="gearth" target="_blank" rel="noopener">Google Earth</a>
+<a class="btn is-off" data-gps-link="wa" target="_blank" rel="noopener">{'Condividi su WhatsApp' if it else 'Share on WhatsApp'}</a>
+<button class="btn btn-ghost is-off" type="button" data-gps-copy data-done="{'Copiato' if it else 'Copied'}">{'Copia coordinate' if it else 'Copy coordinates'}</button>
+</div>
+</section>'''
     h += f'''<div class="wrap">
-<section class="tool-sec" id="vento"><h2 class="h2">{'Vento' if it else 'Wind'}</h2>{bf}</section>
+{live}
+<section class="tool-sec" id="vento"><h2 class="h2">{'Scala del vento' if it else 'Wind scale'}</h2>{bf}</section>
 <section class="tool-sec" id="cime"><h2 class="h2">{'Cime' if it else 'Ropes'}</h2>{cime}{note}</section>
 <section class="tool-sec" id="cavi"><h2 class="h2">{'Cavi in acciaio' if it else 'Steel wire rope'}</h2>{cavi}{note}</section>
 <section class="tool-sec" id="catene"><h2 class="h2">{'Catene' if it else 'Chains'}</h2>{cat}<div style="height:30px"></div>{anc}{note}</section>

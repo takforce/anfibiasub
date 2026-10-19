@@ -7,9 +7,8 @@
 <title><%= typeof title !== 'undefined' ? title + ' · ' : '' %>Anfibiasub</title>
 <meta name="theme-color" content="#050E1A">
 <link rel="icon" href="/favicon.png" type="image/png">
-<link rel="stylesheet" href="/css/style.css">
-<link rel="stylesheet" href="/css/app.css">
-<% if (typeof leaflet !== 'undefined' && leaflet) { %><link rel="stylesheet" href="/vendor/leaflet/leaflet.css"><% } %>
+<link rel="stylesheet" href="/css/style.css?v=<%= ASSET_V %>">
+<link rel="stylesheet" href="/css/app.css?v=<%= ASSET_V %>">
 </head>
 <body>
 <% if (user) { const admin = user.role === 'admin'; %>
@@ -28,7 +27,6 @@
 <a href="/area/home"<%- path === '/area/home' ? ' aria-current="page"' : '' %>><%= L.home %></a>
 <a href="/area/scheda"<%- path === '/area/scheda' ? ' aria-current="page"' : '' %>><%= L.boat_sheet %></a>
 <a href="/area/manutenzione"<%- path === '/area/manutenzione' ? ' aria-current="page"' : '' %>><%= L.maintenance %></a>
-<a href="/area/posizione"<%- path === '/area/posizione' ? ' aria-current="page"' : '' %>><%= L.position %></a>
 <% } %>
 <a href="/area/profilo"<%- path === '/area/profilo' ? ' aria-current="page"' : '' %>><%= user.name ? user.name.split(' ')[0] : L.profile %></a>
 <form method="post" action="/area/logout"><button class="linkbtn" type="submit"><%= L.logout %></button></form>

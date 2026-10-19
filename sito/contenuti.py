@@ -179,12 +179,25 @@ MEZZI = {
 
 MODULI = {
     'it': [('Scheda imbarcazione', 'Dati barca, motore, documenti e scadenze, compilati da te'), ('Pulizia subacquea', 'Data dell\'ultimo intervento e foto dei nostri sub'),
-           ('Registro anodi', 'Foto, codice, data di montaggio e promemoria'), ('Meteomare e webcam', 'Vento, mare e porto di Loano'),
-           ('Posizione GPS', 'Il posto barca da condividere su Google Maps'), ('Condivisione WhatsApp', 'Le foto degli interventi in un tocco')],
+           ('Registro anodi', 'Foto, codice, data di montaggio e promemoria'), ('Promemoria via email', 'Prossima pulizia, anodi, assicurazione'),
+           ('Richiesta intervento', 'Un tocco e ci scrivi su WhatsApp'), ('Condivisione WhatsApp', 'Le foto degli interventi in un tocco')],
     'en': [('Boat details', 'Boat, engine, documents and expiry dates, filled in by you'), ('Underwater cleaning', 'Date of the last job and photos from our divers'),
-           ('Anode log', 'Photo, code, fitting date and reminder'), ('Weather and webcam', 'Wind, sea and Loano harbour'),
-           ('GPS position', 'Your berth, shareable on Google Maps'), ('WhatsApp sharing', 'Job photos in one tap')],
+           ('Anode log', 'Photo, code, fitting date and reminder'), ('Email reminders', 'Next cleaning, anodes, insurance'),
+           ('Job request', 'One tap to message us on WhatsApp'), ('WhatsApp sharing', 'Job photos in one tap')],
 }
+
+# Sezioni della pagina Utilità (id, titolo IT, titolo EN), nell'ordine del menu
+UTIL_SEZIONI = [
+    ('meteo', 'Meteomare Loano', 'Loano marine weather'),
+    ('webcam', 'Webcam Loano', 'Loano webcam'),
+    ('gps', 'Marcatore GPS', 'GPS marker'),
+    ('vento', 'Scala del vento', 'Wind scale'),
+    ('cime', 'Cime', 'Ropes'),
+    ('cavi', 'Cavi in acciaio', 'Steel wire'),
+    ('catene', 'Catene', 'Chains'),
+]
+# Link della webcam di Loano (cambialo qui quando il Comune pubblica quello ufficiale)
+WEBCAM_URL = 'https://www.windfinder.com/webcams/loano'
 
 # ---------------- UTILITÀ ----------------
 # Scala Beaufort (valori standard WMO)

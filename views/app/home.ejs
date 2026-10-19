@@ -1,4 +1,4 @@
-<%- include('../partials/top', { title: L.home, leaflet: d.boat.lat != null }) %>
+<%- include('../partials/top', { title: L.home }) %>
 <% const b = d.boat; const S = { ok: L.st_ok, warn: L.st_warn, bad: L.st_bad, none: L.st_none }; %>
 <main class="app-main" id="main">
 <%- include('../partials/boatpicker') %>
@@ -37,46 +37,6 @@
 <span class="row-kv"><span><%= L.completeness %></span><strong><%= d.completeness %>%</strong></span>
 </a>
 
-<section class="panel stack" aria-label="<%= L.meteo %>">
-<h2><%= L.meteo %></h2>
-<% if (meteo) { %>
-<div class="two">
-<div class="mini"><span class="mini-label"><%= L.wind %></span><span class="mini-val"><%= meteo.wind %> kn <small style="font-size:13px;color:var(--muted)"><%= dir(meteo.deg, lang) %></small></span><span class="mini-note"><%= L.gusts %> <%= meteo.gust %> kn</span></div>
-<div class="mini"><span class="mini-label"><%= L.sea %></span><span class="mini-val"><%= meteo.wave != null ? meteo.wave.toFixed(1).replace('.', lang === 'en' ? '.' : ',') + ' m' : '—' %></span><span class="mini-note"><%= seaState(meteo.wave, lang) %></span></div>
-<div class="mini"><span class="mini-label"><%= L.air %></span><span class="mini-val"><%= meteo.air %>°</span></div>
-<div class="mini"><span class="mini-label"><%= L.water %></span><span class="mini-val"><%= meteo.water != null ? meteo.water + '°' : '—' %></span></div>
-</div>
-<div class="days">
-<% for (const dd of meteo.days.slice(0, 4)) { const dt = new Date(dd.date + 'T12:00:00Z'); %>
-<div class="day"><b><%= L.days[dt.getUTCDay()] %> <%= dt.getUTCDate() %></b><%= dd.wind %> kn <%= dir(dd.deg, lang) %><br><span class="hint"><%= dd.wave != null ? dd.wave.toFixed(1).replace('.', lang === 'en' ? '.' : ',') + ' m' : '' %></span></div>
-<% } %>
-</div>
-<p class="hint" style="font-size:12px"><%= L.meteo_src %></p>
-<% } else { %><p class="hint"><%= L.meteo_na %></p><% } %>
-</section>
-
-<section class="panel stack" aria-label="<%= L.webcam %>">
-<a class="cam" href="<%= settings.webcam_url %>" target="_blank" rel="noopener" aria-label="<%= L.webcam_open %>"><span class="live">LIVE</span></a>
-<h2><%= L.webcam %></h2>
-<p class="hint"><%= L.webcam_hint %></p>
-<a class="more" href="<%= settings.webcam_url %>" target="_blank" rel="noopener" style="text-decoration:none"><%= L.webcam_open %> →</a>
-</section>
-
-<section class="panel stack" aria-label="<%= L.gps %>">
-<% if (b.lat != null) { %>
-<div class="map-mini" data-map data-lat="<%= b.lat %>" data-lng="<%= b.lng %>" data-static></div>
-<% } else { %>
-<div class="map-mini" style="display:flex;align-items:center;justify-content:center"><span class="hint"><%= L.gps_none %></span></div>
-<% } %>
-<h2><%= L.gps %></h2>
-<div class="chips-sm">
-<% if (b.lat != null) { %>
-<a class="chip-sm" href="https://www.google.com/maps?q=<%= b.lat %>,<%= b.lng %>" target="_blank" rel="noopener"><%= L.open_gmaps %></a>
-<a class="chip-sm" href="https://earth.google.com/web/search/<%= b.lat %>,<%= b.lng %>" target="_blank" rel="noopener"><%= L.open_gearth %></a>
-<% } %>
-<a class="chip-sm" href="/area/posizione"><%= b.lat != null ? L.edit : L.set_position %></a>
-</div>
-</section>
 </div>
 </main>
-<%- include('../partials/bottom', { scripts: b.lat != null ? ['/vendor/leaflet/leaflet.js'] : [] }) %>
+<%- include('../partials/bottom') %>

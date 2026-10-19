@@ -13,7 +13,9 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.disable('x-powered-by');
 // valori di partenza per le pagine (sovrascritti da loadUser)
-Object.assign(app.locals, { user: null, lang: 'it', L: require('./src/i18n').t('it'), path: '', flash: null });
+// versione dei file CSS/JS: cambia a ogni modifica, così i browser non usano copie vecchie
+const ASSET_V = require('crypto').createHash('md5').update(['public/css/style.css', 'public/css/app.css', 'public/js/app.js'].map((f) => require('fs').readFileSync(path.join(__dirname, f))).join('')).digest('hex').slice(0, 8);
+Object.assign(app.locals, { ASSET_V, user: null, lang: 'it', L: require('./src/i18n').t('it'), path: '', flash: null });
 
 app.use(helmet({
   contentSecurityPolicy: {
@@ -22,7 +24,7 @@ app.use(helmet({
       imgSrc: ["'self'", 'data:', 'https://*.tile.openstreetmap.org'],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'", 'https://api.open-meteo.com', 'https://marine-api.open-meteo.com'],
       frameAncestors: ["'none'"],
       formAction: ["'self'"],
     },
@@ -39,7 +41,6 @@ app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 const serveSite = process.env.SERVE_SITE !== 'off';
 if (!serveSite) app.get('/', (req, res) => res.redirect('/area'));
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: '7d', index: serveSite ? 'index.html' : false, extensions: ['html'] }));
-app.use('/vendor/leaflet', express.static(path.join(__dirname, 'node_modules/leaflet/dist'), { maxAge: '30d' }));
 
 app.get('/health', (req, res) => res.send('ok'));
 

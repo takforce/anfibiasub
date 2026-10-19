@@ -7,7 +7,6 @@ const { requireUser, flash, token } = require('../auth');
 const { loadBoat } = require('../boatdata');
 const { GROUPS, TIPI, fromBody } = require('../boatfields');
 const { upload, saveMany, sendPhoto } = require('../photos');
-const { fetchMeteo, dir, seaState } = require('../meteo');
 const { send, layout, enabled: mailEnabled } = require('../mail');
 
 const r = express.Router();
@@ -115,8 +114,7 @@ function needBoat(req, res, next) {
 
 r.get('/home', needBoat, async (req, res) => {
   const d = await loadBoat(res.locals.boatId);
-  const meteo = await Promise.race([fetchMeteo(), new Promise((ok) => setTimeout(() => ok(null), 4000))]);
-  res.render('app/home', { d, meteo, dir, seaState });
+  res.render('app/home', { d });
 });
 
 r.get('/scheda', needBoat, async (req, res) => {
@@ -178,19 +176,6 @@ r.post('/foto/:id/elimina', needBoat, async (req, res) => {
   // il cliente può togliere solo le foto dei suoi anodi, non quelle degli interventi
   await q('DELETE FROM photos WHERE id=$1 AND boat_id=$2 AND anode_id IS NOT NULL', [Number(req.params.id) || 0, res.locals.boatId]);
   res.redirect('/area/manutenzione#anodi');
-});
-
-r.get('/posizione', needBoat, async (req, res) => {
-  const d = await loadBoat(res.locals.boatId);
-  res.render('app/posizione', { d, action: '/area/posizione' });
-});
-r.post('/posizione', needBoat, async (req, res) => {
-  const lat = Number(req.body.lat), lng = Number(req.body.lng);
-  if (Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180) {
-    await q('UPDATE boats SET lat=$1, lng=$2, pos_updated=now() WHERE id=$3 AND owner_id=$4', [lat, lng, res.locals.boatId, res.locals.user.id]);
-    flash(req, 'ok', res.locals.L.pos_saved);
-  }
-  res.redirect('/area/posizione');
 });
 
 // Richiesta intervento: la registriamo e apriamo WhatsApp

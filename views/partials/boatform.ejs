@@ -1,0 +1,35 @@
+<form class="form" method="post" action="<%= action %>">
+<fieldset class="box">
+<legend><%= L.boat_type %></legend>
+<div class="types">
+<% for (const ty of TIPI) { %>
+<label class="choice"><input type="radio" name="tipo" value="<%= ty %>"<%= b.tipo === ty ? ' checked' : '' %>><%= L[ty] %></label>
+<% } %>
+</div>
+</fieldset>
+<% for (const g of GROUPS) { %>
+<fieldset class="box">
+<legend><%= L[g.key] %></legend>
+<div class="grid2">
+<% for (const [k, ty] of g.fields) { %>
+<label class="field"><%= L['f_' + k] %>
+<input type="<%= ty %>" name="<%= k %>" value="<%= ty === 'date' ? isoDate(b[k]) : (b[k] || '') %>"<%- ty === 'email' ? ' autocomplete="email"' : '' %><%- k === 'nome' ? ' required' : '' %>>
+</label>
+<% } %>
+</div>
+<% if (g.choice) { const [ck, opts, pre] = g.choice; %>
+<div style="margin-top:18px">
+<span class="field" style="margin-bottom:10px"><%= L['f_' + ck] %></span>
+<div class="choices">
+<% for (const o of opts) { %>
+<label class="choice"><input type="radio" name="<%= ck %>" value="<%= o %>"<%= b[ck] === o ? ' checked' : '' %>><%= L[pre + o] %></label>
+<% } %>
+</div>
+</div>
+<% } %>
+</fieldset>
+<% } %>
+<div class="actions">
+<button class="btn" type="submit"><%= L.save %></button>
+</div>
+</form>

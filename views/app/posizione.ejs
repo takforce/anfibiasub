@@ -1,0 +1,27 @@
+<%- include('../partials/top', { title: L.position, leaflet: true }) %>
+<% const b = d.boat; %>
+<main class="app-main narrow" id="main">
+<%- include('../partials/boatpicker') %>
+<%- include('../partials/flash') %>
+<p class="eyebrow"><%= b.nome %></p>
+<h1 class="h2" style="font-size:38px"><%= L.gps %></h1>
+<p class="sub" style="margin-bottom:22px"><%= L.pos_lead %></p>
+<div class="map-big" data-map data-lat="<%= b.lat ?? '' %>" data-lng="<%= b.lng ?? '' %>" data-edit></div>
+<form method="post" action="<%= action %>" class="stack">
+<input type="hidden" name="lat" value="<%= b.lat ?? '' %>" data-lat-input>
+<input type="hidden" name="lng" value="<%= b.lng ?? '' %>" data-lng-input>
+<p class="hint" data-coords><%= b.lat != null ? b.lat.toFixed(5) + ', ' + b.lng.toFixed(5) + (b.pos_updated ? ' · ' + L.updated + ' ' + fmtDate(b.pos_updated) : '') : L.gps_none %></p>
+<div class="chips-sm">
+<button class="chip-sm" type="button" data-geolocate><%= L.use_my_pos %></button>
+<button class="btn" type="submit" data-save-pos <%= b.lat == null ? 'disabled' : '' %>><%= L.save_pos %></button>
+</div>
+</form>
+<% if (b.lat != null) { const share = (lang === 'en' ? 'Position of ' : 'Posizione di ') + b.nome + ': https://www.google.com/maps?q=' + b.lat + ',' + b.lng; %>
+<div class="chips-sm" style="margin-top:22px">
+<a class="chip-sm" href="https://www.google.com/maps?q=<%= b.lat %>,<%= b.lng %>" target="_blank" rel="noopener"><%= L.open_gmaps %></a>
+<a class="chip-sm" href="https://earth.google.com/web/search/<%= b.lat %>,<%= b.lng %>" target="_blank" rel="noopener"><%= L.open_gearth %></a>
+<a class="chip-sm" href="https://wa.me/?text=<%= encodeURIComponent(share) %>" target="_blank" rel="noopener"><%= L.share_wa %></a>
+</div>
+<% } %>
+</main>
+<%- include('../partials/bottom', { scripts: ['/vendor/leaflet/leaflet.js'] }) %>

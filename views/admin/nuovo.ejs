@@ -1,0 +1,28 @@
+<%- include('../partials/top', { title: 'Nuovo cliente' }) %>
+<main class="app-main narrow" id="main" style="max-width:820px">
+<p class="eyebrow">Gestione</p>
+<h1 class="h2" style="font-size:36px">Nuovo cliente</h1>
+<p class="sub" style="margin-bottom:24px">Crea l'account e la prima barca. Il resto della scheda lo compila il cliente.</p>
+<% if (error) { %><div class="msg err" role="alert"><%= error %></div><% } %>
+<form class="form" method="post">
+<fieldset class="box"><legend>Cliente</legend>
+<div class="grid2">
+<label class="field">Nome e cognome<input name="name" value="<%= v.name || '' %>" required></label>
+<label class="field">Email (sarà il suo accesso)<input type="email" name="email" value="<%= v.email || '' %>" required></label>
+<label class="field">Cellulare<input type="tel" name="phone" value="<%= v.phone || '' %>"></label>
+<label class="field">Lingua<select name="lang"><option value="it">Italiano</option><option value="en"<%= v.lang === 'en' ? ' selected' : '' %>>English</option></select></label>
+</div>
+</fieldset>
+<fieldset class="box"><legend>Barca</legend>
+<div class="grid2">
+<label class="field">Nome imbarcazione<input name="nome" value="<%= v.nome || '' %>" required></label>
+<label class="field">Targa<input name="targa" value="<%= v.targa || '' %>"></label>
+<label class="field">Tipo<select name="tipo"><option value="motore">Motore</option><option value="vela"<%= v.tipo === 'vela' ? ' selected' : '' %>>Vela</option><option value="catamarano"<%= v.tipo === 'catamarano' ? ' selected' : '' %>>Catamarano</option></select></label>
+<label class="field">Pontile / posto barca<input name="posto_barca" value="<%= v.posto_barca || '' %>"></label>
+</div>
+</fieldset>
+<label class="choice" style="align-self:flex-start"><input type="checkbox" name="invia" value="1"<%= mailOn ? ' checked' : ' disabled' %>>Invia le credenziali al cliente via email<%= mailOn ? '' : ' (email non ancora attive)' %></label>
+<div class="actions"><a class="btn btn-ghost" href="/admin">Annulla</a><button class="btn" type="submit">Crea cliente</button></div>
+</form>
+</main>
+<%- include('../partials/bottom') %>

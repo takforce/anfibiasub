@@ -1,0 +1,149 @@
+<%- include('../partials/top', { title: d.boat.nome }) %>
+<% const b = d.boat; const S = { ok: 'Regolare', warn: 'Da controllare', bad: 'Scaduto', none: 'Nessun dato' }; const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Rome' }); %>
+<main class="app-main" id="main">
+<%- include('../partials/flash') %>
+<p class="hint" style="margin-bottom:10px"><a href="/admin">← Clienti e barche</a></p>
+<div class="page-top">
+<div>
+<p class="eyebrow"><%= L[b.tipo] %><%= b.lunghezza ? ' · ' + b.lunghezza + ' m' : '' %></p>
+<h1><%= b.nome %></h1>
+<p class="sub"><%= owner.name %> · <%= [b.targa, b.porto, b.posto_barca].filter(Boolean).join(' · ') %></p>
+</div>
+<div class="chips-sm">
+<span class="pill" style="color:<%= COLORS[d.cleaningStatus] %>">Pulizia: <%= S[d.cleaningStatus] %></span>
+<span class="pill" style="color:<%= COLORS[d.anodesStatus] %>">Anodi: <%= S[d.anodesStatus] %></span>
+</div>
+</div>
+<% if (others.length) { %><p class="hint" style="margin-bottom:16px">Altre barche dello stesso cliente: <% for (const o of others) { %><a href="/admin/barca/<%= o.id %>"><%= o.nome %></a> <% } %></p><% } %>
+
+<nav class="tabs" aria-label="Sezioni">
+<% for (const [k, lbl] of [['interventi', 'Pulizie e foto'], ['anodi', 'Anodi'], ['scheda', 'Scheda barca'], ['cliente', 'Cliente']]) { %>
+<a href="?tab=<%= k %>"<%- tab === k ? ' aria-current="page"' : '' %>><%= lbl %></a>
+<% } %>
+</nav>
+
+<% if (tab === 'interventi') { %>
+<div class="tiles colsA">
+<section class="panel">
+<h2 style="margin-bottom:16px">Nuovo intervento</h2>
+<form class="stack" method="post" action="/admin/barca/<%= b.id %>/pulizia" enctype="multipart/form-data">
+<div class="grid2">
+<label class="field">Data<input type="date" name="data" value="<%= today %>" required></label>
+<label class="field">Tipo<input name="tipo" list="tipi" placeholder="Carena + eliche"></label>
+</div>
+<datalist id="tipi"><option value="Carena + eliche"><option value="Pulizia eliche"><option value="Pulizia carena"><option value="Ispezione video"><option value="Sostituzione anodi"></datalist>
+<label class="field">Foto (anche molte insieme, dal telefono)<input type="file" name="foto" accept="image/*" multiple></label>
+<label class="field">Note per il cliente<textarea name="note"></textarea></label>
+<label class="choice" style="align-self:flex-start"><input type="checkbox" name="notifica" value="1" checked>Avvisa il cliente via email</label>
+<button class="btn" type="submit" style="align-self:flex-start">Salva intervento</button>
+<p class="hint">Le foto vengono ridotte automaticamente: puoi caricarle così come escono dal telefono.</p>
+</form>
+<% if (b.prox_pulizia) { %><div class="row-kv" style="margin-top:18px"><span>Promemoria del cliente</span><strong><%= fmtDate(b.prox_pulizia) %></strong></div><% } %>
+</section>
+<section class="panel stack">
+<h2>Storico (<%= d.cleanings.length %>)</h2>
+<% if (!d.cleanings.length) { %><p class="hint">Nessun intervento registrato.</p><% } %>
+<% for (const c of d.cleanings) { %>
+<div class="hist" id="pulizia-<%= c.id %>">
+<div class="panel-head" style="margin-bottom:8px"><strong style="color:#fff"><%= fmtDate(c.data) %> · <%= c.tipo || 'Pulizia' %></strong><span class="hint"><%= c.photos.length %> foto<%= c.notified ? ' · email inviata' : '' %></span></div>
+<% if (c.photos.length) { %>
+<div class="gallery"><% for (const p of c.photos) { %><figure><a href="/area/foto/<%= p %>" target="_blank" rel="noopener"><img src="/area/foto/<%= p %>?t=1" alt=""></a><form method="post" action="/admin/foto/<%= p %>/elimina" data-confirm="Eliminare questa foto?"><button class="linkbtn" style="margin-top:6px;font-size:12px;padding:4px 10px">Elimina</button></form></figure><% } %></div>
+<% } %>
+<% if (c.note) { %><p class="hint" style="margin-top:8px"><%= c.note %></p><% } %>
+<details class="edit"><summary>Modifica o aggiungi foto</summary>
+<form class="stack" method="post" action="/admin/pulizia/<%= c.id %>" enctype="multipart/form-data">
+<div class="grid2"><label class="field">Data<input type="date" name="data" value="<%= isoDate(c.data) %>"></label><label class="field">Tipo<input name="tipo" value="<%= c.tipo %>" list="tipi"></label></div>
+<label class="field">Aggiungi foto<input type="file" name="foto" accept="image/*" multiple></label>
+<label class="field">Note<textarea name="note"><%= c.note %></textarea></label>
+<button class="btn" type="submit" style="align-self:flex-start">Salva</button>
+</form>
+<form method="post" action="/admin/pulizia/<%= c.id %>/elimina" data-confirm="Eliminare l'intervento e tutte le sue foto?" style="margin-top:12px"><button class="danger">Elimina intervento</button></form>
+</details>
+<p class="hint" style="margin-top:6px;font-size:12px">Link pubblico per WhatsApp: <a href="/area/condividi/<%= c.share_token %>" target="_blank" rel="noopener">apri</a></p>
+</div>
+<% } %>
+</section>
+</div>
+<% } %>
+
+<% if (tab === 'anodi') { %>
+<div class="tiles colsA">
+<section class="panel"><h2 style="margin-bottom:16px">Aggiungi anodo</h2>
+<%- include('../partials/anodeform', { a: {}, action: '/admin/barca/' + b.id + '/anodi' }) %>
+</section>
+<section class="panel stack"><h2>Registro anodi (<%= d.anodes.length %>)</h2>
+<% if (!d.anodes.length) { %><p class="hint">Nessun anodo registrato.</p><% } %>
+<% for (const a of d.anodes) { %>
+<div class="anode" id="anodo-<%= a.id %>">
+<% if (a.photos.length) { %><img class="anode-img" src="/area/foto/<%= a.photos[0] %>?t=1" alt=""><% } else { %><span class="anode-ph">Nessuna foto</span><% } %>
+<div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><strong style="color:#fff"><%= a.posizione %></strong><span class="dot" style="color:<%= COLORS[a.status] %>;font-size:13px">● <%= S[a.status] %></span></div>
+<span class="hint"><%= [a.codice ? 'Cod. ' + a.codice : '', a.dati].filter(Boolean).join(' · ') %></span>
+<span class="hint">Montato <%= a.data_montaggio ? fmtDate(a.data_montaggio) : '—' %> · Avviso <%= a.data_alert ? fmtDate(a.data_alert) : '—' %><%= a.alert_sent ? ' (inviato)' : '' %> · ultima modifica: <%= a.updated_by === 'anfibiasub' ? 'Anfibiasub' : 'cliente' %></span>
+<details class="edit"><summary>Modifica</summary>
+<%- include('../partials/anodeform', { a, action: '/admin/anodi/' + a.id }) %>
+<% if (a.photos.length) { %><div class="gallery" style="margin-top:12px"><% for (const p of a.photos) { %><figure><img src="/area/foto/<%= p %>?t=1" alt=""><form method="post" action="/admin/foto/<%= p %>/elimina" data-confirm="Eliminare questa foto?"><button class="linkbtn" style="margin-top:6px;font-size:12px;padding:4px 10px">Elimina</button></form></figure><% } %></div><% } %>
+<form method="post" action="/admin/anodi/<%= a.id %>/elimina" data-confirm="Eliminare questo anodo?" style="margin-top:12px"><button class="danger">Elimina anodo</button></form>
+</details>
+</div>
+</div>
+<% } %>
+</section>
+</div>
+<% } %>
+
+<% if (tab === 'scheda') { %>
+<div class="narrow" style="max-width:1000px">
+<p class="sub" style="margin-bottom:20px">Completezza: <%= d.completeness %>%. Questa è la stessa scheda che compila il cliente.</p>
+<%- include('../partials/boatform', { b, action: '/admin/barca/' + b.id + '/scheda' }) %>
+<% if (b.lat != null) { %><p class="hint" style="margin-top:20px">Posizione GPS: <a href="https://www.google.com/maps?q=<%= b.lat %>,<%= b.lng %>" target="_blank" rel="noopener"><%= b.lat.toFixed(5) %>, <%= b.lng.toFixed(5) %></a></p><% } %>
+</div>
+<% } %>
+
+<% if (tab === 'cliente') { %>
+<div class="tiles cols2">
+<section class="panel">
+<h2 style="margin-bottom:16px">Dati del cliente</h2>
+<form class="stack" method="post" action="/admin/cliente/<%= owner.id %>">
+<input type="hidden" name="back" value="/admin/barca/<%= b.id %>?tab=cliente">
+<label class="field">Nome<input name="name" value="<%= owner.name %>" required></label>
+<label class="field">Email di accesso<input type="email" name="email" value="<%= owner.email %>" required></label>
+<label class="field">Cellulare<input type="tel" name="phone" value="<%= owner.phone %>"></label>
+<label class="field">Lingua<select name="lang"><option value="it">Italiano</option><option value="en"<%= owner.lang === 'en' ? ' selected' : '' %>>English</option></select></label>
+<label class="choice" style="align-self:flex-start"><input type="checkbox" name="active" value="1"<%= owner.active ? ' checked' : '' %>>Account attivo</label>
+<button class="btn" type="submit" style="align-self:flex-start">Salva</button>
+</form>
+<p class="hint" style="margin-top:14px">Ultimo accesso: <%= owner.last_login ? new Date(owner.last_login).toLocaleString('it-IT', { timeZone: 'Europe/Rome' }) : 'mai' %></p>
+</section>
+<div class="stack">
+<section class="panel stack">
+<h2>Password</h2>
+<p class="hint">Genera una nuova password provvisoria: al primo accesso il cliente ne sceglie una sua.</p>
+<form method="post" action="/admin/cliente/<%= owner.id %>/password" class="chips-sm" data-confirm="Generare una nuova password? Quella attuale smetterà di funzionare.">
+<label class="choice"><input type="checkbox" name="invia" value="1"<%= mailOn ? ' checked' : ' disabled' %>>Invia via email</label>
+<button class="btn" type="submit">Nuova password</button>
+</form>
+</section>
+<section class="panel stack">
+<h2>Note interne</h2>
+<form method="post" action="/admin/barca/<%= b.id %>/note" class="stack"><label class="field">Visibili solo ad Anfibiasub<textarea name="note_admin"><%= b.note_admin %></textarea></label><button class="btn btn-ghost" type="submit" style="align-self:flex-start">Salva note</button></form>
+</section>
+<section class="panel stack">
+<h2>Altra barca per questo cliente</h2>
+<form method="post" action="/admin/cliente/<%= owner.id %>/barca" class="search"><input name="nome" placeholder="Nome barca" required><input name="targa" placeholder="Targa"><button class="btn btn-ghost" type="submit">Aggiungi</button></form>
+</section>
+<% if (reqs.length) { %>
+<section class="panel stack"><h2>Richieste WhatsApp</h2>
+<% for (const r of reqs) { %><span class="hint"><%= new Date(r.created_at).toLocaleString('it-IT', { timeZone: 'Europe/Rome' }) %></span><% } %>
+</section>
+<% } %>
+<section class="panel stack" style="border-color:#7A2B3D">
+<h2>Elimina barca</h2>
+<p class="hint">Cancella la barca con interventi, foto e anodi. Non si può annullare.</p>
+<form method="post" action="/admin/barca/<%= b.id %>/elimina" class="search"><input name="conferma" placeholder="Scrivi ELIMINA" aria-label="Conferma"><button class="danger" type="submit">Elimina barca</button></form>
+</section>
+</div>
+</div>
+<% } %>
+</main>
+<%- include('../partials/bottom') %>

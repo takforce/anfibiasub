@@ -1,0 +1,12 @@
+<form class="stack" method="post" action="<%= action %>" enctype="multipart/form-data">
+<div class="grid2">
+<label class="field"><%= L.a_posizione %><input name="posizione" value="<%= a.posizione || '' %>" placeholder="<%= lang === 'en' ? 'e.g. Starboard shaft' : 'es. Asse elica DX' %>" required></label>
+<label class="field"><%= L.a_codice %><input name="codice" value="<%= a.codice || '' %>"></label>
+<label class="field"><%= L.a_dati %><input name="dati" value="<%= a.dati || '' %>" placeholder="<%= lang === 'en' ? 'zinc, 40 mm collar' : 'zinco, collare 40 mm' %>"></label>
+<label class="field"><%= L.a_foto %><input type="file" name="foto" accept="image/*" multiple></label>
+<label class="field"><%= L.a_montaggio %><input type="date" name="data_montaggio" value="<%= isoDate(a.data_montaggio) %>"></label>
+<label class="field"><%= L.a_alert %><input type="date" name="data_alert" value="<%= isoDate(a.data_alert) %>"></label>
+</div>
+<label class="field"><%= L.a_note %><textarea name="note"><%= a.note || '' %></textarea></label>
+<div><button class="btn" type="submit"><%= L.save %></button></div>
+</form>

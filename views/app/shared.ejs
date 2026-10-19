@@ -1,0 +1,12 @@
+<%- include('../partials/top', { title: L.shared_title }) %>
+<main class="app-main" id="main">
+<a class="logo" href="/" aria-label="<%= L.site %>" style="margin-bottom:30px;display:inline-flex"><span class="logo-name" style="color:#fff">ANFIBIA<span class="hl">SUB</span></span></a>
+<p class="eyebrow"><%= L.shared_title %> · <%= fmtDate(c.data) %></p>
+<h1 class="h2" style="font-size:36px"><%= c.nome %></h1>
+<p class="sub" style="margin-bottom:24px"><%= c.tipo %><%= c.note ? ' · ' + c.note : '' %></p>
+<div class="shared-grid">
+<% photos.forEach((p, i) => { %><a href="/area/condividi/<%= c.share_token %>/foto/<%= p.id %>" target="_blank" rel="noopener"><img src="/area/condividi/<%= c.share_token %>/foto/<%= p.id %>?t=1" alt="<%= L.photo_n %> <%= i + 1 %>" loading="lazy"></a><% }) %>
+</div>
+<p class="hint" style="margin-top:30px"><%= L.shared_by %> · <a href="/">anfibiasub.it</a></p>
+</main>
+<%- include('../partials/bottom') %>

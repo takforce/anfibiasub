@@ -1,0 +1,17 @@
+<%- include('../partials/top', { title: L.reset_title }) %>
+<main class="app-main" id="main" style="max-width:520px;min-height:70vh;display:flex;flex-direction:column;justify-content:center">
+<a class="logo-name" href="/area/login" style="text-decoration:none;color:#fff;margin-bottom:30px">ANFIBIA<span class="hl">SUB</span></a>
+<h1 class="h2" style="font-size:30px"><%= L.reset_title %></h1>
+<% if (!valid) { %>
+<div class="msg err" style="margin-top:16px"><%= L.reset_bad %></div>
+<% } else { %>
+<% if (error) { %><div class="msg err" role="alert"><%= error %></div><% } %>
+<form class="form" method="post">
+<label class="field"><%= L.pw_new %><input type="password" name="p1" minlength="8" autocomplete="new-password" required autofocus></label>
+<label class="field"><%= L.pw_new2 %><input type="password" name="p2" minlength="8" autocomplete="new-password" required></label>
+<button class="btn" type="submit" style="justify-content:center"><%= L.save %></button>
+</form>
+<% } %>
+<p class="hint" style="margin-top:24px"><a href="/area/login">← <%= L.back_login %></a></p>
+</main>
+<%- include('../partials/bottom') %>

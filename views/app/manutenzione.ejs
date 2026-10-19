@@ -1,0 +1,90 @@
+<%- include('../partials/top', { title: L.maintenance }) %>
+<% const b = d.boat; const S = { ok: L.st_ok, warn: L.st_warn, bad: L.st_bad, none: L.st_none }; const host = (typeof shareBase !== 'undefined' ? shareBase : ''); %>
+<main class="app-main" id="main">
+<%- include('../partials/boatpicker') %>
+<%- include('../partials/flash') %>
+<p class="eyebrow"><%= b.nome %></p>
+<h1 class="h2" style="font-size:38px;margin-bottom:28px"><%= lang === 'en' ? 'Boat maintenance' : 'Manutenzione imbarcazione' %></h1>
+
+<div class="tiles cols2">
+
+<section class="panel stack" id="pulizia" aria-labelledby="pul-t">
+<div class="panel-head" style="margin:0"><h2 id="pul-t"><%= L.cleaning %></h2><span class="dot" style="color:<%= COLORS[d.cleaningStatus] %>">● <%= S[d.cleaningStatus] %></span></div>
+<div class="two">
+<div class="mini"><span class="mini-label"><%= L.last_job %></span><span class="mini-val"><%= d.last ? fmtDate(d.last.data) : '—' %></span><span class="mini-note"><%= d.last ? (d.last.tipo || L.cleaning) : L.none_yet %></span></div>
+<div class="mini"><span class="mini-label"><%= L.next_job %></span><span class="mini-val"><%= b.prox_pulizia ? fmtDate(b.prox_pulizia) : '—' %></span><span class="mini-note"><%= b.prox_pulizia ? L.reminder_by_you : L.no_reminder %></span></div>
+</div>
+
+<% if (d.last) { %>
+<div>
+<div class="panel-head" style="margin-bottom:10px"><strong style="color:#fff;font-weight:600"><%= L.cleaning_photos %></strong><span class="hint"><%= L.by_anf %></span></div>
+<% if (d.last.photos.length) { %>
+<div class="gallery">
+<% d.last.photos.forEach((p, i) => { %><a href="/area/foto/<%= p %>" target="_blank" rel="noopener"><img src="/area/foto/<%= p %>?t=1" alt="<%= L.photo_n %> <%= i + 1 %>" loading="lazy"></a><% }) %>
+</div>
+<% } else { %><p class="hint">—</p><% } %>
+<% if (d.last.note) { %><p class="hint" style="margin-top:10px"><%= d.last.note %></p><% } %>
+</div>
+<div class="chips-sm">
+<a class="btn btn-wa" data-share href="https://wa.me/?text=<%= encodeURIComponent((lang === 'en' ? 'Underwater job photos ' : 'Foto intervento subacqueo ') + b.nome + ': ') %>" data-url="/area/condividi/<%= d.last.share_token %>" data-title="<%= b.nome %>" target="_blank" rel="noopener"><%= L.share_wa %></a>
+<button class="chip-sm" type="button" data-copy="/area/condividi/<%= d.last.share_token %>" data-done="<%= L.copied %>"><%= L.share_link %></button>
+</div>
+<% } %>
+
+<form method="post" action="/area/promemoria" class="stack" style="border-top:1px solid var(--line2);padding-top:18px">
+<label class="field"><%= L.remind_me %>
+<input type="date" name="data" value="<%= isoDate(b.prox_pulizia) %>" required></label>
+<div class="chips-sm"><button class="btn" type="submit"><%= L.save_reminder %></button>
+<% if (b.prox_pulizia) { %><button class="linkbtn" type="submit" name="remove" value="1" formnovalidate><%= L.remove_reminder %></button><% } %></div>
+</form>
+
+<% if (d.cleanings.length > 1) { %>
+<div>
+<strong style="color:#fff;font-weight:600;display:block;margin-bottom:4px"><%= L.history %></strong>
+<% for (const c of d.cleanings.slice(1)) { %>
+<details class="hist edit">
+<summary><span style="color:var(--txt)"><%= fmtDate(c.data) %></span> · <span class="hint"><%= c.tipo || L.cleaning %> · <%= c.photos.length %> <%= L.photos %></span></summary>
+<% if (c.photos.length) { %><div class="gallery"><% c.photos.forEach((p, i) => { %><a href="/area/foto/<%= p %>" target="_blank" rel="noopener"><img src="/area/foto/<%= p %>?t=1" alt="<%= L.photo_n %> <%= i + 1 %>" loading="lazy"></a><% }) %></div><% } %>
+<% if (c.note) { %><p class="hint" style="margin-top:8px"><%= c.note %></p><% } %>
+<div class="chips-sm" style="margin-top:10px">
+<a class="chip-sm" data-share href="https://wa.me/?text=<%= encodeURIComponent(b.nome + ' ' + fmtDate(c.data) + ': ') %>" data-url="/area/condividi/<%= c.share_token %>" data-title="<%= b.nome %>" target="_blank" rel="noopener"><%= L.share_wa %></a>
+</div>
+</details>
+<% } %>
+</div>
+<% } %>
+</section>
+
+<section class="panel stack" id="anodi" aria-labelledby="an-t">
+<div class="panel-head" style="margin:0"><h2 id="an-t"><%= L.anodes %></h2><span class="dot" style="color:<%= COLORS[d.anodesStatus] %>">● <%= d.anodes.length ? S[d.anodesStatus] : L.st_none %></span></div>
+<p class="hint"><%= L.anodes_lead %></p>
+<% if (!d.anodes.length) { %><p class="hint"><%= L.no_anodes %></p><% } %>
+<% for (const a of d.anodes) { %>
+<div class="anode" id="anodo-<%= a.id %>">
+<% if (a.photos.length) { %><a href="/area/foto/<%= a.photos[0] %>" target="_blank" rel="noopener"><img class="anode-img" src="/area/foto/<%= a.photos[0] %>?t=1" alt="<%= L.a_foto %> <%= a.posizione %>"></a><% } else { %><span class="anode-ph"><%= L.a_foto %></span><% } %>
+<div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><strong style="color:#fff;font-weight:600"><%= a.posizione || '—' %></strong><span class="dot" style="color:<%= COLORS[a.status] %>;font-size:13px">● <%= S[a.status] %></span></div>
+<span class="hint"><%= [a.codice ? L.code + ' ' + a.codice : '', a.dati].filter(Boolean).join(' · ') %></span>
+<span class="hint"><%= L.mounted %> <strong style="color:var(--txt);font-weight:500"><%= a.data_montaggio ? fmtDate(a.data_montaggio) : '—' %></strong> · <%= L.alert_on %> <strong style="color:var(--txt);font-weight:500"><%= a.data_alert ? fmtDate(a.data_alert) : '—' %></strong></span>
+<% if (a.updated_by === 'anfibiasub') { %><span class="hint" style="font-size:12px"><%= lang === 'en' ? 'Updated by Anfibiasub' : 'Aggiornato da Anfibiasub' %></span><% } %>
+<details class="edit">
+<summary><%= L.edit %></summary>
+<%- include('../partials/anodeform', { a, action: '/area/anodi/' + a.id }) %>
+<% if (a.photos.length > 1 || a.photos.length) { %>
+<div class="gallery" style="margin-top:12px">
+<% for (const p of a.photos) { %><figure><img src="/area/foto/<%= p %>?t=1" alt=""><form method="post" action="/area/foto/<%= p %>/elimina" data-confirm="<%= L.confirm_delete %>"><button class="linkbtn" style="margin-top:6px;font-size:12px;padding:4px 10px"><%= L.delete %></button></form></figure><% } %>
+</div>
+<% } %>
+<form method="post" action="/area/anodi/<%= a.id %>/elimina" data-confirm="<%= L.confirm_delete %>" style="margin-top:14px"><button class="danger" type="submit"><%= L.delete %></button></form>
+</details>
+</div>
+</div>
+<% } %>
+<details class="edit" <%= d.anodes.length ? '' : 'open' %>>
+<summary class="chip-sm" style="display:inline-block">+ <%= L.add_anode %></summary>
+<%- include('../partials/anodeform', { a: {}, action: '/area/anodi' }) %>
+</details>
+</section>
+</div>
+</main>
+<%- include('../partials/bottom') %>

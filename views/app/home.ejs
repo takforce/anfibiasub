@@ -1,0 +1,82 @@
+<%- include('../partials/top', { title: L.home, leaflet: d.boat.lat != null }) %>
+<% const b = d.boat; const S = { ok: L.st_ok, warn: L.st_warn, bad: L.st_bad, none: L.st_none }; %>
+<main class="app-main" id="main">
+<%- include('../partials/boatpicker') %>
+<%- include('../partials/flash') %>
+<div class="page-top">
+<div>
+<p class="eyebrow"><%= L[b.tipo] || b.tipo %><%= b.lunghezza ? ' · ' + b.lunghezza + ' m' : '' %></p>
+<h1><%= b.nome || '—' %></h1>
+<p class="sub"><%= [b.targa, b.porto, b.posto_barca].filter(Boolean).join(' · ') %></p>
+</div>
+<a class="btn btn-wa" href="/area/richiesta" target="_blank" rel="noopener"><%= L.request_wa %></a>
+</div>
+
+<div class="tiles">
+<a class="panel tile-link span2" href="/area/manutenzione">
+<span class="panel-head" style="margin:0"><h2><%= L.maintenance %></h2><span class="more"><%= L.open %> →</span></span>
+<span class="two">
+<span class="mini">
+<span class="mini-label"><%= L.cleaning %></span>
+<span class="dot" style="color:<%= COLORS[d.cleaningStatus] %>">● <%= S[d.cleaningStatus] %></span>
+<span class="mini-note"><%= d.last ? L.last_job + ' ' + fmtDate(d.last.data) + ' · ' + d.last.photos.length + ' ' + L.photos : L.none_yet %></span>
+</span>
+<span class="mini">
+<span class="mini-label"><%= L.anodes %></span>
+<span class="dot" style="color:<%= COLORS[d.anodesStatus] %>">● <%= d.anodes.length ? S[d.anodesStatus] : L.st_none %></span>
+<span class="mini-note"><%= d.anodes.length %> <%= lang === 'en' ? (d.anodes.length === 1 ? 'anode' : 'anodes') : (d.anodes.length === 1 ? 'anodo' : 'anodi') %><%= d.anodesToCheck ? ' · ' + d.anodesToCheck + ' ' + (lang === 'en' ? 'to check' : 'da controllare') : '' %></span>
+</span>
+</span>
+<span class="row-kv"><span><%= L.next_job %></span><strong><%= b.prox_pulizia ? fmtDate(b.prox_pulizia) : L.no_reminder %></strong></span>
+</a>
+
+<a class="panel tile-link" href="/area/scheda">
+<span class="panel-head" style="margin:0"><h2><%= L.boat_sheet %></h2><span class="more"><%= L.edit %> →</span></span>
+<span class="hint"><%= L.sheet_hint %></span>
+<span class="row-kv"><span><%= L.insurance %></span><strong><%= b.scad_assicurazione ? L.expires + ' ' + fmtDate(b.scad_assicurazione) : '—' %></strong></span>
+<span class="row-kv"><span><%= L.completeness %></span><strong><%= d.completeness %>%</strong></span>
+</a>
+
+<section class="panel stack" aria-label="<%= L.meteo %>">
+<h2><%= L.meteo %></h2>
+<% if (meteo) { %>
+<div class="two">
+<div class="mini"><span class="mini-label"><%= L.wind %></span><span class="mini-val"><%= meteo.wind %> kn <small style="font-size:13px;color:var(--muted)"><%= dir(meteo.deg, lang) %></small></span><span class="mini-note"><%= L.gusts %> <%= meteo.gust %> kn</span></div>
+<div class="mini"><span class="mini-label"><%= L.sea %></span><span class="mini-val"><%= meteo.wave != null ? meteo.wave.toFixed(1).replace('.', lang === 'en' ? '.' : ',') + ' m' : '—' %></span><span class="mini-note"><%= seaState(meteo.wave, lang) %></span></div>
+<div class="mini"><span class="mini-label"><%= L.air %></span><span class="mini-val"><%= meteo.air %>°</span></div>
+<div class="mini"><span class="mini-label"><%= L.water %></span><span class="mini-val"><%= meteo.water != null ? meteo.water + '°' : '—' %></span></div>
+</div>
+<div class="days">
+<% for (const dd of meteo.days.slice(0, 4)) { const dt = new Date(dd.date + 'T12:00:00Z'); %>
+<div class="day"><b><%= L.days[dt.getUTCDay()] %> <%= dt.getUTCDate() %></b><%= dd.wind %> kn <%= dir(dd.deg, lang) %><br><span class="hint"><%= dd.wave != null ? dd.wave.toFixed(1).replace('.', lang === 'en' ? '.' : ',') + ' m' : '' %></span></div>
+<% } %>
+</div>
+<p class="hint" style="font-size:12px"><%= L.meteo_src %></p>
+<% } else { %><p class="hint"><%= L.meteo_na %></p><% } %>
+</section>
+
+<section class="panel stack" aria-label="<%= L.webcam %>">
+<a class="cam" href="<%= settings.webcam_url %>" target="_blank" rel="noopener" aria-label="<%= L.webcam_open %>"><span class="live">LIVE</span></a>
+<h2><%= L.webcam %></h2>
+<p class="hint"><%= L.webcam_hint %></p>
+<a class="more" href="<%= settings.webcam_url %>" target="_blank" rel="noopener" style="text-decoration:none"><%= L.webcam_open %> →</a>
+</section>
+
+<section class="panel stack" aria-label="<%= L.gps %>">
+<% if (b.lat != null) { %>
+<div class="map-mini" data-map data-lat="<%= b.lat %>" data-lng="<%= b.lng %>" data-static></div>
+<% } else { %>
+<div class="map-mini" style="display:flex;align-items:center;justify-content:center"><span class="hint"><%= L.gps_none %></span></div>
+<% } %>
+<h2><%= L.gps %></h2>
+<div class="chips-sm">
+<% if (b.lat != null) { %>
+<a class="chip-sm" href="https://www.google.com/maps?q=<%= b.lat %>,<%= b.lng %>" target="_blank" rel="noopener"><%= L.open_gmaps %></a>
+<a class="chip-sm" href="https://earth.google.com/web/search/<%= b.lat %>,<%= b.lng %>" target="_blank" rel="noopener"><%= L.open_gearth %></a>
+<% } %>
+<a class="chip-sm" href="/area/posizione"><%= b.lat != null ? L.edit : L.set_position %></a>
+</div>
+</section>
+</div>
+</main>
+<%- include('../partials/bottom', { scripts: b.lat != null ? ['/vendor/leaflet/leaflet.js'] : [] }) %>

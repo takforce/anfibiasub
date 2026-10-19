@@ -1,0 +1,9 @@
+<% if (typeof boats !== 'undefined' && boats.length > 1) { %>
+<form method="get" class="search" style="margin-bottom:18px">
+<label class="field" style="flex-direction:row;align-items:center;gap:10px"><%= L.choose_boat %>
+<select name="barca" data-autosubmit style="min-width:220px">
+<% for (const b of boats) { %><option value="<%= b.id %>"<%= b.id === boatId ? ' selected' : '' %>><%= b.nome %></option><% } %>
+</select></label>
+<noscript><button class="btn btn-ghost" type="submit">OK</button></noscript>
+</form>
+<% } %>

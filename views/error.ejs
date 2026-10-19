@@ -1,0 +1,7 @@
+<%- include('partials/top', { title: String(code) }) %>
+<main class="app-main" id="main" style="min-height:60vh;display:flex;flex-direction:column;justify-content:center;max-width:640px">
+<p class="eyebrow"><%= code %></p>
+<h1 class="h2" style="font-size:34px"><%= message %></h1>
+<p style="margin-top:20px"><a class="btn btn-ghost" href="<%= user ? (user.role === 'admin' ? '/admin' : '/area/home') : '/' %>">← Anfibiasub</a></p>
+</main>
+<%- include('partials/bottom') %>

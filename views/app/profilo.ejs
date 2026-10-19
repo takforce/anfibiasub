@@ -1,0 +1,31 @@
+<%- include('../partials/top', { title: L.profile }) %>
+<main class="app-main narrow" id="main" style="max-width:760px">
+<%- include('../partials/flash') %>
+<% if (user.must_change_password) { %><div class="msg info"><%= L.must_change %></div><% } %>
+<h1 class="h2" style="font-size:38px;margin-bottom:26px"><%= L.profile_title %></h1>
+<% if (!user.must_change_password) { %>
+<form class="form" method="post" action="/area/profilo" style="margin-bottom:26px">
+<fieldset class="box"><legend><%= L.profile %></legend>
+<div class="grid2">
+<label class="field"><%= L.name %><input name="name" value="<%= user.name %>" required></label>
+<label class="field"><%= L.phone %><input type="tel" name="phone" value="<%= user.phone %>"></label>
+<label class="field"><%= L.email %><input value="<%= user.email %>" disabled></label>
+<label class="field"><%= L.language %><select name="lang"><option value="it"<%= user.lang === 'it' ? ' selected' : '' %>>Italiano</option><option value="en"<%= user.lang === 'en' ? ' selected' : '' %>>English</option></select></label>
+</div>
+</fieldset>
+<div class="actions"><button class="btn" type="submit"><%= L.save %></button></div>
+</form>
+<% } %>
+<form class="form" method="post" action="/area/profilo/password">
+<fieldset class="box"><legend><%= L.change_pw %></legend>
+<% if (error) { %><div class="msg err" role="alert"><%= error %></div><% } %>
+<div class="stack">
+<label class="field"><%= L.pw_current %><input type="password" name="current" autocomplete="current-password" required></label>
+<label class="field"><%= L.pw_new %><input type="password" name="p1" minlength="8" autocomplete="new-password" required></label>
+<label class="field"><%= L.pw_new2 %><input type="password" name="p2" minlength="8" autocomplete="new-password" required></label>
+</div>
+</fieldset>
+<div class="actions"><button class="btn" type="submit"><%= L.save %></button></div>
+</form>
+</main>
+<%- include('../partials/bottom') %>

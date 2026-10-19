@@ -1,0 +1,122 @@
+-- Schema Anfibiasub Boat Care. Idempotente: si può rieseguire a ogni avvio.
+
+CREATE TABLE IF NOT EXISTS users (
+  id            SERIAL PRIMARY KEY,
+  email         TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  name          TEXT NOT NULL DEFAULT '',
+  phone         TEXT NOT NULL DEFAULT '',
+  role          TEXT NOT NULL DEFAULT 'client' CHECK (role IN ('client','admin')),
+  lang          TEXT NOT NULL DEFAULT 'it' CHECK (lang IN ('it','en')),
+  active        BOOLEAN NOT NULL DEFAULT TRUE,
+  must_change_password BOOLEAN NOT NULL DEFAULT TRUE,
+  reset_token   TEXT,
+  reset_expires TIMESTAMPTZ,
+  last_login    TIMESTAMPTZ,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS boats (
+  id                SERIAL PRIMARY KEY,
+  owner_id          INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  tipo              TEXT NOT NULL DEFAULT 'motore',
+  nome              TEXT NOT NULL DEFAULT '',
+  targa             TEXT NOT NULL DEFAULT '',
+  matricola         TEXT NOT NULL DEFAULT '',
+  codice_scafo      TEXT NOT NULL DEFAULT '',
+  bandiera          TEXT NOT NULL DEFAULT '',
+  ufficio_reg       TEXT NOT NULL DEFAULT '',
+  lunghezza         TEXT NOT NULL DEFAULT '',
+  utilizzo          TEXT NOT NULL DEFAULT '',
+  cantiere_modello  TEXT NOT NULL DEFAULT '',
+  anno              TEXT NOT NULL DEFAULT '',
+  materiale         TEXT NOT NULL DEFAULT '',
+  motore_modello    TEXT NOT NULL DEFAULT '',
+  motore_serie      TEXT NOT NULL DEFAULT '',
+  potenza           TEXT NOT NULL DEFAULT '',
+  carburante        TEXT NOT NULL DEFAULT '',
+  serbatoi          TEXT NOT NULL DEFAULT '',
+  armatore_nome     TEXT NOT NULL DEFAULT '',
+  armatore_cell     TEXT NOT NULL DEFAULT '',
+  armatore_email    TEXT NOT NULL DEFAULT '',
+  scad_assicurazione DATE,
+  licenza_rtf       TEXT NOT NULL DEFAULT '',
+  mmsi              TEXT NOT NULL DEFAULT '',
+  call_sign         TEXT NOT NULL DEFAULT '',
+  porto             TEXT NOT NULL DEFAULT 'Loano',
+  posto_barca       TEXT NOT NULL DEFAULT '',
+  lat               DOUBLE PRECISION,
+  lng               DOUBLE PRECISION,
+  pos_updated       TIMESTAMPTZ,
+  prox_pulizia      DATE,
+  prox_pulizia_sent BOOLEAN NOT NULL DEFAULT FALSE,
+  assic_alert_sent  BOOLEAN NOT NULL DEFAULT FALSE,
+  note_admin        TEXT NOT NULL DEFAULT '',
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS boats_owner_idx ON boats(owner_id);
+
+CREATE TABLE IF NOT EXISTS cleanings (
+  id          SERIAL PRIMARY KEY,
+  boat_id     INTEGER NOT NULL REFERENCES boats(id) ON DELETE CASCADE,
+  data        DATE NOT NULL,
+  tipo        TEXT NOT NULL DEFAULT '',
+  note        TEXT NOT NULL DEFAULT '',
+  share_token TEXT NOT NULL UNIQUE,
+  notified    BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS cleanings_boat_idx ON cleanings(boat_id, data DESC);
+
+CREATE TABLE IF NOT EXISTS anodes (
+  id             SERIAL PRIMARY KEY,
+  boat_id        INTEGER NOT NULL REFERENCES boats(id) ON DELETE CASCADE,
+  posizione      TEXT NOT NULL DEFAULT '',
+  codice         TEXT NOT NULL DEFAULT '',
+  dati           TEXT NOT NULL DEFAULT '',
+  data_montaggio DATE,
+  data_alert     DATE,
+  alert_sent     BOOLEAN NOT NULL DEFAULT FALSE,
+  note           TEXT NOT NULL DEFAULT '',
+  updated_by     TEXT NOT NULL DEFAULT 'client',
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS anodes_boat_idx ON anodes(boat_id);
+
+CREATE TABLE IF NOT EXISTS photos (
+  id          SERIAL PRIMARY KEY,
+  boat_id     INTEGER NOT NULL REFERENCES boats(id) ON DELETE CASCADE,
+  cleaning_id INTEGER REFERENCES cleanings(id) ON DELETE CASCADE,
+  anode_id    INTEGER REFERENCES anodes(id) ON DELETE CASCADE,
+  data        BYTEA NOT NULL,
+  thumb       BYTEA NOT NULL,
+  width       INTEGER,
+  height      INTEGER,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS photos_cleaning_idx ON photos(cleaning_id);
+CREATE INDEX IF NOT EXISTS photos_anode_idx ON photos(anode_id);
+
+CREATE TABLE IF NOT EXISTS requests (
+  id         SERIAL PRIMARY KEY,
+  boat_id    INTEGER REFERENCES boats(id) ON DELETE CASCADE,
+  user_id    INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  motivo     TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS settings (
+  key   TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS mail_log (
+  id         SERIAL PRIMARY KEY,
+  to_email   TEXT NOT NULL,
+  subject    TEXT NOT NULL,
+  ok         BOOLEAN NOT NULL,
+  info       TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

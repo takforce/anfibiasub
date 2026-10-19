@@ -1,0 +1,47 @@
+<%- include('../partials/top', { title: 'Impostazioni' }) %>
+<% const s = settings; %>
+<main class="app-main" id="main">
+<%- include('../partials/flash') %>
+<p class="eyebrow">Gestione</p>
+<h1 class="h2" style="font-size:36px;margin-bottom:24px">Impostazioni</h1>
+<div class="tiles cols2">
+<form class="panel stack" method="post" action="/admin/impostazioni">
+<h2>Area clienti</h2>
+<label class="field">Link webcam Loano (pulsante "Webcam" dei clienti)<input type="url" name="webcam_url" value="<%= s.webcam_url %>" required></label>
+<label class="field">Numero WhatsApp per le richieste (con prefisso, es. 393470119832)<input name="whatsapp" value="<%= s.whatsapp %>" required></label>
+<label class="field">Email che riceve i promemoria<input type="email" name="admin_email" value="<%= s.admin_email %>" required></label>
+<h2 style="margin-top:10px">Semafori (mesi)</h2>
+<div class="grid2">
+<label class="field">Pulizia: giallo dopo<input type="number" min="1" max="60" name="pulizia_giallo_mesi" value="<%= s.pulizia_giallo_mesi %>"></label>
+<label class="field">Pulizia: rosso dopo<input type="number" min="1" max="60" name="pulizia_rosso_mesi" value="<%= s.pulizia_rosso_mesi %>"></label>
+<label class="field">Anodi: giallo dopo<input type="number" min="1" max="60" name="anodi_giallo_mesi" value="<%= s.anodi_giallo_mesi %>"></label>
+<label class="field">Anodi: rosso dopo<input type="number" min="1" max="60" name="anodi_rosso_mesi" value="<%= s.anodi_rosso_mesi %>"></label>
+</div>
+<button class="btn" type="submit" style="align-self:flex-start">Salva</button>
+</form>
+<div class="stack">
+<section class="panel stack">
+<h2>Email automatiche</h2>
+<% if (mailOn) { %>
+<p class="dot" style="color:#6EE08F">● Attive</p>
+<form method="post" action="/admin/impostazioni/test-email"><button class="btn btn-ghost" type="submit">Manda un'email di prova a me</button></form>
+<% } else { %>
+<p class="dot" style="color:#FFC75A">● Non ancora attive</p>
+<p class="hint">Servono le variabili BREVO_API_KEY e MAIL_FROM su Railway (vedi la guida). Finché mancano, il sito funziona ma le email non partono.</p>
+<% } %>
+<% if (mails.length) { %>
+<div class="tbl-wrap"><table class="tbl"><thead><tr><th>Quando</th><th>A</th><th>Oggetto</th><th>Esito</th></tr></thead><tbody>
+<% for (const m of mails) { %><tr><td class="hint"><%= new Date(m.created_at).toLocaleString('it-IT', { timeZone: 'Europe/Rome' }) %></td><td><%= m.to_email %></td><td><%= m.subject %></td><td style="color:<%= m.ok ? '#6EE08F' : '#FFC75A' %>"><%= m.ok ? 'inviata' : m.info %></td></tr><% } %>
+</tbody></table></div>
+<% } %>
+</section>
+<section class="panel stack">
+<h2>Amministratori</h2>
+<% for (const a of admins) { %><div class="row-kv"><span><%= a.name || a.email %></span><span class="hint"><%= a.email %></span></div><% } %>
+<% if (adminPw) { %><div class="msg ok">Creato <%= adminPw.email %>. Password provvisoria: <span class="cred" style="display:inline-block;font-size:16px;padding:4px 10px"><%= adminPw.pw %></span></div><% } %>
+<form method="post" action="/admin/impostazioni/admin" class="search"><input name="name" placeholder="Nome" required><input type="email" name="email" placeholder="Email" required><button class="btn btn-ghost" type="submit">Aggiungi</button></form>
+</section>
+</div>
+</div>
+</main>
+<%- include('../partials/bottom') %>

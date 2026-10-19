@@ -1,0 +1,54 @@
+<%- include('../partials/top', { title: 'Gestione' }) %>
+<% const S = { ok: 'Regolare', warn: 'Da controllare', bad: 'Scaduto', none: '—' }; %>
+<main class="app-main" id="main">
+<%- include('../partials/flash') %>
+<% if (!mailOn) { %><div class="msg info">Le email automatiche non sono ancora attive: manca la chiave Brevo. Il resto funziona. <a href="/admin/impostazioni">Dettagli</a></div><% } %>
+<div class="page-top">
+<div><p class="eyebrow">Gestione Anfibiasub</p><h1>Clienti e barche</h1><p class="sub"><%= all.length %> barche registrate</p></div>
+<a class="btn" href="/admin/clienti/nuovo">+ Nuovo cliente</a>
+</div>
+<form class="search" method="get" style="margin-bottom:18px">
+<input type="search" name="f" value="<%= f %>" placeholder="Cerca barca, targa, cliente…" aria-label="Cerca">
+<button class="btn btn-ghost" type="submit">Cerca</button>
+<% if (f) { %><a class="chip-sm" href="/admin">Mostra tutti</a><% } %>
+</form>
+<div class="panel tbl-wrap" style="padding:8px 8px 4px">
+<table class="tbl">
+<thead><tr><th>Barca</th><th>Cliente</th><th>Ultima pulizia</th><th>Pulizia</th><th>Anodi</th><th>Promemoria cliente</th></tr></thead>
+<tbody>
+<% if (!boats.length) { %><tr><td colspan="6" class="hint">Nessuna barca. Crea il primo cliente.</td></tr><% } %>
+<% for (const b of boats) { %>
+<tr>
+<td><a href="/admin/barca/<%= b.id %>"><%= b.nome %></a><br><span class="hint"><%= [b.targa, b.posto_barca].filter(Boolean).join(' · ') %></span></td>
+<td><%= b.name %><% if (!b.active) { %> <span class="pill" style="color:#FFB3C0">disattivato</span><% } %><br><span class="hint"><%= b.phone || b.email %></span></td>
+<td><%= b.last_clean ? fmtDate(b.last_clean) : '—' %></td>
+<td><span class="dot" style="color:<%= COLORS[b.cst] %>">● <%= S[b.cst] %></span></td>
+<td><span class="dot" style="color:<%= COLORS[b.ast] %>">● <%= S[b.ast] %></span></td>
+<td><%= b.prox_pulizia ? fmtDate(b.prox_pulizia) : '—' %></td>
+</tr>
+<% } %>
+</tbody>
+</table>
+</div>
+
+<% if (noBoat.length) { %>
+<div class="panel" style="margin-top:22px"><h2>Clienti senza barca</h2>
+<% for (const u of noBoat) { %>
+<form method="post" action="/admin/cliente/<%= u.id %>/barca" class="search" style="margin-top:14px;align-items:center">
+<strong style="color:#fff;min-width:200px"><%= u.name %></strong>
+<input name="nome" placeholder="Nome barca" required><input name="targa" placeholder="Targa">
+<button class="btn" type="submit">Aggiungi barca</button>
+</form>
+<% } %>
+</div>
+<% } %>
+
+<div class="panel" style="margin-top:22px">
+<h2 style="margin-bottom:12px">Ultime richieste da WhatsApp</h2>
+<% if (!reqs.length) { %><p class="hint">Nessuna richiesta.</p><% } %>
+<% for (const r of reqs) { %>
+<div class="row-kv" style="margin-bottom:8px"><span><%= r.name %> · <a href="/admin/barca/<%= r.boat_id %>"><%= r.nome %></a></span><span class="hint"><%= new Date(r.created_at).toLocaleString('it-IT', { timeZone: 'Europe/Rome' }) %></span></div>
+<% } %>
+</div>
+</main>
+<%- include('../partials/bottom') %>

@@ -1,0 +1,18 @@
+<%- include('../partials/top', { title: 'Credenziali' }) %>
+<main class="app-main narrow" id="main" style="max-width:720px">
+<p class="eyebrow">Credenziali</p>
+<h1 class="h2" style="font-size:34px"><%= u.name %></h1>
+<div class="panel stack" style="margin-top:20px">
+<p class="sub">Questa password si vede <strong>solo ora</strong>. Al primo accesso il cliente sceglie la sua.</p>
+<div class="field">Indirizzo<div class="cred"><%= loginUrl %></div></div>
+<div class="field">Email<div class="cred"><%= u.email %></div></div>
+<div class="field">Password provvisoria<div class="cred"><%= pw %></div></div>
+<% if (mailed) { %><div class="msg ok">Credenziali inviate via email a <%= u.email %>.</div>
+<% } else { %><p class="hint">Mandale al cliente su WhatsApp:</p>
+<% let dg = (u.phone || '').replace(/\D/g, ''); if (dg.length === 10 && dg[0] === '3') dg = '39' + dg; %>
+<a class="btn btn-wa" style="align-self:flex-start" href="https://wa.me/<%= dg %>?text=<%= encodeURIComponent((u.lang === 'en' ? 'Your Anfibiasub customer area: ' : 'La tua area clienti Anfibiasub: ') + loginUrl + '\nEmail: ' + u.email + '\nPassword: ' + pw) %>" target="_blank" rel="noopener">Invia su WhatsApp</a>
+<% } %>
+</div>
+<p style="margin-top:22px"><a class="btn" href="<%= boatId ? '/admin/barca/' + boatId : '/admin' %>">Vai alla barca →</a></p>
+</main>
+<%- include('../partials/bottom') %>

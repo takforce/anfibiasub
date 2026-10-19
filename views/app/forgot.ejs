@@ -1,0 +1,16 @@
+<%- include('../partials/top', { title: L.forgot_title }) %>
+<main class="app-main" id="main" style="max-width:520px;min-height:70vh;display:flex;flex-direction:column;justify-content:center">
+<a class="logo-name" href="/area/login" style="text-decoration:none;color:#fff;margin-bottom:30px">ANFIBIA<span class="hl">SUB</span></a>
+<h1 class="h2" style="font-size:30px"><%= L.forgot_title %></h1>
+<% if (done) { %>
+<div class="msg info" style="margin-top:16px"><%= done %></div>
+<% } else { %>
+<p class="sub" style="margin-bottom:22px"><%= L.forgot_lead %></p>
+<form class="form" method="post" action="/area/password">
+<label class="field"><%= L.email %><input type="email" name="email" required autofocus></label>
+<button class="btn" type="submit" style="justify-content:center"><%= L.send_link %></button>
+</form>
+<% } %>
+<p class="hint" style="margin-top:24px"><a href="/area/login">← <%= L.back_login %></a></p>
+</main>
+<%- include('../partials/bottom') %>

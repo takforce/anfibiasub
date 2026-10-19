@@ -1,0 +1,28 @@
+{
+  "name": "anfibiasub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sito Anfibiasub e area clienti Boat Care",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "crea-admin": "node scripts/crea-admin.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "compression": "^1.8.2",
+    "connect-pg-simple": "^10.0.0",
+    "ejs": "^7.0.2",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.1",
+    "express-session": "^1.19.0",
+    "helmet": "^8.3.0",
+    "leaflet": "^1.9.4",
+    "multer": "^2.4.0",
+    "pg": "^8.23.1",
+    "sharp": "^0.35.5"
+  }
+}

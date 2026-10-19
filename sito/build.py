@@ -270,7 +270,13 @@ def build_lang(lang):
     home = f'''<section class="hero" aria-label="{T('intro')}">
 <img class="hero-img" src="/img/porto-loano.webp" alt="{T('hero_alt')}" fetchpriority="high">
 <div class="wrap hero-body">
-<p class="hero-kicker">{T('hero_kicker')}</p>
+<nav class="quick" aria-label="{U['area']}">
+<a class="q-tile q-area" href="{area_url(lang)}">{QI_AREA}<strong>{T('q_area')[0]}</strong><span>{T('q_area')[1]}</span></a>
+<a class="q-tile q-help" href="{WA}" target="_blank" rel="noopener">{WA_ICON}<strong>{T('q_help')[0]}</strong><span>{T('q_help')[1]}</span></a>
+<a class="q-tile" href="{url('utilita', lang, 'meteo')}">{QI_METEO}<strong>{T('q_meteo')[0]}</strong><span>{T('q_meteo')[1]}</span></a>
+<a class="q-tile" href="{url('utilita', lang, 'gps')}">{QI_GPS}<strong>{T('q_gps')[0]}</strong><span>{T('q_gps')[1]}</span></a>
+</nav>
+<p class="hero-kicker"><span class="kick-d">{T('hero_kicker')}</span><span class="kick-m">{T('hero_kicker_m')}</span></p>
 <h1>{T('hero_h1')}</h1>
 <p class="hero-lead">{T('hero_lead')}</p>
 <div class="badges">{badges}</div>
@@ -278,17 +284,9 @@ def build_lang(lang):
 </div>
 </section>
 
-<nav class="quick" aria-label="{U['area']}">
-<a class="q-tile q-area" href="{area_url(lang)}">{QI_AREA}<strong>{T('q_area')[0]}</strong><span>{T('q_area')[1]}</span></a>
-<a class="q-tile q-help" href="{WA}" target="_blank" rel="noopener">{WA_ICON}<strong>{T('q_help')[0]}</strong><span>{T('q_help')[1]}</span></a>
-<a class="q-tile" href="{url('utilita', lang, 'meteo')}">{QI_METEO}<strong>{T('q_meteo')[0]}</strong><span>{T('q_meteo')[1]}</span></a>
-<a class="q-tile" href="{url('utilita', lang, 'gps')}">{QI_GPS}<strong>{T('q_gps')[0]}</strong><span>{T('q_gps')[1]}</span></a>
-</nav>
-
 <section class="meteo-home" aria-label="{dict(UTIL)['meteo'][lang]}">
 <div class="wrap">
 <div class="meteo" data-meteo data-lang="{lang}" data-title="{dict(UTIL)['meteo'][lang]}"><p class="hint">{T('meteo_loading')}</p></div>
-<p class="hint" style="margin-top:12px">{T('meteo_note')}</p>
 </div>
 </section>
 
@@ -433,7 +431,6 @@ def utilita_html(lang):
                 [(f'<b>{r[0]}</b>',) + tuple(fmt(x, lang) for x in r[1:]) for r in CATENE_ANCORE], T('anchor_cap'))
     live = f'''<section class="tool-sec" id="meteo"><h2 class="vh">{title['meteo'][lang]}</h2>
 <div class="meteo" data-meteo data-lang="{lang}" data-title="{title['meteo'][lang]}"><p class="hint">{T('meteo_loading')}</p></div>
-<p class="hint" style="margin-top:12px">{T('meteo_note')}</p>
 </section>
 <section class="tool-sec" id="webcam"><h2 class="h2">{title['webcam'][lang]}</h2>
 <a class="cam-card" href="{WEBCAM_URL}" target="_blank" rel="noopener">

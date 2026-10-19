@@ -18,6 +18,7 @@ TX = {
     # --- home
     'hero_alt': {'it': 'Operatore subacqueo guida un blocco di cemento calato dalla gru sul fondale', 'en': 'Diver guiding a concrete block lowered by a crane onto the seabed',
                  'es': 'Buzo guiando un bloque de hormigón bajado por la grúa al fondo', 'de': 'Taucher führt einen vom Kran abgesenkten Betonblock auf den Meeresgrund'},
+    'hero_kicker_m': {'it': 'LAVORI SUBACQUEI', 'en': 'UNDERWATER WORKS', 'es': 'TRABAJOS SUBACUÁTICOS', 'de': 'UNTERWASSERARBEITEN'},
     'hero_kicker': {'it': 'LAVORI MARITTIMI SUBACQUEI · PORTO DI LOANO', 'en': 'UNDERWATER MARINE WORKS · LOANO HARBOUR',
                     'es': 'TRABAJOS MARÍTIMOS SUBACUÁTICOS · PUERTO DE LOANO', 'de': 'MARITIME UNTERWASSERARBEITEN · HAFEN LOANO'},
     'hero_h1': {'it': '<span class="fit">IL VALORE DELL\'ESPERIENZA,</span><span class="fit hl">SOTTO LA SUPERFICIE</span>',

@@ -307,17 +307,24 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 .rim-list li{position:relative;padding-left:26px}
 .rim-list li::before{content:"";position:absolute;left:0;top:.55em;width:12px;height:12px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 4px rgba(34,184,240,.18)}
 .card-text{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.kick-m{display:none}
 @media (max-width:767px){
   .m-hide{display:none}
-  .quick{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px;margin:-30px 0 56px;position:relative;z-index:3}
-  .q-tile{display:flex;flex-direction:column;gap:4px;min-height:132px;padding:18px 16px;border-radius:16px;text-decoration:none;background:var(--card2);border:1px solid var(--line2);color:var(--muted);font-size:13px;line-height:1.3}
-  .q-tile svg{width:30px;height:30px;color:var(--cyan);margin-bottom:8px}
-  .q-tile strong{color:var(--white);font-size:18px;font-weight:700}
-  .q-tile:active{transform:scale(.98)}
-  .q-area{background:var(--btn);border-color:var(--btn);color:rgba(5,14,26,.75)}
+  .kick-d{display:none}.kick-m{display:inline}
+  .hero-body{padding-top:96px}
+  .hero-lead{font-size:14.5px;line-height:1.6;text-align:justify;hyphens:auto;-webkit-hyphens:auto}
+  .quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 26px}
+  .q-tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:68px;padding:10px 4px;border-radius:12px;text-decoration:none;text-align:center;
+    background:rgba(11,31,53,.78);border:1px solid var(--line2);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+  .q-tile svg{width:22px;height:22px;color:var(--cyan)}
+  .q-tile strong{color:var(--white);font-size:11.5px;font-weight:700;line-height:1.1}
+  .q-tile span{display:none}
+  .q-tile:active{transform:scale(.97)}
+  .q-area{background:var(--btn);border-color:var(--btn)}
   .q-area svg,.q-area strong{color:var(--btntxt)}
-  .q-help{background:#1FA855;border-color:#1FA855;color:rgba(255,255,255,.85)}
-  .q-help svg{color:#fff}
+  .q-help{background:#1FA855;border-color:#1FA855}
+  .q-help svg,.q-help strong{color:#fff}
+}
 }
 /* titoli grandi: mai parole spezzate col trattino */
 .hero h1,.page-hero h1,.h2{hyphens:manual;-webkit-hyphens:manual}

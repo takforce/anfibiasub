@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
   name          TEXT NOT NULL DEFAULT '',
   phone         TEXT NOT NULL DEFAULT '',
   role          TEXT NOT NULL DEFAULT 'client' CHECK (role IN ('client','admin')),
-  lang          TEXT NOT NULL DEFAULT 'it' CHECK (lang IN ('it','en')),
+  lang          TEXT NOT NULL DEFAULT 'it',
   active        BOOLEAN NOT NULL DEFAULT TRUE,
   must_change_password BOOLEAN NOT NULL DEFAULT TRUE,
   reset_token   TEXT,
@@ -120,3 +120,7 @@ CREATE TABLE IF NOT EXISTS mail_log (
   info       TEXT NOT NULL DEFAULT '',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Lingue ammesse (aggiornabile su database già esistenti)
+ALTER TABLE users DROP CONSTRAINT IF EXISTS users_lang_check;
+ALTER TABLE users ADD CONSTRAINT users_lang_check CHECK (lang IN ('it','en','es','de'));

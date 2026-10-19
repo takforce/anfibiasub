@@ -7,7 +7,8 @@ const { requireUser, flash, token } = require('../auth');
 const { loadBoat } = require('../boatdata');
 const { GROUPS, TIPI, fromBody } = require('../boatfields');
 const { upload, saveMany, sendPhoto } = require('../photos');
-const { send, layout, enabled: mailEnabled } = require('../mail');
+const { send, layout, enabled: mailEnabled, esc } = require('../mail');
+const { t: tr, fill, LANGS } = require('../i18n');
 
 const r = express.Router();
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -50,12 +51,9 @@ r.post('/password', loginLimiter, async (req, res) => {
     const tk = token();
     await q("UPDATE users SET reset_token=$1, reset_expires=now() + interval '2 hours' WHERE id=$2", [tk, u.id]);
     const base = (process.env.APP_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '');
-    const en = u.lang === 'en';
-    await send(u.email, en ? 'Reset your password' : 'Nuova password area clienti',
-      layout(en ? 'Reset your password' : 'Scegli una nuova password',
-        [en ? 'Click the button to choose a new password. The link is valid for 2 hours.' : 'Clicca il pulsante per scegliere una nuova password. Il link vale 2 ore.',
-         en ? 'If you did not ask for this, just ignore this email.' : 'Se non l\'hai chiesto tu, ignora questa email.'],
-        { label: en ? 'Choose password' : 'Scegli la password', url: `${base}/area/reset/${tk}` }));
+    const M = tr(u.lang);
+    await send(u.email, M.m_reset_subj,
+      layout(M.m_reset_title, [M.m_reset_p1, M.m_reset_p2], { label: M.m_reset_btn, url: `${base}/area/reset/${tk}` }, u.lang));
   }
   res.render('app/forgot', { done: res.locals.L.forgot_sent });
 });
@@ -182,9 +180,7 @@ r.post('/foto/:id/elimina', needBoat, async (req, res) => {
 r.get('/richiesta', needBoat, async (req, res) => {
   const b = await one('SELECT nome, targa FROM boats WHERE id=$1', [res.locals.boatId]);
   await q('INSERT INTO requests(boat_id, user_id, motivo) VALUES ($1,$2,$3)', [res.locals.boatId, res.locals.user.id, clip(req.query.motivo || 'intervento')]);
-  const txt = res.locals.lang === 'en'
-    ? `Hello Anfibiasub, I would like to request a job for ${b.nome}${b.targa ? ' (' + b.targa + ')' : ''}.`
-    : `Ciao Anfibiasub, vorrei richiedere un intervento per ${b.nome}${b.targa ? ' (' + b.targa + ')' : ''}.`;
+  const txt = fill(res.locals.L.wa_request, { boat: b.nome + (b.targa ? ' (' + b.targa + ')' : '') });
   res.redirect(`https://wa.me/${res.locals.settings.whatsapp}?text=${encodeURIComponent(txt)}`);
 });
 
@@ -198,9 +194,9 @@ r.get('/foto/:id', async (req, res) => {
 
 r.get('/profilo', (req, res) => res.render('app/profilo', { error: null }));
 r.post('/profilo', async (req, res) => {
-  const lang = req.body.lang === 'en' ? 'en' : 'it';
+  const lang = LANGS.includes(req.body.lang) ? req.body.lang : 'it';
   await q('UPDATE users SET name=$1, phone=$2, lang=$3 WHERE id=$4', [clip(req.body.name), clip(req.body.phone), lang, res.locals.user.id]);
-  flash(req, 'ok', require('../i18n').t(lang).saved);
+  flash(req, 'ok', tr(lang).saved);
   res.redirect('/area/profilo');
 });
 r.post('/profilo/password', async (req, res) => {

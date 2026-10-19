@@ -6,17 +6,24 @@
   // ---------- METEO ----------
   var box = document.querySelector('[data-meteo]');
   if (box) {
-    var en = box.getAttribute('data-lang') === 'en';
-    var T = en
-      ? { wind: 'Wind', sea: 'Sea', air: 'Air', water: 'Water', gusts: 'gusts', na: 'Weather data not available right now.', days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] }
-      : { wind: 'Vento', sea: 'Mare', air: 'Aria', water: 'Acqua', gusts: 'raffiche', na: 'Dati meteo non disponibili in questo momento.', days: ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'] };
-    var DIR = en ? ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'] : ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+    var lang = box.getAttribute('data-lang') || 'it';
+    var en = lang === 'en';
+    var TT = {
+      it: { wind: 'Vento', sea: 'Mare', air: 'Aria', water: 'Acqua', gusts: 'raffiche', na: 'Dati meteo non disponibili in questo momento.', days: ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'], dir: ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'],
+            sea_s: [[0.1, 'calmo'], [0.5, 'quasi calmo'], [1.25, 'poco mosso'], [2.5, 'mosso'], [4, 'molto mosso'], [6, 'agitato'], [99, 'grosso']] },
+      en: { wind: 'Wind', sea: 'Sea', air: 'Air', water: 'Water', gusts: 'gusts', na: 'Weather data not available right now.', days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], dir: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'],
+            sea_s: [[0.1, 'calm'], [0.5, 'smooth'], [1.25, 'slight'], [2.5, 'moderate'], [4, 'rough'], [6, 'very rough'], [99, 'high']] },
+      es: { wind: 'Viento', sea: 'Mar', air: 'Aire', water: 'Agua', gusts: 'rachas', na: 'Datos meteorológicos no disponibles en este momento.', days: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'], dir: ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'],
+            sea_s: [[0.1, 'calma'], [0.5, 'rizada'], [1.25, 'marejadilla'], [2.5, 'marejada'], [4, 'fuerte marejada'], [6, 'gruesa'], [99, 'muy gruesa']] },
+      de: { wind: 'Wind', sea: 'See', air: 'Luft', water: 'Wasser', gusts: 'Böen', na: 'Wetterdaten derzeit nicht verfügbar.', days: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'], dir: ['N', 'NO', 'O', 'SO', 'S', 'SW', 'W', 'NW'],
+            sea_s: [[0.1, 'ruhig'], [0.5, 'schwach bewegt'], [1.25, 'leicht bewegt'], [2.5, 'mäßig bewegt'], [4, 'grob'], [6, 'sehr grob'], [99, 'hoch']] },
+    };
+    var T = TT[lang] || TT.it;
+    var DIR = T.dir;
     var dir = function (d) { return d == null ? '' : DIR[Math.round(d / 45) % 8]; };
     var num = function (v, n) { var s = v.toFixed(n); return en ? s : s.replace('.', ','); };
     var stato = function (h) {
-      var it = [[0.1, 'calmo'], [0.5, 'quasi calmo'], [1.25, 'poco mosso'], [2.5, 'mosso'], [4, 'molto mosso'], [6, 'agitato'], [99, 'grosso']];
-      var gb = [[0.1, 'calm'], [0.5, 'smooth'], [1.25, 'slight'], [2.5, 'moderate'], [4, 'rough'], [6, 'very rough'], [99, 'high']];
-      var l = en ? gb : it;
+      var l = T.sea_s;
       for (var i = 0; i < l.length; i++) if (h <= l[i][0]) return l[i][1];
       return '';
     };
@@ -49,7 +56,8 @@
   // ---------- MARCATORE GPS ----------
   var el = document.querySelector('[data-gps]');
   if (el && window.L) {
-    var en2 = el.getAttribute('data-lang') === 'en';
+    var l2 = el.getAttribute('data-lang') || 'it';
+    var MYPOS = { it: 'La mia posizione: ', en: 'My position: ', es: 'Mi posición: ', de: 'Meine Position: ' }[l2];
     var map = L.map(el, { scrollWheelZoom: false }).setView(LOANO, 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
     var icon = L.divIcon({ className: '', html: '<svg width="36" height="36" viewBox="0 0 24 24" fill="#FF8A3D" stroke="#050E1A" stroke-width="1"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>', iconSize: [36, 36], iconAnchor: [18, 34] });
@@ -70,7 +78,7 @@
       var g = 'https://www.google.com/maps?q=' + lat + ',' + lng;
       links.forEach(function (a) {
         var k = a.getAttribute('data-gps-link');
-        a.href = k === 'gmaps' ? g : k === 'gearth' ? 'https://earth.google.com/web/search/' + lat + ',' + lng : 'https://wa.me/?text=' + encodeURIComponent((en2 ? 'My position: ' : 'La mia posizione: ') + g);
+        a.href = k === 'gmaps' ? g : k === 'gearth' ? 'https://earth.google.com/web/search/' + lat + ',' + lng : 'https://wa.me/?text=' + encodeURIComponent(MYPOS + g);
         a.classList.remove('is-off');
       });
       copy.classList.remove('is-off');

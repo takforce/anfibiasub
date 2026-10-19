@@ -24,7 +24,7 @@
 <span class="mini">
 <span class="mini-label"><%= L.anodes %></span>
 <span class="dot" style="color:<%= COLORS[d.anodesStatus] %>">● <%= d.anodes.length ? S[d.anodesStatus] : L.st_none %></span>
-<span class="mini-note"><%= d.anodes.length %> <%= lang === 'en' ? (d.anodes.length === 1 ? 'anode' : 'anodes') : (d.anodes.length === 1 ? 'anodo' : 'anodi') %><%= d.anodesToCheck ? ' · ' + d.anodesToCheck + ' ' + (lang === 'en' ? 'to check' : 'da controllare') : '' %></span>
+<span class="mini-note"><%= d.anodes.length %> <%= d.anodes.length === 1 ? L.anode_1 : L.anode_n %><%= d.anodesToCheck ? ' · ' + d.anodesToCheck + ' ' + L.to_check : '' %></span>
 </span>
 </span>
 <span class="row-kv"><span><%= L.next_job %></span><strong><%= b.prox_pulizia ? fmtDate(b.prox_pulizia) : L.no_reminder %></strong></span>

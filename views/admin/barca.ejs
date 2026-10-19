@@ -109,7 +109,7 @@
 <label class="field">Nome<input name="name" value="<%= owner.name %>" required></label>
 <label class="field">Email di accesso<input type="email" name="email" value="<%= owner.email %>" required></label>
 <label class="field">Cellulare<input type="tel" name="phone" value="<%= owner.phone %>"></label>
-<label class="field">Lingua<select name="lang"><option value="it">Italiano</option><option value="en"<%= owner.lang === 'en' ? ' selected' : '' %>>English</option></select></label>
+<label class="field">Lingua<select name="lang"><% for (const l of LANGS) { %><option value="<%= l %>"<%= owner.lang === l ? ' selected' : '' %>><%= LANG_NAMES[l] %></option><% } %></select></label>
 <label class="choice" style="align-self:flex-start"><input type="checkbox" name="active" value="1"<%= owner.active ? ' checked' : '' %>>Account attivo</label>
 <button class="btn" type="submit" style="align-self:flex-start">Salva</button>
 </form>

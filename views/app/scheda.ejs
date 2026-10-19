@@ -2,7 +2,7 @@
 <main class="app-main narrow" id="main">
 <%- include('../partials/boatpicker') %>
 <%- include('../partials/flash') %>
-<p class="eyebrow"><%= lang === 'en' ? 'Self-managed sheet' : 'Scheda autogestita' %></p>
+<p class="eyebrow"><%= L.sheet_eyebrow %></p>
 <h1 class="h2" style="font-size:38px"><%= L.sheet_title %></h1>
 <p class="sub" style="margin-bottom:28px"><%= L.sheet_lead %></p>
 <%- include('../partials/boatform', { b: d.boat, action }) %>

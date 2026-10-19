@@ -2,7 +2,7 @@ const session = require('express-session');
 const PgStore = require('connect-pg-simple')(session);
 const crypto = require('crypto');
 const { pool, one } = require('./db');
-const { t, fmtDate, isoDate } = require('./i18n');
+const { t, fill, fmtDate, isoDate, LANGS, LANG_NAMES, SITE_HOME, pickLang } = require('./i18n');
 const { COLORS } = require('./status');
 
 function sessionMiddleware() {
@@ -45,9 +45,13 @@ async function loadUser(req, res, next) {
     if (u && u.active) res.locals.user = u;
     else req.session.uid = null;
   }
-  const lang = res.locals.user?.lang || (req.query.lang === 'en' ? 'en' : null) || req.session.lang || 'it';
-  if (req.query.lang === 'en' || req.query.lang === 'it') req.session.lang = req.query.lang;
-  res.locals.lang = res.locals.user ? res.locals.user.lang : (req.session.lang || lang);
+  if (LANGS.includes(req.query.lang)) req.session.lang = req.query.lang;
+  res.locals.lang = pickLang(res.locals.user ? res.locals.user.lang : req.session.lang);
+  res.locals.LANGS = LANGS;
+  res.locals.LANG_NAMES = LANG_NAMES;
+  res.locals.SITE_HOME = SITE_HOME;
+  res.locals.fill = fill;
+  res.locals.tr = t;
   res.locals.L = t(res.locals.lang);
   res.locals.fmtDate = (d) => fmtDate(d, res.locals.lang);
   res.locals.isoDate = isoDate;

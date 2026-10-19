@@ -4,7 +4,7 @@
 <%- include('../partials/boatpicker') %>
 <%- include('../partials/flash') %>
 <p class="eyebrow"><%= b.nome %></p>
-<h1 class="h2" style="font-size:38px;margin-bottom:28px"><%= lang === 'en' ? 'Boat maintenance' : 'Manutenzione imbarcazione' %></h1>
+<h1 class="h2" style="font-size:38px;margin-bottom:28px"><%= L.maint_title %></h1>
 
 <div class="tiles cols2">
 
@@ -26,7 +26,7 @@
 <% if (d.last.note) { %><p class="hint" style="margin-top:10px"><%= d.last.note %></p><% } %>
 </div>
 <div class="chips-sm">
-<a class="btn btn-wa" data-share href="https://wa.me/?text=<%= encodeURIComponent((lang === 'en' ? 'Underwater job photos ' : 'Foto intervento subacqueo ') + b.nome + ': ') %>" data-url="/area/condividi/<%= d.last.share_token %>" data-title="<%= b.nome %>" target="_blank" rel="noopener"><%= L.share_wa %></a>
+<a class="btn btn-wa" data-share href="https://wa.me/?text=<%= encodeURIComponent(L.share_text + ' ' + b.nome + ': ') %>" data-url="/area/condividi/<%= d.last.share_token %>" data-title="<%= b.nome %>" target="_blank" rel="noopener"><%= L.share_wa %></a>
 <button class="chip-sm" type="button" data-copy="/area/condividi/<%= d.last.share_token %>" data-done="<%= L.copied %>"><%= L.share_link %></button>
 </div>
 <% } %>
@@ -66,7 +66,7 @@
 <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><strong style="color:#fff;font-weight:600"><%= a.posizione || '—' %></strong><span class="dot" style="color:<%= COLORS[a.status] %>;font-size:13px">● <%= S[a.status] %></span></div>
 <span class="hint"><%= [a.codice ? L.code + ' ' + a.codice : '', a.dati].filter(Boolean).join(' · ') %></span>
 <span class="hint"><%= L.mounted %> <strong style="color:var(--txt);font-weight:500"><%= a.data_montaggio ? fmtDate(a.data_montaggio) : '—' %></strong> · <%= L.alert_on %> <strong style="color:var(--txt);font-weight:500"><%= a.data_alert ? fmtDate(a.data_alert) : '—' %></strong></span>
-<% if (a.updated_by === 'anfibiasub') { %><span class="hint" style="font-size:12px"><%= lang === 'en' ? 'Updated by Anfibiasub' : 'Aggiornato da Anfibiasub' %></span><% } %>
+<% if (a.updated_by === 'anfibiasub') { %><span class="hint" style="font-size:12px"><%= L.updated_by_anf %></span><% } %>
 <details class="edit">
 <summary><%= L.edit %></summary>
 <%- include('../partials/anodeform', { a, action: '/area/anodi/' + a.id }) %>

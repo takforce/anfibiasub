@@ -6,15 +6,18 @@ TEL_S = '+393470387290'
 WA = 'https://wa.me/393470119832'
 MAIL = 'termoclino@libero.it'
 
-# Pagine: chiave -> (file IT, file EN)
+LANGS = ['it', 'en', 'es', 'de']
+LANG_NAMES = {'it': 'Italiano', 'en': 'English', 'es': 'Español', 'de': 'Deutsch'}
+
+# Pagine: chiave -> file per lingua
 PAGES = {
-    'home': ('index.html', 'en/index.html'),
-    'chi': ('chi-siamo.html', 'en/about.html'),
-    'servizi': ('servizi.html', 'en/services.html'),
-    'lavori': ('lavori.html', 'en/works.html'),
-    'utilita': ('utilita.html', 'en/tools.html'),
-    'contatti': ('contatti.html', 'en/contact.html'),
-    'privacy': ('privacy.html', 'en/privacy.html'),
+    'home':     {'it': 'index.html',     'en': 'en/index.html',    'es': 'es/index.html',      'de': 'de/index.html'},
+    'chi':      {'it': 'chi-siamo.html', 'en': 'en/about.html',    'es': 'es/quienes-somos.html', 'de': 'de/ueber-uns.html'},
+    'servizi':  {'it': 'servizi.html',   'en': 'en/services.html', 'es': 'es/servicios.html',  'de': 'de/leistungen.html'},
+    'lavori':   {'it': 'lavori.html',    'en': 'en/works.html',    'es': 'es/trabajos.html',   'de': 'de/referenzen.html'},
+    'utilita':  {'it': 'utilita.html',   'en': 'en/tools.html',    'es': 'es/utilidades.html', 'de': 'de/nuetzliches.html'},
+    'contatti': {'it': 'contatti.html',  'en': 'en/contact.html',  'es': 'es/contacto.html',   'de': 'de/kontakt.html'},
+    'privacy':  {'it': 'privacy.html',   'en': 'en/privacy.html',  'es': 'es/privacidad.html', 'de': 'de/datenschutz.html'},
 }
 
 UI = {
@@ -26,7 +29,7 @@ UI = {
         'foot_about': 'Lavori marittimi subacquei.<br>Base operativa: porto di Loano (SV).',
         'office': 'Ufficio', 'site': 'SITO', 'privacy': 'Privacy e cookie', 'no_cookie': 'Nessun cookie di profilazione',
         'wa': 'Scrivici su WhatsApp', 'need': 'Serve un intervento?', 'need_lead': 'Scrivici su WhatsApp o chiamaci: ti rispondiamo in giornata.',
-        'lang_other': 'EN', 'lang_other_label': 'English version',
+        'lang_label': 'Lingua',
     },
     'en': {
         'nav': [('home', 'Home'), ('chi', 'About us'), ('servizi', 'Services'), ('lavori', 'Our work'), ('utilita', 'Tools'), ('contatti', 'Contact')],
@@ -36,7 +39,7 @@ UI = {
         'foot_about': 'Underwater marine works.<br>Operating base: Loano harbour (SV), Italy.',
         'office': 'Office', 'site': 'WEBSITE', 'privacy': 'Privacy and cookies', 'no_cookie': 'No tracking cookies',
         'wa': 'Message us on WhatsApp', 'need': 'Need a job done?', 'need_lead': 'Message us on WhatsApp or call us: we reply the same day.',
-        'lang_other': 'IT', 'lang_other_label': 'Versione italiana',
+        'lang_label': 'Language',
     },
 }
 
@@ -261,3 +264,22 @@ CATENE_ANCORE = [
     (114, 317300, 453300, 453300, 634600, 634600, 906600, 8020, 7700), (120, 346750, 495350, 495350, 693500, 693500, 990700, 8900, 8520), (130, 397490, 567840, 567840, 794980, 794980, 1135680, None, 10000),
     (142, 460710, 658150, 658150, 921410, 921410, 1316310, None, 11845), (152, 514940, 735630, 735630, 1029880, 1029880, 1471260, None, 13595),
 ]
+
+
+# ---------------- spagnolo e tedesco ----------------
+from contenuti_es_de import (UI_ES_DE, SERVIZI_ES_DE, LAVORI_ES_DE, TEAM_ES_DE, MEZZI_ES_DE,  # noqa: E402
+                             MODULI_ES_DE, UTIL_ES_DE, BEAUFORT_ES_DE)
+UI.update(UI_ES_DE)
+for _s in SERVIZI:
+    _s.update(SERVIZI_ES_DE[_s['id']])
+for _l in LAVORI:
+    _l.update(LAVORI_ES_DE[_l['id']])
+for _p in TEAM:
+    _p.update(TEAM_ES_DE[_p['ini']])
+MEZZI.update(MEZZI_ES_DE)
+MODULI.update(MODULI_ES_DE)
+# Utilità: id -> titolo per lingua
+UTIL = [(a, {'it': b, 'en': c, 'es': UTIL_ES_DE[a][0], 'de': UTIL_ES_DE[a][1]}) for a, b, c in UTIL_SEZIONI]
+# Beaufort: forza, km/h, nodi, {lingua: (nome, stato del mare)}
+BEAUFORT4 = [(f, kmh, kn, {'it': (a, s_it), 'en': (b, s_en), 'es': BEAUFORT_ES_DE['es'][f], 'de': BEAUFORT_ES_DE['de'][f]})
+             for f, a, b, kmh, kn, s_it, s_en in BEAUFORT]

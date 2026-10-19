@@ -91,7 +91,17 @@ Per rigenerarla dopo una modifica ai testi: `python3 sito/build.py --prod`.
 ---
 
 ## 4. Modificare i testi del sito
-Tutti i testi IT/EN sono in `sito/contenuti.py`. Dopo una modifica:
+Il sito è in 4 lingue (italiano, inglese, spagnolo, tedesco), con la tendina delle lingue nel menu.
+
+| Cosa | File |
+|---|---|
+| Servizi, lavori, squadra, mezzi, tabelle (IT/EN) | `sito/contenuti.py` |
+| Gli stessi contenuti in ES/DE | `sito/contenuti_es_de.py` |
+| Titoli e frasi fisse delle pagine (4 lingue) | `sito/testi_pagine.py` |
+| Area clienti ed email (4 lingue) | `src/i18n.js` |
+| Link della webcam di Loano | `WEBCAM_URL` in `sito/contenuti.py` |
+
+Dopo una modifica:
 
 ```
 python3 sito/build.py          # aggiorna public/ (versione servita da Railway)

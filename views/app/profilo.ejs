@@ -10,7 +10,7 @@
 <label class="field"><%= L.name %><input name="name" value="<%= user.name %>" required></label>
 <label class="field"><%= L.phone %><input type="tel" name="phone" value="<%= user.phone %>"></label>
 <label class="field"><%= L.email %><input value="<%= user.email %>" disabled></label>
-<label class="field"><%= L.language %><select name="lang"><option value="it"<%= user.lang === 'it' ? ' selected' : '' %>>Italiano</option><option value="en"<%= user.lang === 'en' ? ' selected' : '' %>>English</option></select></label>
+<label class="field"><%= L.language %><select name="lang"><% for (const l of LANGS) { %><option value="<%= l %>"<%= user.lang === l ? ' selected' : '' %>><%= LANG_NAMES[l] %></option><% } %></select></label>
 </div>
 </fieldset>
 <div class="actions"><button class="btn" type="submit"><%= L.save %></button></div>

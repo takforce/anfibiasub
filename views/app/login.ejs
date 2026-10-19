@@ -13,7 +13,7 @@
 </div>
 </div>
 <main class="login-form" id="main">
-<div class="lang-switch" style="margin-bottom:30px"><a href="?lang=it" aria-current="<%= lang === 'it' %>">IT</a><a href="?lang=en" aria-current="<%= lang === 'en' %>">EN</a></div>
+<div class="lang-switch" style="margin-bottom:30px"><% for (const l of LANGS) { %><a href="?lang=<%= l %>" lang="<%= l %>" aria-current="<%= lang === l %>"><img class="flag" src="/img/flags/<%= l %>.svg" alt="" width="22" height="15"><%= l.toUpperCase() %></a><% } %></div>
 <h2 style="font-weight:800;font-size:30px;margin-bottom:6px"><%= L.login_title %></h2>
 <p class="hint" style="margin-bottom:28px"><%= L.login_sub %></p>
 <%- include('../partials/flash') %>
@@ -25,7 +25,7 @@
 <button class="btn" type="submit" style="justify-content:center"><%= L.enter.toUpperCase() %></button>
 </form>
 <p class="hint" style="margin-top:30px"><%= L.no_access %> <a href="https://wa.me/393470119832" target="_blank" rel="noopener"><%= L.write_wa %></a></p>
-<p class="hint" style="margin-top:8px"><a href="/<%= lang === 'en' ? 'en/' : '' %>">← <%= L.site %></a></p>
+<p class="hint" style="margin-top:8px"><a href="<%= SITE_HOME[lang] %>">← <%= L.site %></a></p>
 </main>
 </div>
 <%- include('../partials/bottom') %>

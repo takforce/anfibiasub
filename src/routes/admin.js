@@ -8,7 +8,7 @@ const { GROUPS, TIPI, fromBody } = require('../boatfields');
 const { upload, saveMany } = require('../photos');
 const { send, layout, enabled: mailEnabled, esc } = require('../mail');
 const { cleaningStatus, anodesStatus } = require('../status');
-const { t, fmtDate } = require('../i18n');
+const { t, fill, fmtDate, LANGS } = require('../i18n');
 
 const r = express.Router();
 r.use(requireAdmin);
@@ -21,13 +21,10 @@ const id = (v) => Number(v) || 0;
 const base = (req) => (process.env.APP_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '');
 
 async function credentialsMail(req, u, pw) {
-  const en = u.lang === 'en';
-  return send(u.email, en ? 'Your Anfibiasub customer area' : 'La tua area clienti Anfibiasub', layout(
-    en ? 'Welcome to the customer area' : 'Benvenuto nell\'area clienti',
-    [en ? `Hello ${esc(u.name)}, here are your login details:` : `Ciao ${esc(u.name)}, ecco i dati per accedere:`,
-     `Email: <b>${esc(u.email)}</b><br>Password: <b>${esc(pw)}</b>`,
-     en ? 'At first sign-in you will be asked to choose your own password.' : 'Al primo accesso ti chiederemo di scegliere una password personale.'],
-    { label: en ? 'Sign in' : 'Accedi', url: base(req) + '/area/login' }));
+  const M = t(u.lang);
+  return send(u.email, M.m_cred_subj, layout(M.m_cred_title,
+    [fill(M.m_cred_intro, { name: esc(u.name) }), `${esc(M.email)}: <b>${esc(u.email)}</b><br>${esc(M.password)}: <b>${esc(pw)}</b>`, M.m_cred_first],
+    { label: M.m_signin, url: base(req) + '/area/login' }, u.lang));
 }
 
 // ---------- elenco ----------
@@ -51,7 +48,7 @@ r.get('/', async (req, res) => {
 // ---------- nuovo cliente ----------
 r.get('/clienti/nuovo', (req, res) => res.render('admin/nuovo', { error: null, v: {} }));
 r.post('/clienti/nuovo', async (req, res) => {
-  const v = { name: clip(req.body.name), email: clip(req.body.email).toLowerCase(), phone: clip(req.body.phone), lang: req.body.lang === 'en' ? 'en' : 'it', nome: clip(req.body.nome), targa: clip(req.body.targa), tipo: TIPI.includes(req.body.tipo) ? req.body.tipo : 'motore', posto_barca: clip(req.body.posto_barca) };
+  const v = { name: clip(req.body.name), email: clip(req.body.email).toLowerCase(), phone: clip(req.body.phone), lang: LANGS.includes(req.body.lang) ? req.body.lang : 'it', nome: clip(req.body.nome), targa: clip(req.body.targa), tipo: TIPI.includes(req.body.tipo) ? req.body.tipo : 'motore', posto_barca: clip(req.body.posto_barca) };
   if (!v.name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.email) || !v.nome) return res.status(400).render('admin/nuovo', { error: 'Servono almeno nome del cliente, email valida e nome della barca.', v });
   if (await one('SELECT 1 FROM users WHERE lower(email)=$1', [v.email])) return res.status(400).render('admin/nuovo', { error: 'Esiste già un account con questa email.', v });
   const pw = tempPassword();
@@ -87,13 +84,12 @@ r.post('/barca/:id/pulizia', upload.array('foto', 40), async (req, res) => {
   let msg = `Intervento salvato con ${n} foto.`;
   if (req.body.notifica) {
     const u = await one('SELECT * FROM users WHERE id=$1', [b.owner_id]);
-    const L = t(u.lang), en = u.lang === 'en';
-    const ok = await send(u.email, en ? `New job on ${b.nome}` : `Nuovo intervento su ${b.nome}`, layout(
-      en ? 'Job completed' : 'Intervento eseguito',
-      [en ? `Hello ${esc(u.name)}, we have just recorded a job on <b>${esc(b.nome)}</b>.` : `Ciao ${esc(u.name)}, abbiamo appena registrato un intervento su <b>${esc(b.nome)}</b>.`,
-       `${fmtDate(data)} · ${esc(c.tipo || L.cleaning)}${n ? ` · ${n} ${L.photos}` : ''}`,
+    const L = t(u.lang);
+    const ok = await send(u.email, fill(L.m_job_subj, { boat: b.nome }), layout(L.m_job_title,
+      [fill(L.m_job_intro, { name: esc(u.name), boat: esc(b.nome) }),
+       `${fmtDate(data, u.lang)} · ${esc(c.tipo || L.cleaning)}${n ? ` · ${n} ${L.photos}` : ''}`,
        c.note ? esc(c.note) : ''].filter(Boolean),
-      { label: en ? 'See photos' : 'Guarda le foto', url: base(req) + '/area/manutenzione' }));
+      { label: L.m_job_btn, url: base(req) + '/area/manutenzione' }, u.lang));
     if (ok) { await q('UPDATE cleanings SET notified=true WHERE id=$1', [c.id]); msg += ' Email inviata al cliente.'; }
     else msg += mailEnabled() ? ' Email NON inviata: controlla il registro email.' : ' Email non inviata: Brevo non è ancora configurato.';
   }
@@ -177,7 +173,7 @@ r.post('/cliente/:id', async (req, res) => {
   const back = clip(req.body.back) || '/admin';
   if (email !== u.email && await one('SELECT 1 FROM users WHERE lower(email)=$1', [email])) { flash(req, 'err', 'Email già usata da un altro account.'); return res.redirect(back); }
   await q('UPDATE users SET name=$1, email=$2, phone=$3, lang=$4, active=$5 WHERE id=$6',
-    [clip(req.body.name), email, clip(req.body.phone), req.body.lang === 'en' ? 'en' : 'it', Boolean(req.body.active), u.id]);
+    [clip(req.body.name), email, clip(req.body.phone), LANGS.includes(req.body.lang) ? req.body.lang : 'it', Boolean(req.body.active), u.id]);
   flash(req, 'ok', 'Cliente aggiornato.');
   res.redirect(back.startsWith('/admin') ? back : '/admin');
 });

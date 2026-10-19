@@ -9,7 +9,8 @@ function esc(s) {
 }
 
 // Corpo email nello stile del sito
-function layout(title, paragraphs, button) {
+function layout(title, paragraphs, button, lang = 'it') {
+  const footer = require('./i18n').t(lang).m_footer;
   const ps = paragraphs.map((p) => `<p style="margin:0 0 14px;color:#C9D8E3;font-size:15px;line-height:1.6">${p}</p>`).join('');
   const btn = button
     ? `<p style="margin:24px 0 0"><a href="${esc(button.url)}" style="display:inline-block;background:#1FB4EE;color:#03263F;text-decoration:none;font-weight:600;border-radius:24px;padding:13px 24px;font-size:14px">${esc(button.label)}</a></p>`
@@ -20,7 +21,7 @@ function layout(title, paragraphs, button) {
 <tr><td style="padding:26px 28px 6px;font-weight:800;font-size:20px;letter-spacing:1px;color:#fff">ANFIBIA<span style="color:#3CC6F5">SUB</span></td></tr>
 <tr><td style="padding:10px 28px 28px"><h1 style="margin:0 0 16px;color:#fff;font-size:22px">${esc(title)}</h1>${ps}${btn}</td></tr>
 </table>
-<p style="color:#6F8798;font-size:12px;margin:16px 0 0">Anfibiasub · Lavori marittimi subacquei · Porto di Loano (SV)</p>
+<p style="color:#6F8798;font-size:12px;margin:16px 0 0">${esc(footer)}</p>
 </td></tr></table></body></html>`;
 }
 

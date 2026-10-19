@@ -19,6 +19,7 @@ ARROW = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="current
 LOGO = '<svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="9" r="5"/><circle cx="12" cy="9" r="2"/><path d="M3 18c2 0 2-1.5 4.5-1.5S9.5 18 12 18s2.5-1.5 4.5-1.5S19 18 21 18"/></svg>'
 LOCK = '<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'
 WA_ICON = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>'
+CHEVRON = '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'
 MENU = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>'
 
 
@@ -30,7 +31,23 @@ def url(key, lang, anchor=''):
 
 def header(cur, lang, overlay):
     U = UI[lang]
-    links = ''.join(f'<a href="{url(k, lang)}"{" aria-current=\"page\"" if k == cur else ""}>{t}</a>' for k, t in U['nav'])
+    it = lang == 'it'
+    subs = {
+        'servizi': [(s['id'], s[lang]['t']) for s in SERVIZI],
+        'lavori': [(l['id'], l[lang]['toc']) for l in LAVORI],
+        'utilita': [('vento', 'Vento' if it else 'Wind'), ('cime', 'Cime' if it else 'Ropes'), ('cavi', 'Cavi in acciaio' if it else 'Steel wire'), ('catene', 'Catene' if it else 'Chains')],
+    }
+    links = ''
+    for k, t in U['nav']:
+        cur_attr = ' aria-current="page"' if k == cur else ''
+        if k not in subs:
+            links += f'<a href="{url(k, lang)}"{cur_attr}>{t}</a>'
+            continue
+        items = ''.join(f'<a href="{url(k, lang, a)}">{e(b)}</a>' for a, b in subs[k])
+        wide = ' dd-wide' if len(subs[k]) > 10 else ''
+        links += (f'<div class="dd"><a href="{url(k, lang)}"{cur_attr}>{t}</a>'
+                  f'<button class="dd-btn" type="button" aria-expanded="false" aria-label="{"Apri il sottomenu" if it else "Open submenu"} {t}">{CHEVRON}</button>'
+                  f'<div class="dd-menu{wide}">{items}</div></div>')
     other = 'en' if lang == 'it' else 'it'
     return f'''<a class="skip" href="#main">{U["skip"]}</a>
 <header class="site-header{'' if overlay else ' solid'}">
@@ -273,8 +290,8 @@ def build_lang(lang):
 </div>
 <a class="btn btn-ghost" href="{url('lavori', lang)}">{U['all_works'].format(n=len(LAVORI))} {ARROW}</a>
 </div>
-<div class="g3" style="margin-bottom:30px">{''.join(job_card(l, lang) for l in LAVORI[:6])}</div>
-<div class="chips">{''.join(f'<a class="chip" href="{url("lavori", lang, l["id"])}">{e(l[lang]["toc"])}</a>' for l in LAVORI[6:])}</div>
+<div class="g3">{''.join(job_card(l, lang) for l in LAVORI[:6])}</div>
+
 </div>
 </section>
 
@@ -298,7 +315,7 @@ def build_lang(lang):
     # SERVIZI
     srv = phero('saldature', N['servizi'], 'Cosa facciamo<br><span class="hl">sott\'acqua</span>' if it else 'What we do<br><span class="hl">underwater</span>',
                 'Dieci servizi, un solo interlocutore: dalla pulizia dell\'elica alla costruzione di un porto.' if it else 'Ten services, one contact: from cleaning a propeller to building a marina.')
-    srv += '<div class="wrap"><nav class="toc" aria-label="' + N['servizi'] + '">' + ''.join(f'<a class="chip" href="#{s["id"]}">{e(s[lang]["t"])}</a>' for s in SERVIZI) + '</nav><div>'
+    srv += '<div class="wrap"><div>'
     srv += ''.join(detail(s, s[lang], paras=s[lang]['body']) for s in SERVIZI) + '</div></div>' + cta(lang)
     page('servizi', lang, N['servizi'] + ' · Anfibiasub',
          'Pulizia eliche, carenaggi, sostituzione anodi, lavori edili e metalmeccanici subacquei, recuperi, alaggi, foto e video, reti anti medusa.' if it else
@@ -307,7 +324,7 @@ def build_lang(lang):
     # LAVORI
     lav = phero('pietra-ligure', N['lavori'], 'Opere che stanno<br><span class="hl">sotto il livello del mare</span>' if it else 'Structures that sit<br><span class="hl">below sea level</span>',
                 'Porti turistici, scivoli di varo, condotte, ormeggi. In Liguria, in Francia e all\'estero.' if it else 'Marinas, launching ramps, pipelines, moorings. In Liguria, in France and abroad.')
-    lav += '<div class="wrap"><nav class="toc" aria-label="' + N['lavori'] + '">' + ''.join(f'<a class="chip" href="#{l["id"]}">{e(l[lang]["toc"])}</a>' for l in LAVORI) + '</nav><div>'
+    lav += '<div class="wrap"><div>'
     lav += ''.join(detail(l, l[lang], l[lang]['luogo']) for l in LAVORI) + '</div></div>' + cta(lang)
     page('lavori', lang, N['lavori'] + ' · Anfibiasub',
          'Porti di Loano, Varazze e Arenzano, scivolo di varo a Pietra Ligure, impianti Azimut, Antibes, condotte sommerse, Malta e Algeria.' if it else
@@ -378,8 +395,6 @@ def utilita_html(lang):
     it = lang == 'it'
     h = phero('catenarie', dict(UI[lang]['nav'])['utilita'], 'Tabelle utili<br><span class="hl">per chi va per mare</span>' if it else 'Handy tables<br><span class="hl">for life at sea</span>',
               'Vento, cime, cavi e catene: i valori di riferimento che usiamo anche noi in cantiere.' if it else 'Wind, ropes, wire and chains: the reference values we use on our own jobs.')
-    toc = [('vento', 'Vento' if it else 'Wind'), ('cime', 'Cime' if it else 'Ropes'), ('cavi', 'Cavi in acciaio' if it else 'Steel wire'), ('catene', 'Catene' if it else 'Chains')]
-    h += '<div class="wrap"><nav class="toc" aria-label="Tabelle">' + ''.join(f'<a class="chip" href="#{a}">{b}</a>' for a, b in toc) + '</nav></div>'
     note = '<p class="hint" style="margin-top:12px">' + ('Valori indicativi, riportati dalle tabelle tecniche di riferimento. Per un carico reale chiedi sempre i dati certificati del produttore.' if it else 'Indicative values taken from reference technical tables. For a real load always ask for the manufacturer\'s certified data.') + '</p>'
 
     def table(head, rows, caption):

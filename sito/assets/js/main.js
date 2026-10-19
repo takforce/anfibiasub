@@ -1,17 +1,39 @@
-// Menu mobile
+// Menu mobile e menu a tendina
 (function () {
   var btn = document.querySelector('.menu-btn');
   var nav = document.getElementById('nav');
   if (!btn || !nav) return;
+  var mobile = function () { return window.matchMedia('(max-width: 960px)').matches; };
+
   btn.addEventListener('click', function () {
     var open = nav.classList.toggle('open');
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    btn.setAttribute('aria-label', open ? 'Chiudi il menu' : 'Apri il menu');
   });
+
+  var dds = nav.querySelectorAll('.dd');
+  function closeAll(except) {
+    dds.forEach(function (d) {
+      if (d !== except) { d.classList.remove('open'); d.querySelector('.dd-btn').setAttribute('aria-expanded', 'false'); }
+    });
+  }
+  dds.forEach(function (d) {
+    var b = d.querySelector('.dd-btn');
+    b.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = !d.classList.contains('open');
+      closeAll(d);
+      d.classList.toggle('open', open);
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+  document.addEventListener('click', function (e) { if (!nav.contains(e.target)) closeAll(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAll(); });
+
+  // Un link scelto chiude tutto (sul telefono anche il menu principale)
   nav.addEventListener('click', function (e) {
-    if (e.target.tagName === 'A') {
-      nav.classList.remove('open');
-      btn.setAttribute('aria-expanded', 'false');
-    }
+    if (e.target.tagName !== 'A') return;
+    closeAll();
+    if (mobile()) { nav.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
+    if (document.activeElement) document.activeElement.blur();
   });
 })();

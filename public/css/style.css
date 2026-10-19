@@ -323,10 +323,6 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
   .q-tile strong{color:#fff;font-size:10px;font-weight:700;letter-spacing:.1px;white-space:nowrap;text-shadow:0 1px 1px rgba(0,0,0,.5)}
   .q-tile span{display:none}
   .q-tile:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -1px 0 rgba(0,0,0,.35),0 1px 0 #061424,0 2px 5px rgba(0,0,0,.4)}
-  .q-area{background:linear-gradient(180deg,#5FD3FF 0%,#1FB0EC 55%,#0E8CC4 100%);border-color:#7FDCFF;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 0 rgba(0,0,0,.2),0 3px 0 #0A5E86,0 6px 12px rgba(0,0,0,.45)}
-  .q-area svg,.q-area strong{color:#052033;text-shadow:none;filter:none}
-  .q-help{background:linear-gradient(180deg,#4FE08A 0%,#22B65C 55%,#178F46 100%);border-color:#6BEA9E;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 0 rgba(0,0,0,.2),0 3px 0 #0F6A33,0 6px 12px rgba(0,0,0,.45)}
-  .q-help svg,.q-help strong{color:#fff}
 }
 }
 /* titoli grandi: mai parole spezzate col trattino */
@@ -339,3 +335,24 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 .hero-img,.tow img,.page-hero>img{left:50%!important;right:auto!important;width:min(100%,1600px)!important;transform:translateX(-50%);
   -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 78%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 18%,#000 78%,transparent 100%)}
 @media (max-width:1100px){.hero-img,.tow img,.page-hero>img{-webkit-mask-image:none;mask-image:none}}
+/* piè di pagina */
+.foot-brand img{width:72px;height:72px;border-radius:50%;margin-bottom:10px}
+.foot-brand p{margin-top:6px}
+.foot-h2{margin-top:18px}
+@media (max-width:767px){
+  .hero .badges,.hero-body>.btn{display:none}
+  .hero-body{padding-bottom:8px}
+  .hero::after{height:60px}
+  .site-footer{padding:28px 0 90px;font-size:13px;line-height:1.5}
+  .foot-grid{grid-template-columns:1fr 1fr;gap:18px 16px}
+  .foot-brand{grid-column:1/-1;display:flex;align-items:center;gap:12px}
+  .foot-brand img{width:44px;height:44px;margin:0;flex:none}
+  .foot-brand p{margin:0;font-size:12.5px}
+  .site-footer h3{font-size:11px;letter-spacing:2px;margin-bottom:3px}
+  .foot-h2{margin-top:10px}
+  .foot-links{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 14px;padding-top:12px;border-top:1px solid #12253A}
+  .foot-links h3{display:none}
+  .foot-links p{font-size:12.5px}
+  .foot-bottom{margin-top:14px;padding-top:12px;font-size:11.5px;justify-content:center;text-align:center;gap:4px 12px}
+}
+

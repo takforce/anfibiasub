@@ -93,9 +93,9 @@ def footer(lang):
     return f'''<footer class="site-footer">
 <div class="wrap">
 <div class="foot-grid">
-<div>
-<img src="/img/logo-casco-96.png" alt="Anfibiasub" width="72" height="72" style="border-radius:50%;margin-bottom:10px">
-<p style="margin-top:6px">{U["foot_about"]}</p>
+<div class="foot-brand">
+<img src="/img/logo-casco-96.png" alt="Anfibiasub" width="72" height="72">
+<p>{U["foot_about"]}</p>
 </div>
 <div>
 <h3>ANFIBIASUB</h3>
@@ -105,10 +105,10 @@ def footer(lang):
 <div>
 <h3>FRANCESCO</h3>
 <p><a href="tel:{TEL_F}">347 011 9832</a></p>
-<h3 style="margin-top:18px">SIMONE</h3>
+<h3 class="foot-h2">SIMONE</h3>
 <p><a href="tel:{TEL_S}">347 038 7290</a></p>
 </div>
-<div>
+<div class="foot-links">
 <h3>{U["site"]}</h3>
 <p><a href="{url('servizi', lang)}">{dict(U['nav'])['servizi']}</a></p>
 <p><a href="{url('lavori', lang)}">{dict(U['nav'])['lavori']}</a></p>

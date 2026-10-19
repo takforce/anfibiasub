@@ -1,0 +1,15 @@
+<%- include('../partials/top', { title: L.reg_sent_title }) %>
+<div class="login">
+<%- include('../partials/loginart') %>
+<main class="login-form" id="main">
+<h2 style="font-weight:800;font-size:30px;margin-bottom:14px"><%= L.reg_sent_title %></h2>
+<% if (resent) { %><div class="msg ok" role="status"><%= L.reg_resent %></div><% } %>
+<p style="color:#C9D8E3;line-height:1.6"><%= fill(L.reg_sent, { email }) %></p>
+<form method="post" action="/area/registrati/reinvia" style="margin-top:22px">
+<input type="hidden" name="email" value="<%= email %>">
+<button class="btn btn-ghost" type="submit"><%= L.reg_resend %></button>
+</form>
+<p class="hint" style="margin-top:24px"><a href="/area/login">← <%= L.back_login %></a></p>
+</main>
+</div>
+<%- include('../partials/bottom') %>

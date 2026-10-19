@@ -2,7 +2,7 @@ const session = require('express-session');
 const PgStore = require('connect-pg-simple')(session);
 const crypto = require('crypto');
 const { pool, one } = require('./db');
-const { t, fill, fmtDate, isoDate, LANGS, LANG_NAMES, SITE_HOME, pickLang } = require('./i18n');
+const { t, fill, fmtDate, isoDate, LANGS, LANG_NAMES, SITE_HOME, PRIVACY_URL, pickLang } = require('./i18n');
 const { COLORS } = require('./status');
 
 function sessionMiddleware() {
@@ -50,6 +50,7 @@ async function loadUser(req, res, next) {
   res.locals.LANGS = LANGS;
   res.locals.LANG_NAMES = LANG_NAMES;
   res.locals.SITE_HOME = SITE_HOME;
+  res.locals.PRIVACY_URL = PRIVACY_URL;
   res.locals.fill = fill;
   res.locals.tr = t;
   res.locals.L = t(res.locals.lang);

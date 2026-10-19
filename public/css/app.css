@@ -172,3 +172,20 @@ details.edit[open] summary{margin-bottom:14px}
   .g-index{display:none}
 }
 .g-bar [hidden]{display:none!important}
+
+/* registrazione */
+.reg-two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.reg-terms{display:flex;gap:12px;align-items:flex-start;padding:16px;border-radius:12px;border:1px solid var(--line2);background:var(--card);font-size:13.5px;line-height:1.5;color:var(--txt)}
+.reg-terms input{flex:none;width:20px;height:20px;margin-top:2px;accent-color:var(--cyan)}
+.reg-terms input:disabled{opacity:.5}
+.reg-terms a{color:var(--cyan);font-weight:700}
+.reg-need{margin:-6px 0 0;font-size:12.5px}
+.reg-need[hidden]{display:none}
+.reg-btn{justify-content:center;padding:15px 22px;font-size:16px}
+.terms-dlg{max-width:680px;width:calc(100% - 32px);max-height:80vh;border:1px solid var(--line2);border-radius:16px;background:var(--bg2);color:var(--txt);padding:0}
+.terms-dlg::backdrop{background:rgba(2,8,16,.75)}
+.terms-in{padding:26px;display:flex;flex-direction:column;gap:16px;max-height:80vh}
+.terms-in h2{font-size:22px;color:var(--white)}
+.terms-txt{overflow-y:auto;flex:1;font-size:14px;line-height:1.6}
+.terms-in .btn{align-self:flex-end}
+@media (max-width:640px){.reg-two{grid-template-columns:1fr}}

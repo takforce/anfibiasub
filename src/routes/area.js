@@ -33,6 +33,10 @@ r.post('/login', loginLimiter, async (req, res) => {
   const u = await one('SELECT * FROM users WHERE lower(email)=$1 AND active', [email]);
   const ok = u && (await bcrypt.compare(String(req.body.password || ''), u.password_hash));
   if (!ok) return res.status(401).render('app/login', { error: res.locals.L.bad_login, email });
+  if (!u.email_verified) { // registrato ma non ancora confermato: rimandiamo il link
+    if (mailEnabled()) await sendVerify(req, u);
+    return res.status(403).render('app/login', { error: res.locals.L.reg_unverified + ' ' + res.locals.L.reg_resent, email });
+  }
   req.session.regenerate(async (err) => {
     if (err) throw err;
     req.session.uid = u.id;
@@ -40,6 +44,77 @@ r.post('/login', loginLimiter, async (req, res) => {
     res.redirect(u.role === 'admin' ? '/admin' : '/area/home');
   });
 });
+
+// ---------- registrazione autonoma con conferma dell'email ----------
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const TERMINI = require('../termini');
+const appBase = (req) => (process.env.APP_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '');
+
+async function sendVerify(req, u) {
+  const tk = token();
+  await q("UPDATE users SET verify_token=$1, verify_expires=now() + interval '24 hours' WHERE id=$2", [tk, u.id]);
+  const M = tr(u.lang);
+  return send(u.email, M.m_ver_subj, layout(M.m_ver_title,
+    [fill(M.m_ver_p1, { name: esc(u.name) }), M.m_ver_p2, `<span style="color:#7d8b99">${M.m_ver_ignore}</span>`],
+    { label: M.m_ver_btn, url: `${appBase(req)}/area/verifica/${tk}` }, u.lang));
+}
+const regView = (res, error, v = {}) => res.render('app/register', { error, v, termini: TERMINI[res.locals.lang] || '', mailOn: mailEnabled() });
+
+r.get('/registrati', (req, res) => {
+  if (res.locals.user) return res.redirect('/area');
+  regView(res, null);
+});
+r.post('/registrati', loginLimiter, async (req, res) => {
+  const L = res.locals.L;
+  const v = { name: clip(req.body.name), email: clip(req.body.email).toLowerCase(), phone: clip(req.body.phone, 40), boat: clip(req.body.boat) };
+  if (!mailEnabled()) return regView(res, L.reg_nomail, v);
+  if (!v.name || !v.email || !v.phone || !v.boat) return regView(res, L.reg_err_fields, v);
+  if (!EMAIL.test(v.email)) return regView(res, L.reg_err_email, v);
+  const pw = String(req.body.password || '');
+  if (pw.length < 8 || pw !== String(req.body.password2 || '')) return regView(res, L.reg_err_pw, v);
+  if (req.body.accept !== 'on') return regView(res, L.reg_err_terms, v);
+  const hash = await bcrypt.hash(pw, 12);
+  const old = await one('SELECT * FROM users WHERE lower(email)=$1', [v.email]);
+  let u;
+  if (old && old.email_verified) return regView(res, L.reg_err_exists, v);
+  if (old) { // registrazione già iniziata ma mai confermata: aggiorniamo i dati
+    u = await one(`UPDATE users SET name=$1, phone=$2, password_hash=$3, lang=$4, terms_accepted_at=now() WHERE id=$5 RETURNING *`,
+      [v.name, v.phone, hash, res.locals.lang, old.id]);
+    await q('UPDATE boats SET nome=$1 WHERE owner_id=$2 AND id=(SELECT min(id) FROM boats WHERE owner_id=$2)', [v.boat, u.id]);
+  } else {
+    u = await one(`INSERT INTO users(email, password_hash, name, phone, role, lang, must_change_password, email_verified, self_registered, terms_accepted_at)
+      VALUES ($1,$2,$3,$4,'client',$5,false,false,true,now()) RETURNING *`, [v.email, hash, v.name, v.phone, res.locals.lang]);
+    await q('INSERT INTO boats(owner_id, nome) VALUES ($1,$2)', [u.id, v.boat]);
+  }
+  const sent = await sendVerify(req, u);
+  if (!sent) return regView(res, L.error, v);
+  res.render('app/registered', { email: v.email, resent: false });
+});
+r.post('/registrati/reinvia', loginLimiter, async (req, res) => {
+  const email = clip(req.body.email).toLowerCase();
+  const u = await one('SELECT * FROM users WHERE lower(email)=$1 AND NOT email_verified AND active', [email]);
+  if (u && mailEnabled()) await sendVerify(req, u);
+  res.render('app/registered', { email, resent: true });
+});
+r.get('/verifica/:tk', async (req, res) => {
+  if (res.locals.user) return res.redirect('/area');
+  const u = await one(`UPDATE users SET email_verified=true, verify_token=NULL, verify_expires=NULL
+    WHERE verify_token=$1 AND verify_expires > now() AND NOT email_verified RETURNING *`, [String(req.params.tk)]);
+  if (!u) return res.status(400).render('app/login', { error: res.locals.L.reg_bad_link, email: '' });
+  const s = await settings();
+  const b = await one('SELECT nome FROM boats WHERE owner_id=$1 ORDER BY id LIMIT 1', [u.id]);
+  send(s.admin_email, `[Nuovo cliente registrato] ${u.name}`, layout('Nuovo cliente registrato',
+    [`Nome: ${esc(u.name)}`, `Email: ${esc(u.email)}`, `Cellulare: ${esc(u.phone)}`, `Barca: ${esc(b ? b.nome : '')}`],
+    { label: 'Apri la gestione', url: `${appBase(req)}/admin` })).catch(() => {});
+  req.session.regenerate((err) => {
+    if (err) throw err;
+    req.session.uid = u.id;
+    req.session.lang = u.lang;
+    flash(req, 'ok', tr(u.lang).reg_ok);
+    q('UPDATE users SET last_login=now() WHERE id=$1', [u.id]).then(() => res.redirect('/area/home'));
+  });
+});
+r.get('/termini', (req, res) => res.render('app/termini', { termini: TERMINI[res.locals.lang] || '' }));
 
 r.post('/logout', (req, res) => req.session.destroy(() => res.redirect('/area/login')));
 

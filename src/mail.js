@@ -2,7 +2,7 @@
 // Senza BREVO_API_KEY le email non partono: vengono solo registrate nel log.
 const { q } = require('./db');
 
-const enabled = () => Boolean(process.env.BREVO_API_KEY && process.env.MAIL_FROM);
+const enabled = () => process.env.MAIL_DRY === '1' || Boolean(process.env.BREVO_API_KEY && process.env.MAIL_FROM);
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -27,6 +27,10 @@ function layout(title, paragraphs, button, lang = 'it') {
 
 async function send(to, subject, html) {
   if (!to) return false;
+  if (process.env.MAIL_DRY === '1') { // solo per le prove in locale: non invia, registra nel log
+    await q('INSERT INTO mail_log(to_email, subject, ok, info) VALUES ($1,$2,true,$3)', [to, subject, 'DRY ' + html.slice(0, 2000)]);
+    return true;
+  }
   if (!enabled()) {
     console.log(`[email non inviata: Brevo non configurato] a=${to} oggetto="${subject}"`);
     await q('INSERT INTO mail_log(to_email, subject, ok, info) VALUES ($1,$2,false,$3)', [to, subject, 'Brevo non configurato']);

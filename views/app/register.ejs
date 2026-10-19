@@ -1,0 +1,37 @@
+<%- include('../partials/top', { title: L.reg_title }) %>
+<div class="login">
+<%- include('../partials/loginart') %>
+<main class="login-form" id="main">
+<div class="lang-switch" style="margin-bottom:24px"><% for (const l of LANGS) { %><a href="?lang=<%= l %>" lang="<%= l %>" aria-current="<%= lang === l %>"><img class="flag" src="/img/flags/<%= l %>.svg" alt="" width="22" height="15"><%= l.toUpperCase() %></a><% } %></div>
+<h2 style="font-weight:800;font-size:30px;margin-bottom:6px"><%= L.reg_title %></h2>
+<p class="hint" style="margin-bottom:22px"><%= L.reg_sub %></p>
+<% if (!mailOn) { %><div class="msg info" role="status"><%= L.reg_nomail %></div><% } %>
+<% if (error) { %><div class="msg err" role="alert"><%= error %></div><% } %>
+<form class="form" method="post" action="/area/registrati" data-reg>
+<label class="field"><%= L.reg_name %><input name="name" value="<%= v.name || '' %>" autocomplete="name" maxlength="200" required></label>
+<label class="field"><%= L.email %><input type="email" name="email" value="<%= v.email || '' %>" autocomplete="email" required></label>
+<label class="field"><%= L.reg_phone %><input type="tel" name="phone" value="<%= v.phone || '' %>" autocomplete="tel" maxlength="40" required></label>
+<label class="field"><%= L.reg_boat %><input name="boat" value="<%= v.boat || '' %>" maxlength="200" required></label>
+<div class="reg-two">
+<label class="field"><%= L.password %><input type="password" name="password" autocomplete="new-password" minlength="8" required></label>
+<label class="field"><%= L.reg_pw2 %><input type="password" name="password2" autocomplete="new-password" minlength="8" required></label>
+</div>
+<div class="reg-terms">
+<input type="checkbox" name="accept" id="accept" required disabled data-accept>
+<label for="accept"><%- fill(L.reg_terms_html, { privacy: PRIVACY_URL[lang] }) %> *</label>
+</div>
+<p class="hint reg-need" data-need><%= L.reg_terms_need %></p>
+<button class="btn reg-btn" type="submit"<%= mailOn ? '' : ' disabled' %>><%= L.reg_btn %> →</button>
+</form>
+<p class="hint" style="margin-top:24px"><%= L.reg_have %> <a href="/area/login"><%= L.login_title %></a></p>
+<p class="hint" style="margin-top:8px"><a href="<%= SITE_HOME[lang] %>">← <%= L.site %></a></p>
+</main>
+</div>
+<dialog class="terms-dlg" data-terms-dlg aria-labelledby="terms-t">
+<div class="terms-in">
+<h2 id="terms-t"><%= L.terms_title %></h2>
+<div class="terms-txt prose"><% if (termini) { %><%- termini %><% } else { %><p class="hint"><%= L.terms_soon %></p><% } %></div>
+<button class="btn" type="button" data-terms-ok><%= L.terms_close %></button>
+</div>
+</dialog>
+<%- include('../partials/bottom', { scripts: ['/js/register.js?v=' + ASSET_V] }) %>

@@ -3,11 +3,14 @@
 const LANGS = ['it', 'en', 'es', 'de'];
 const LANG_NAMES = { it: 'Italiano', en: 'English', es: 'Español', de: 'Deutsch' };
 // pagina iniziale del sito pubblico per lingua
-const SITE_HOME = { it: '/', en: '/en/', es: '/es/', de: '/de/' };
+// SITE_URL: indirizzo del sito pubblico quando sta su un altro server (es. https://www.anfibiasub.it con SERVE_SITE=off)
+const SITE = (process.env.SITE_URL || '').replace(/\/$/, '');
+const SITE_HOME = { it: SITE + '/', en: SITE + '/en/', es: SITE + '/es/', de: SITE + '/de/' };
+const PRIVACY_URL = { it: SITE + '/privacy', en: SITE + '/en/privacy', es: SITE + '/es/privacidad', de: SITE + '/de/datenschutz' };
 
 const T = {
   it: {
-    area: 'Area clienti', login_title: 'Accedi', login_sub: 'Le credenziali te le fornisce Anfibiasub.',
+    area: 'Area clienti', login_title: 'Accedi', login_sub: 'Entra con la tua email e la tua password.',
     email: 'Email', password: 'Password', enter: 'Entra', forgot: 'Password dimenticata?',
     no_access: 'Non hai un accesso?', write_wa: 'Scrivici su WhatsApp',
     bad_login: 'Email o password non corretti.', too_many: 'Troppi tentativi. Riprova tra qualche minuto.',
@@ -65,7 +68,7 @@ const T = {
   },
 
   en: {
-    area: 'Customer area', login_title: 'Sign in', login_sub: 'Your login details are provided by Anfibiasub.',
+    area: 'Customer area', login_title: 'Sign in', login_sub: 'Sign in with your email and password.',
     email: 'Email', password: 'Password', enter: 'Sign in', forgot: 'Forgot your password?',
     no_access: 'No account yet?', write_wa: 'Message us on WhatsApp',
     bad_login: 'Wrong email or password.', too_many: 'Too many attempts. Please try again in a few minutes.',
@@ -122,7 +125,7 @@ const T = {
   },
 
   es: {
-    area: 'Área de clientes', login_title: 'Iniciar sesión', login_sub: 'Anfibiasub te facilita los datos de acceso.',
+    area: 'Área de clientes', login_title: 'Iniciar sesión', login_sub: 'Entra con tu email y tu contraseña.',
     email: 'Email', password: 'Contraseña', enter: 'Entrar', forgot: '¿Has olvidado la contraseña?',
     no_access: '¿Aún no tienes acceso?', write_wa: 'Escríbenos por WhatsApp',
     bad_login: 'Email o contraseña incorrectos.', too_many: 'Demasiados intentos. Vuelve a intentarlo dentro de unos minutos.',
@@ -179,7 +182,7 @@ const T = {
   },
 
   de: {
-    area: 'Kundenbereich', login_title: 'Anmelden', login_sub: 'Ihre Zugangsdaten erhalten Sie von Anfibiasub.',
+    area: 'Kundenbereich', login_title: 'Anmelden', login_sub: 'Melden Sie sich mit E-Mail und Passwort an.',
     email: 'E-Mail', password: 'Passwort', enter: 'Anmelden', forgot: 'Passwort vergessen?',
     no_access: 'Noch keinen Zugang?', write_wa: 'Schreiben Sie uns auf WhatsApp',
     bad_login: 'E-Mail oder Passwort falsch.', too_many: 'Zu viele Versuche. Bitte versuchen Sie es in einigen Minuten erneut.',
@@ -236,6 +239,10 @@ const T = {
   },
 };
 
+// testi della registrazione
+const REG = require('./i18n_reg');
+for (const l of Object.keys(REG)) Object.assign(T[l], REG[l]);
+
 const pickLang = (l) => (LANGS.includes(l) ? l : 'it');
 function t(lang) { return T[pickLang(lang)]; }
 
@@ -261,4 +268,4 @@ function isoDate(d) {
   return x.toISOString().slice(0, 10);
 }
 
-module.exports = { T, t, fill, fmtDate, isoDate, LANGS, LANG_NAMES, SITE_HOME, pickLang };
+module.exports = { T, t, fill, fmtDate, isoDate, LANGS, LANG_NAMES, SITE_HOME, PRIVACY_URL, pickLang };

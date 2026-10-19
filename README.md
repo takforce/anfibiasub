@@ -53,6 +53,8 @@ Senza questo passaggio tutto funziona, ma le email non partono (credenziali, nuo
 | `MAIL_FROM_NAME` | `Anfibiasub` |
 | `APP_URL` | il link Railway, poi `https://clienti.anfibiasub.it` |
 
+Con le email attive si apre anche la **registrazione autonoma** dei clienti (`/area/registrati`): il cliente conferma l'indirizzo con il link ricevuto via email (valido 24 ore) e poi entra. Anfibiasub riceve un'email per ogni nuovo cliente registrato. I Termini di servizio si scrivono in `src/termini.js`.
+
 5. In **Gestione → Impostazioni** usa *Manda un'email di prova a me*.
 
 ---
@@ -88,7 +90,7 @@ Per rigenerarla dopo una modifica ai testi: `python3 sito/build.py --prod`.
 ### 3.2 Area clienti su clienti.anfibiasub.it
 1. Railway → servizio → **Settings → Networking → Custom Domain** → `clienti.anfibiasub.it`. Railway mostra i record DNS da creare.
 2. cPanel HostGator → **Zone Editor** → `anfibiasub.it` → aggiungi i record indicati da Railway (un **CNAME** `clienti` e, se lo chiede, un **TXT** di verifica). Non toccare i record **MX**.
-3. Su Railway imposta `SERVE_SITE=off` (la radice porta all'area clienti) e `APP_URL=https://clienti.anfibiasub.it`.
+3. Su Railway imposta `SERVE_SITE=off` (la radice porta all'area clienti), `APP_URL=https://clienti.anfibiasub.it` e `SITE_URL=https://www.anfibiasub.it` (i link al sito e alla privacy dall'area clienti).
 
 ---
 

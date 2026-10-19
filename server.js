@@ -14,7 +14,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.disable('x-powered-by');
 // valori di partenza per le pagine (sovrascritti da loadUser)
 // versione dei file CSS/JS: cambia a ogni modifica, così i browser non usano copie vecchie
-const ASSET_V = require('crypto').createHash('md5').update(['public/css/style.css', 'public/css/app.css', 'public/js/app.js', 'public/js/guida.js', 'public/js/skytts.js'].map((f) => require('fs').readFileSync(path.join(__dirname, f))).join('')).digest('hex').slice(0, 8);
+const ASSET_V = require('crypto').createHash('md5').update(['public/css/style.css', 'public/css/app.css', 'public/js/app.js', 'public/js/guida.js', 'public/js/skytts.js', 'public/js/register.js'].map((f) => require('fs').readFileSync(path.join(__dirname, f))).join('')).digest('hex').slice(0, 8);
 Object.assign(app.locals, { ASSET_V, user: null, lang: 'it', L: require('./src/i18n').t('it'), path: '', flash: null });
 
 app.use(helmet({

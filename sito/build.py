@@ -102,11 +102,9 @@ def footer(lang):
 <p>Via Dufour 23, Carcare (SV)</p>
 <p><a href="mailto:{MAIL}">{MAIL}</a></p>
 </div>
-<div>
-<h3>FRANCESCO</h3>
-<p><a href="tel:{TEL_F}">347 011 9832</a></p>
-<h3 class="foot-h2">SIMONE</h3>
-<p><a href="tel:{TEL_S}">347 038 7290</a></p>
+<div class="foot-tel">
+<div><h3>FRANCESCO</h3><p><a href="tel:{TEL_F}">347 011 9832</a></p></div>
+<div><h3>SIMONE</h3><p><a href="tel:{TEL_S}">347 038 7290</a></p></div>
 </div>
 <div class="foot-links">
 <h3>{U["site"]}</h3>
@@ -114,10 +112,9 @@ def footer(lang):
 <p><a href="{url('lavori', lang)}">{dict(U['nav'])['lavori']}</a></p>
 <p><a href="{url('utilita', lang)}">{dict(U['nav'])['utilita']}</a></p>
 <p><a href="{area_url(lang)}">{U["area"]}</a></p>
-<p><a href="{url('privacy', lang)}">{U["privacy"]}</a></p>
 </div>
 </div>
-<div class="foot-bottom"><span>© Anfibiasub · P.I. 01326660097</span><span>{U["no_cookie"]}</span></div>
+<div class="foot-bottom"><span>© Anfibiasub · P.I. 01326660097</span><a href="{url('privacy', lang)}">{U["privacy"]}</a></div>
 </div>
 </footer>
 <a class="wa" href="{WA}" target="_blank" rel="noopener" aria-label="{U["wa"]}">{WA_ICON}</a>

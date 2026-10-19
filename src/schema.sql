@@ -124,3 +124,11 @@ CREATE TABLE IF NOT EXISTS mail_log (
 -- Lingue ammesse (aggiornabile su database già esistenti)
 ALTER TABLE users DROP CONSTRAINT IF EXISTS users_lang_check;
 ALTER TABLE users ADD CONSTRAINT users_lang_check CHECK (lang IN ('it','en','es','de'));
+
+-- Registrazione autonoma con verifica dell'email (gli utenti già esistenti risultano verificati)
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS verify_token TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS verify_expires TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS terms_accepted_at TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS self_registered BOOLEAN NOT NULL DEFAULT FALSE;
+CREATE INDEX IF NOT EXISTS users_verify_token ON users(verify_token);

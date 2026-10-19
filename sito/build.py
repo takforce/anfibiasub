@@ -53,7 +53,7 @@ def header(cur, lang, overlay):
 <header class="site-header{'' if overlay else ' solid'}">
 <div class="wrap nav-row">
 <a class="logo" href="{url('home', lang)}" aria-label="Anfibiasub, home">
-<span class="logo-mark">{LOGO}</span>
+<img class="logo-img" src="/img/logo-anfibia-96.png" alt="" width="52" height="52">
 <span class="logo-txt"><span class="logo-name">ANFIBIA<span class="hl">SUB</span></span><span class="logo-sub">{U["tagline"]}</span></span>
 </a>
 <button class="menu-btn" type="button" aria-label="{U["menu_open"]}" aria-expanded="false" aria-controls="nav">{MENU}</button>
@@ -73,7 +73,7 @@ def footer(lang):
 <div class="wrap">
 <div class="foot-grid">
 <div>
-<div class="logo-name" style="color:#fff">ANFIBIA<span class="hl">SUB</span></div>
+<img src="/img/logo-anfibia-96.png" alt="Anfibiasub" width="72" height="72" style="border-radius:50%;margin-bottom:10px">
 <p style="margin-top:6px">{U["foot_about"]}</p>
 </div>
 <div>
@@ -122,7 +122,8 @@ def page(key, lang, title, desc, body, overlay=False, og='porto-loano'):
 <meta property="og:image" content="{SITE_URL}/img/{og}.webp">
 <meta property="og:locale" content="{'it_IT' if lang == 'it' else 'en_GB'}">
 <meta name="theme-color" content="#050E1A">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/fonts/montserrat-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css">
 </head>

@@ -40,7 +40,11 @@ app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 // (serve quando il sito sta su anfibiasub.it e qui resta solo clienti.anfibiasub.it).
 const serveSite = process.env.SERVE_SITE !== 'off';
 if (!serveSite) app.get('/', (req, res) => res.redirect('/area'));
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: '7d', index: serveSite ? 'index.html' : false, extensions: ['html'] }));
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: '7d', index: serveSite ? 'index.html' : false, extensions: ['html'],
+  // le pagine html vanno sempre ricontrollate, così dopo un aggiornamento anche il telefono vede la versione nuova
+  setHeaders: (res, file) => { if (file.endsWith('.html')) res.setHeader('Cache-Control', 'no-cache'); },
+}));
 
 app.get('/health', (req, res) => res.send('ok'));
 

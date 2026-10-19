@@ -502,7 +502,8 @@ def extras_prod():
             lines.append(f'RewriteRule ^{a.lstrip("/")}/?$ {b} [L,R=301,NE]')
     lines += ['# Vecchie pagine inglesi che non esistono più', 'RewriteCond %{REQUEST_FILENAME} !-f', 'RewriteRule ^en/.+$ /en/ [L,R=301]', '', '# Area clienti', 'RewriteRule ^area(/.*)?$ https://clienti.anfibiasub.it/area$1 [L,R=302]', '',
               '# Cache', '<IfModule mod_expires.c>', 'ExpiresActive On', 'ExpiresByType image/webp "access plus 1 month"', 'ExpiresByType font/woff2 "access plus 1 year"',
-              'ExpiresByType text/css "access plus 1 week"', 'ExpiresByType application/javascript "access plus 1 week"', '</IfModule>', '',
+              'ExpiresByType text/css "access plus 1 week"', 'ExpiresByType application/javascript "access plus 1 week"', 'ExpiresByType text/html "access plus 0 seconds"', '</IfModule>',
+              '<IfModule mod_headers.c>', '<FilesMatch "\\.html$">', 'Header set Cache-Control "no-cache"', '</FilesMatch>', '</IfModule>', '',
               'ErrorDocument 404 /index.html']
     with open(os.path.join(OUT, '.htaccess'), 'w') as f:
         f.write('\n'.join(l for l in lines if l is not None) + '\n')

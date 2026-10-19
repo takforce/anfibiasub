@@ -321,4 +321,6 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 }
 /* titoli grandi: mai parole spezzate col trattino */
 .hero h1,.page-hero h1,.h2{hyphens:manual;-webkit-hyphens:manual}
-.hero h1{font-size:clamp(30px,5.4vw,68px);overflow-wrap:normal}
+.hero h1{font-size:min(68px,4.6vw);overflow-wrap:normal;max-width:none}
+.hero h1 .fit{display:block;white-space:nowrap;width:max-content;max-width:100%}
+@media (max-width:767px){.hero h1{font-size:4.9vw}}

@@ -36,3 +36,26 @@
     if (mobile() && btn) { nav.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); }
   });
 })();
+
+// Titolo della home: ogni riga resta su una riga sola e si rimpicciolisce fino a stare nella larghezza
+(function () {
+  var h = document.querySelector('.hero h1');
+  if (!h || !h.querySelector('.fit')) return;
+  var MAX = 68;
+  function fit() {
+    h.style.fontSize = '';
+    var cs = getComputedStyle(h.parentNode);
+    var avail = h.parentNode.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    var lines = h.querySelectorAll('.fit'), size = Math.min(MAX, parseFloat(getComputedStyle(h).fontSize) * 3);
+    h.style.fontSize = size + 'px';
+    var widest = 0;
+    lines.forEach(function (l) { l.style.maxWidth = 'none'; widest = Math.max(widest, l.scrollWidth); });
+    if (widest > avail) size = Math.floor(size * avail / widest * 0.99);
+    h.style.fontSize = Math.min(MAX, size) + 'px';
+    lines.forEach(function (l) { l.style.maxWidth = ''; });
+  }
+  fit();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  window.addEventListener('resize', fit);
+})();
+

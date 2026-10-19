@@ -83,7 +83,7 @@ p{margin:0}
 .hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:70% 40%}
 .hero::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(5,14,26,.96) 0%,rgba(5,14,26,.85) 38%,rgba(5,14,26,.15) 70%,rgba(5,14,26,.35) 100%)}
 .hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:180px;z-index:1;background:linear-gradient(180deg,rgba(5,14,26,0),var(--bg))}
-.hero-body{position:relative;z-index:2;padding-top:170px;padding-bottom:120px}
+.hero-body{width:100%;position:relative;z-index:2;padding-top:220px;padding-bottom:120px}
 .hero-kicker{font-size:13px;letter-spacing:6px;color:var(--cyan);font-weight:500;margin-bottom:18px}
 .hero h1{font-weight:800;font-size:clamp(40px,6vw,72px);line-height:1.02;max-width:760px;margin-bottom:24px}
 .hero-lead{font-size:18px;max-width:560px;margin-bottom:36px}
@@ -173,15 +173,49 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 #vento table.data td:nth-child(3),#vento table.data td:nth-child(4){white-space:nowrap}
 
 /* utilità: meteo, webcam, gps */
-.meteo{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.m-box{background:var(--card2);border:1px solid var(--line2);border-radius:14px;padding:18px}
+.meteo{display:block}
 .m-label{font-size:12px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
-.m-val{font-size:30px;font-weight:800;color:var(--white);line-height:1.2;margin-top:4px}
-.m-val small{font-size:15px;font-weight:500;color:var(--muted)}
-.m-note{font-size:13px;color:var(--muted)}
-.m-days{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-.m-day{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;font-size:14px}
-.m-day b{display:block;color:var(--white);letter-spacing:1px;font-size:12px;margin-bottom:4px}
+.m-note{font-size:12.5px;color:var(--muted);line-height:1.45}
+.mt-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 14px}
+.mt-head h3{font-size:15px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);font-weight:600}
+.mt-head span{font-size:13px;color:var(--dim)}
+.mt-now{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:16px;margin-bottom:34px}
+.mt-wind{display:flex;align-items:center;gap:28px;padding:26px;border-radius:18px;background:radial-gradient(120% 140% at 0% 0%,#0F3556 0%,var(--card2) 55%);border:1px solid var(--line2)}
+.mt-dial{width:170px;height:170px;flex:none}
+.mt-dial text{font-family:inherit;fill:#C9D8E3;font-size:12px;font-weight:600}
+.mt-dial .mt-dial-n{fill:#fff;font-size:26px;font-weight:800}
+.mt-dial .mt-dial-u{fill:var(--muted);font-size:11px;letter-spacing:1px}
+.mt-needle{fill:var(--lv,#22B8F0)}
+.lv-ok{--lv:#3DDC97}.lv-mid{--lv:#FFC542}.lv-hi{--lv:#FF8A3D}.lv-max{--lv:#FF4D5E}
+.mt-big{font-size:34px;font-weight:800;color:#fff;line-height:1.1;margin-top:6px}
+.mt-sub{font-size:15px;color:var(--lv,var(--txt));font-weight:500;margin-top:2px}
+.mt-tile .mt-sub{color:var(--txt)}
+.mt-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.mt-chips span{font-size:13px;color:var(--txt);border:1px solid var(--line2);background:rgba(5,14,26,.4);border-radius:20px;padding:5px 12px}
+.mt-side{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mt-tile{background:var(--card2);border:1px solid var(--line2);border-radius:18px;padding:18px 20px}
+.mt-tile:first-child{grid-column:1/-1}
+.mt-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mt-val{font-size:32px;font-weight:800;color:#fff;line-height:1.15;margin-top:4px}
+.mt-val small{font-size:15px;font-weight:500;color:var(--muted)}
+.mt-bar{height:6px;border-radius:4px;background:rgba(255,255,255,.08);margin-top:12px;overflow:hidden}
+.mt-bar i{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#22B8F0,#3DDC97 40%,#FFC542 70%,#FF4D5E)}
+.mt-days{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+.mt-day{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+.mt-day b{color:#fff;letter-spacing:1px;font-size:13px;text-transform:uppercase}
+.mt-temp{font-size:20px;font-weight:700;color:#fff}
+.mt-temp span{font-size:15px;color:var(--muted);font-weight:500}
+.mt-pill{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:#050E1A;background:var(--lv);border-radius:20px;padding:4px 12px}
+.mt-arr{flex:none}
+@media (max-width:960px){
+  .mt-now{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .mt-wind{flex-direction:column;align-items:flex-start;gap:16px;padding:20px}
+  .mt-dial{width:150px;height:150px;align-self:center}
+  .mt-days{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:42%;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}
+  .mt-day{scroll-snap-align:start}
+}
 .cam-card{position:relative;display:block;border-radius:16px;overflow:hidden;max-width:900px;aspect-ratio:16/8;text-decoration:none;border:1px solid var(--line2)}
 .cam-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .4s}
 .cam-card:hover img{transform:scale(1.03)}
@@ -245,7 +279,6 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
   .wrap{padding-left:16px;padding-right:16px}
   .section{padding:64px 0}
   .g3,.g4,.contact-grid,.modules,.foot-grid{grid-template-columns:1fr}
-  .meteo{grid-template-columns:1fr 1fr}
   .m-days{grid-template-columns:1fr 1fr}
   .gps-map{height:340px}
   .cam-card{aspect-ratio:4/3}
@@ -258,3 +291,34 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
   .logo-sub{display:none}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}a.card{transition:none}}
+
+/* header su due righe (desktop): logo + preventivo, sotto il menu */
+.nav-cta{padding:11px 22px;min-height:44px}
+@media (min-width:1280px){
+  .nav-row{flex-wrap:wrap;row-gap:0;padding-bottom:0}
+  .nav{order:3;flex:0 0 100%;gap:34px;font-size:14px;margin-top:16px;padding:12px 0 14px;border-top:1px solid rgba(255,255,255,.1)}
+  .dd-btn{font-size:14px}
+  .nav .dd-lang{margin-left:auto}
+  .nav-btn-mob{display:none}
+}
+@media (max-width:1279px){.nav-cta{display:none}}
+
+/* pulsanti rapidi home: solo cellulare */
+.quick{display:none}
+.rim-list{list-style:none;padding:0;margin:14px 0 0;display:grid;gap:10px}
+.rim-list li{position:relative;padding-left:26px}
+.rim-list li::before{content:"";position:absolute;left:0;top:.55em;width:12px;height:12px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 4px rgba(34,184,240,.18)}
+.card-text{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+@media (max-width:767px){
+  .m-hide{display:none}
+  .quick{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px;margin:-30px 0 56px;position:relative;z-index:3}
+  .q-tile{display:flex;flex-direction:column;gap:4px;min-height:132px;padding:18px 16px;border-radius:16px;text-decoration:none;background:var(--card2);border:1px solid var(--line2);color:var(--muted);font-size:13px;line-height:1.3}
+  .q-tile svg{width:30px;height:30px;color:var(--cyan);margin-bottom:8px}
+  .q-tile strong{color:var(--white);font-size:18px;font-weight:700}
+  .q-tile:active{transform:scale(.98)}
+  .q-area{background:var(--btn);border-color:var(--btn);color:rgba(5,14,26,.75)}
+  .q-area svg,.q-area strong{color:var(--btntxt)}
+  .q-help{background:#1FA855;border-color:#1FA855;color:rgba(255,255,255,.85)}
+  .q-help svg{color:#fff}
+}
+

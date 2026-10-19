@@ -23,6 +23,10 @@ ARROW = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="current
 LOCK = '<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'
 WA_ICON = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>'
 CHEVRON = '<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>'
+Q_ICON = lambda d: f'<svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">{d}</svg>'  # noqa: E731
+QI_AREA = Q_ICON('<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>')
+QI_METEO = Q_ICON('<path d="M3 8h11a3 3 0 1 0-3-3"/><path d="M3 12h16a3 3 0 1 1-3 3"/><path d="M3 16h7"/>')
+QI_GPS = Q_ICON('<path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.6"/>')
 MENU = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>'
 
 
@@ -72,12 +76,13 @@ def header(cur, lang, overlay):
 <img class="logo-img" src="/img/logo-anfibia-96.png" alt="" width="52" height="52">
 <span class="logo-txt"><span class="logo-name">ANFIBIA<span class="hl">SUB</span></span><span class="logo-sub">{U["tagline"]}</span></span>
 </a>
+<a class="btn nav-cta" href="{url('contatti', lang)}">{U["quote"]}</a>
 <button class="menu-btn" type="button" aria-label="{U["menu_open"]}" aria-expanded="false" aria-controls="nav">{MENU}</button>
 <nav class="nav" id="nav" aria-label="Menu">
 {links}
 <a class="nav-lock" href="{area_url(lang)}">{LOCK}{U["area"]}</a>
 {lang_dd}
-<a class="btn" href="{url('contatti', lang)}">{U["quote"]}</a>
+<a class="btn nav-btn-mob" href="{url('contatti', lang)}">{U["quote"]}</a>
 </nav>
 </div>
 </header>'''
@@ -268,11 +273,18 @@ def build_lang(lang):
 <h1>{T('hero_h1')}</h1>
 <p class="hero-lead">{T('hero_lead')}</p>
 <div class="badges">{badges}</div>
-<a class="btn" href="#servizi">{T('hero_cta')} {ARROW}</a>
+<a class="btn" href="{url('servizi', lang)}">{T('hero_cta')} {ARROW}</a>
 </div>
 </section>
 
-<section class="section" id="servizi" aria-labelledby="srv-t">
+<nav class="quick" aria-label="{U['area']}">
+<a class="q-tile q-area" href="{area_url(lang)}">{QI_AREA}<strong>{T('q_area')[0]}</strong><span>{T('q_area')[1]}</span></a>
+<a class="q-tile q-help" href="{WA}" target="_blank" rel="noopener">{WA_ICON}<strong>{T('q_help')[0]}</strong><span>{T('q_help')[1]}</span></a>
+<a class="q-tile" href="{url('utilita', lang, 'meteo')}">{QI_METEO}<strong>{T('q_meteo')[0]}</strong><span>{T('q_meteo')[1]}</span></a>
+<a class="q-tile" href="{url('utilita', lang, 'gps')}">{QI_GPS}<strong>{T('q_gps')[0]}</strong><span>{T('q_gps')[1]}</span></a>
+</nav>
+
+<section class="section m-hide" id="servizi" aria-labelledby="srv-t">
 <div class="wrap">
 <div class="sec-head">
 <div>
@@ -286,7 +298,7 @@ def build_lang(lang):
 </div>
 </section>
 
-<section class="section band" aria-labelledby="chi-t">
+<section class="section band m-hide" aria-labelledby="chi-t">
 <div class="wrap">
 <p class="eyebrow">{N['chi']}</p>
 <h2 class="h2" id="chi-t">{T('fam_h2')}</h2>
@@ -295,7 +307,7 @@ def build_lang(lang):
 </div>
 </section>
 
-<section class="section" aria-labelledby="lav-t">
+<section class="section m-hide" aria-labelledby="lav-t">
 <div class="wrap">
 <div class="sec-head">
 <div>
@@ -308,7 +320,7 @@ def build_lang(lang):
 </div>
 </section>
 
-<section class="section band" id="area" aria-labelledby="area-t">
+<section class="section band m-hide" id="area" aria-labelledby="area-t">
 <div class="wrap split">
 <div>
 <p class="eyebrow">{T('area_eyebrow')}</p>
@@ -330,7 +342,7 @@ def build_lang(lang):
 
     # LAVORI
     lav = phero('pietra-ligure', N['lavori'], T('lav_h2'), T('lav_page_lead'))
-    lav += '<div class="wrap"><div>' + ''.join(detail(l, l[lang], l[lang]['luogo']) for l in LAVORI) + '</div></div>' + cta(lang)
+    lav += '<div class="wrap"><div>' + ''.join(detail(l, l[lang], l[lang]['luogo'], paras=l[lang].get('body')) for l in LAVORI) + '</div></div>' + cta(lang)
     page('lavori', lang, N['lavori'] + ' · Anfibiasub', T('lav_desc'), lav, og='pietra-ligure')
 
     # CHI SIAMO
@@ -343,6 +355,20 @@ def build_lang(lang):
 <div class="g4">{mezzi_html(lang)}</div>
 </div></section>''' + tow_band(lang)
     page('chi', lang, N['chi'] + ' · Anfibiasub', T('chi_desc'), chi, og='spianamenti')
+
+    # RIMORCHIATORE
+    rim = phero('rimorchiatore', N['rimorchiatore'], T('rim_h1'), T('rim_lead'))
+    rim_li = ''.join(f'<li>{e(x)}</li>' for x in T('rim_list'))
+    rim += f'''<section class="section"><div class="wrap">
+<article class="detail" id="elansa">
+<div class="detail-img"><img src="/img/rimorchiatore.webp" alt="{T('tug')} Elansa" width="1536" height="1024" loading="lazy"></div>
+<div><span class="card-place">{T('rim_cert')} · {T('rim_base')}</span><h2>{T('rim_what')}</h2>
+<ul class="rim-list">{rim_li}</ul>
+<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:22px"><a class="btn" href="tel:{TEL_F}">{U["call_now"]} {ARROW}</a><a class="btn btn-ghost" href="{WA}" target="_blank" rel="noopener">WhatsApp</a></div>
+</div>
+</article>
+</div></section>''' + cta(lang)
+    page('rimorchiatore', lang, N['rimorchiatore'] + ' · Anfibiasub', T('rim_desc'), rim, og='rimorchiatore')
 
     # UTILITÀ
     page('utilita', lang, N['utilita'] + ' · Anfibiasub', T('uti_desc'), utilita_html(lang), og='catenarie')
@@ -444,7 +470,7 @@ def extras_prod():
     # Reindirizzamenti dai vecchi indirizzi Joomla, così i link salvati e Google non portano a pagine vuote
     old = {
         '/it/': '/', '/it': '/', '/it/chi-siamo': '/chi-siamo.html', '/it/contatti': '/contatti.html',
-        '/it/attrezzatura': '/chi-siamo.html#mezzi', '/it/rimorchiatore': '/chi-siamo.html#mezzi',
+        '/it/attrezzatura': '/chi-siamo.html#mezzi', '/it/rimorchiatore': '/rimorchiatore.html',
         '/it/utilita/vento': '/utilita.html#vento', '/it/utilita/cime': '/utilita.html#cime', '/it/utilita/cavi': '/utilita.html#cavi', '/it/utilita/catene': '/utilita.html#catene',
     }
     svc = {'lavori-edili-subacquei': 'edili', 'metalmeccanica-subacquea': 'metalmeccanica', 'recuperi': 'recuperi', 'alaggi-e-vari': 'alaggi',

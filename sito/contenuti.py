@@ -17,12 +17,13 @@ PAGES = {
     'lavori':   {'it': 'lavori.html',    'en': 'en/works.html',    'es': 'es/trabajos.html',   'de': 'de/referenzen.html'},
     'utilita':  {'it': 'utilita.html',   'en': 'en/tools.html',    'es': 'es/utilidades.html', 'de': 'de/nuetzliches.html'},
     'contatti': {'it': 'contatti.html',  'en': 'en/contact.html',  'es': 'es/contacto.html',   'de': 'de/kontakt.html'},
+    'rimorchiatore': {'it': 'rimorchiatore.html', 'en': 'en/tug.html', 'es': 'es/remolcador.html', 'de': 'de/schlepper.html'},
     'privacy':  {'it': 'privacy.html',   'en': 'en/privacy.html',  'es': 'es/privacidad.html', 'de': 'de/datenschutz.html'},
 }
 
 UI = {
     'it': {
-        'nav': [('home', 'Home'), ('chi', 'Chi siamo'), ('servizi', 'Servizi'), ('lavori', 'Lavori eseguiti'), ('utilita', 'Utilità'), ('contatti', 'Contatti')],
+        'nav': [('home', 'Home'), ('chi', 'Chi siamo'), ('servizi', 'Servizi'), ('lavori', 'Lavori eseguiti'), ('rimorchiatore', 'Rimorchiatore'), ('utilita', 'Utilità'), ('contatti', 'Contatti')],
         'area': 'Area clienti', 'quote': 'Richiedi un preventivo', 'skip': 'Vai al contenuto',
         'menu_open': 'Apri il menu', 'tagline': 'LAVORI MARITTIMI SUBACQUEI', 'more': 'Scopri',
         'all_services': 'Tutti i servizi', 'all_works': 'Tutti i {n} lavori', 'call_now': 'CHIAMA ORA',
@@ -32,7 +33,7 @@ UI = {
         'lang_label': 'Lingua',
     },
     'en': {
-        'nav': [('home', 'Home'), ('chi', 'About us'), ('servizi', 'Services'), ('lavori', 'Our work'), ('utilita', 'Tools'), ('contatti', 'Contact')],
+        'nav': [('home', 'Home'), ('chi', 'About us'), ('servizi', 'Services'), ('lavori', 'Our work'), ('rimorchiatore', 'Tug'), ('utilita', 'Tools'), ('contatti', 'Contact')],
         'area': 'Customer area', 'quote': 'Request a quote', 'skip': 'Skip to content',
         'menu_open': 'Open menu', 'tagline': 'UNDERWATER MARINE WORKS', 'more': 'Learn more',
         'all_services': 'All services', 'all_works': 'All {n} projects', 'call_now': 'CALL NOW',
@@ -53,7 +54,7 @@ SERVIZI = [
                  body=['After years of testing we developed a method to clean and descale propellers of any size directly in the water. No haul-out, no yard: costs are halved.',
                        'Algae and small shellfish on the underwater hull slow the boat down: you lose speed, burn more fuel and strain the engine. Like a visit to the dentist, regular maintenance costs little and pays for itself straight away in fuel savings.',
                        'Our system reduces the diver\'s effort and does not pollute the harbour water.'])),
-    dict(id='carenaggi', img='pulizia-eliche', pos='20% 60%',
+    dict(id='carenaggi', img='alaggi',  # provvisoria: in attesa dell'immagine IA 'carenaggi'
          it=dict(t='Carenaggi', short='Spugne morbide per la vela, più abrasive per il motore, macchinari dedicati per le navi.',
                  body=['Puliamo la carena in acqua scegliendo lo strumento in base allo scafo: spugne idonee per le barche a vela, spugne più abrasive per le barche a motore.',
                        'Per le navi usiamo macchinari specifici ad assetto variabile, che lavorano su grandi superfici in tempi ridotti.']),
@@ -274,6 +275,10 @@ for _s in SERVIZI:
     _s.update(SERVIZI_ES_DE[_s['id']])
 for _l in LAVORI:
     _l.update(LAVORI_ES_DE[_l['id']])
+from lavori_testi import LAV_TXT  # noqa: E402
+for _l in LAVORI:
+    for _lg, _v in LAV_TXT.get(_l['id'], {}).items():
+        _l[_lg].update(_v)
 for _p in TEAM:
     _p.update(TEAM_ES_DE[_p['ini']])
 MEZZI.update(MEZZI_ES_DE)

@@ -23,7 +23,7 @@ PAGES = {
 
 UI = {
     'it': {
-        'nav': [('home', 'Home'), ('chi', 'Chi siamo'), ('servizi', 'Servizi'), ('lavori', 'Lavori eseguiti'), ('rimorchiatore', 'Rimorchiatore'), ('utilita', 'Utilità'), ('contatti', 'Contatti')],
+        'nav': [('home', 'Home'), ('servizi', 'Servizi'), ('lavori', 'Lavori eseguiti'), ('utilita', 'Utilità'), ('chi', 'Chi siamo'), ('rimorchiatore', 'Rimorchiatore'), ('contatti', 'Contatti')],
         'area': 'Area clienti', 'quote': 'Richiedi un preventivo', 'skip': 'Vai al contenuto',
         'menu_open': 'Apri il menu', 'tagline': 'LAVORI MARITTIMI SUBACQUEI', 'more': 'Scopri',
         'all_services': 'Tutti i servizi', 'all_works': 'Tutti i {n} lavori', 'call_now': 'CHIAMA ORA',
@@ -33,7 +33,7 @@ UI = {
         'lang_label': 'Lingua',
     },
     'en': {
-        'nav': [('home', 'Home'), ('chi', 'About us'), ('servizi', 'Services'), ('lavori', 'Our work'), ('rimorchiatore', 'Tug'), ('utilita', 'Tools'), ('contatti', 'Contact')],
+        'nav': [('home', 'Home'), ('servizi', 'Services'), ('lavori', 'Our work'), ('utilita', 'Tools'), ('chi', 'About us'), ('rimorchiatore', 'Tug'), ('contatti', 'Contact')],
         'area': 'Customer area', 'quote': 'Request a quote', 'skip': 'Skip to content',
         'menu_open': 'Open menu', 'tagline': 'UNDERWATER MARINE WORKS', 'more': 'Learn more',
         'all_services': 'All services', 'all_works': 'All {n} projects', 'call_now': 'CALL NOW',

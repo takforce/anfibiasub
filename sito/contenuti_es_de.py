@@ -3,7 +3,7 @@
 
 UI_ES_DE = {
     'es': {
-        'nav': [('home', 'Inicio'), ('chi', 'Quiénes somos'), ('servizi', 'Servicios'), ('lavori', 'Trabajos realizados'), ('rimorchiatore', 'Remolcador'), ('utilita', 'Utilidades'), ('contatti', 'Contacto')],
+        'nav': [('home', 'Inicio'), ('servizi', 'Servicios'), ('lavori', 'Trabajos realizados'), ('utilita', 'Utilidades'), ('chi', 'Quiénes somos'), ('rimorchiatore', 'Remolcador'), ('contatti', 'Contacto')],
         'area': 'Área de clientes', 'quote': 'Pedir presupuesto', 'skip': 'Ir al contenido',
         'menu_open': 'Abrir el menú', 'tagline': 'TRABAJOS MARÍTIMOS SUBACUÁTICOS', 'more': 'Ver más',
         'all_services': 'Todos los servicios', 'all_works': 'Los {n} trabajos', 'call_now': 'LLÁMANOS',
@@ -13,7 +13,7 @@ UI_ES_DE = {
         'lang_label': 'Idioma',
     },
     'de': {
-        'nav': [('home', 'Start'), ('chi', 'Über uns'), ('servizi', 'Leistungen'), ('lavori', 'Referenzen'), ('rimorchiatore', 'Schlepper'), ('utilita', 'Nützliches'), ('contatti', 'Kontakt')],
+        'nav': [('home', 'Start'), ('servizi', 'Leistungen'), ('lavori', 'Referenzen'), ('utilita', 'Nützliches'), ('chi', 'Über uns'), ('rimorchiatore', 'Schlepper'), ('contatti', 'Kontakt')],
         'area': 'Kundenbereich', 'quote': 'Angebot anfordern', 'skip': 'Zum Inhalt',
         'menu_open': 'Menü öffnen', 'tagline': 'MARITIME UNTERWASSERARBEITEN', 'more': 'Mehr erfahren',
         'all_services': 'Alle Leistungen', 'all_works': 'Alle {n} Referenzen', 'call_now': 'JETZT ANRUFEN',

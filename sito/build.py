@@ -277,7 +277,6 @@ def build_lang(lang):
 <h1>{T('hero_h1')}</h1>
 <p class="hero-lead">{T('hero_lead')}</p>
 <div class="badges">{badges}</div>
-<a class="btn" href="{url('servizi', lang)}">{T('hero_cta')} {ARROW}</a>
 </div>
 </section>
 

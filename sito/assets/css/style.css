@@ -364,4 +364,6 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
   .q-help{background:#1FA855;border-color:#1FA855;color:rgba(255,255,255,.85)}
   .q-help svg{color:#fff}
 }
-
+/* titoli grandi: mai parole spezzate col trattino */
+.hero h1,.page-hero h1,.h2{hyphens:manual;-webkit-hyphens:manual}
+.hero h1{font-size:clamp(30px,5.4vw,68px);overflow-wrap:normal}

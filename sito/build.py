@@ -370,7 +370,6 @@ def build_lang(lang):
 <div class="detail-img"><img src="/img/rimorchiatore.webp" alt="{T('tug')} Elansa" width="1536" height="1024" loading="lazy"></div>
 <div><span class="card-place">{T('rim_cert')} · {T('rim_base')}</span><h2>{T('rim_what')}</h2>
 <ul class="rim-list">{rim_li}</ul>
-<div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:22px"><a class="btn" href="tel:{TEL_F}">{U["call_now"]} {ARROW}</a><a class="btn btn-ghost" href="{WA}" target="_blank" rel="noopener">WhatsApp</a></div>
 </div>
 </article>
 </div></section>''' + cta(lang)

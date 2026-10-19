@@ -23,10 +23,12 @@
 <a href="/admin"<%- path === '/admin' || path.startsWith('/admin/barca') ? ' aria-current="page"' : '' %>>Clienti e barche</a>
 <a href="/admin/clienti/nuovo"<%- path === '/admin/clienti/nuovo' ? ' aria-current="page"' : '' %>>Nuovo cliente</a>
 <a href="/admin/impostazioni"<%- path === '/admin/impostazioni' ? ' aria-current="page"' : '' %>>Impostazioni</a>
+<a href="/admin/guida"<%- path === '/admin/guida' ? ' aria-current="page"' : '' %>>Guida</a>
 <% } else { %>
 <a href="/area/home"<%- path === '/area/home' ? ' aria-current="page"' : '' %>><%= L.home %></a>
 <a href="/area/scheda"<%- path === '/area/scheda' ? ' aria-current="page"' : '' %>><%= L.boat_sheet %></a>
 <a href="/area/manutenzione"<%- path === '/area/manutenzione' ? ' aria-current="page"' : '' %>><%= L.maintenance %></a>
+<a href="/area/guida"<%- path === '/area/guida' ? ' aria-current="page"' : '' %>>Guida</a>
 <% } %>
 <a href="/area/profilo"<%- path === '/area/profilo' ? ' aria-current="page"' : '' %>><%= user.name ? user.name.split(' ')[0] : L.profile %></a>
 <form method="post" action="/area/logout"><button class="linkbtn" type="submit"><%= L.logout %></button></form>

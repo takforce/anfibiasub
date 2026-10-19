@@ -14,7 +14,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.disable('x-powered-by');
 // valori di partenza per le pagine (sovrascritti da loadUser)
 // versione dei file CSS/JS: cambia a ogni modifica, così i browser non usano copie vecchie
-const ASSET_V = require('crypto').createHash('md5').update(['public/css/style.css', 'public/css/app.css', 'public/js/app.js'].map((f) => require('fs').readFileSync(path.join(__dirname, f))).join('')).digest('hex').slice(0, 8);
+const ASSET_V = require('crypto').createHash('md5').update(['public/css/style.css', 'public/css/app.css', 'public/js/app.js', 'public/js/guida.js', 'public/js/skytts.js'].map((f) => require('fs').readFileSync(path.join(__dirname, f))).join('')).digest('hex').slice(0, 8);
 Object.assign(app.locals, { ASSET_V, user: null, lang: 'it', L: require('./src/i18n').t('it'), path: '', flash: null });
 
 app.use(helmet({
@@ -25,6 +25,7 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
       connectSrc: ["'self'", 'https://api.open-meteo.com', 'https://marine-api.open-meteo.com'],
+      mediaSrc: ["'self'", 'blob:'],
       frameAncestors: ["'none'"],
       formAction: ["'self'"],
     },
@@ -51,6 +52,7 @@ app.get('/health', (req, res) => res.send('ok'));
 app.use(sessionMiddleware());
 app.use(sameOrigin);
 app.use(loadUser);
+app.use('/api', require('./src/tts'));
 app.use('/area', require('./src/routes/area'));
 app.use('/admin', require('./src/routes/admin'));
 app.get('/condividi/:tk', (req, res) => res.redirect(`/area/condividi/${encodeURIComponent(req.params.tk)}`));
@@ -71,7 +73,7 @@ async function firstAdmin() {
   const pw = process.env.ADMIN_PASSWORD || '';
   if (!email || pw.length < 8) { console.log('Nessun amministratore: imposta ADMIN_EMAIL e ADMIN_PASSWORD (min 8 caratteri) e riavvia.'); return; }
   const hash = await require('bcryptjs').hash(pw, 12);
-  await q("INSERT INTO users(email, password_hash, name, role, must_change_password) VALUES ($1,$2,'Anfibiasub','admin',false)", [email, hash]);
+  await q("INSERT INTO users(email, password_hash, name, role, must_change_password) VALUES ($1,$2,'Creator','admin',false)", [email, hash]);
   console.log('Amministratore creato:', email);
 }
 

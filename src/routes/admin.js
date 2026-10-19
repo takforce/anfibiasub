@@ -198,6 +198,8 @@ r.post('/cliente/:id/barca', async (req, res) => {
 });
 
 // ---------- impostazioni ----------
+r.get('/guida', (req, res) => res.render('guida', { G: require('../guida').GESTIONE, titolo: 'Guida alla gestione', intro: 'Come si usa la parte riservata ad Anfibiasub. Tocca "Ascolta" per sentire una sezione, oppure ascolta tutta la guida dall\'inizio.' }));
+
 r.get('/impostazioni', async (req, res) => {
   const admins = await all("SELECT id, name, email, last_login FROM users WHERE role='admin' ORDER BY id");
   const mails = await all('SELECT * FROM mail_log ORDER BY created_at DESC LIMIT 15');

@@ -192,6 +192,7 @@ r.get('/foto/:id', async (req, res) => {
   sendPhoto(res, p, req.query.t === '1' ? 'thumb' : 'big');
 });
 
+r.get('/guida', (req, res) => res.render('guida', { G: require('../guida').CLIENTE, titolo: 'Guida all\'area clienti', intro: 'Come usare la tua area personale. Tocca "Ascolta" per sentire una sezione, oppure ascolta tutta la guida dall\'inizio.' }));
 r.get('/profilo', (req, res) => res.render('app/profilo', { error: null }));
 r.post('/profilo', async (req, res) => {
   const lang = LANGS.includes(req.body.lang) ? req.body.lang : 'it';

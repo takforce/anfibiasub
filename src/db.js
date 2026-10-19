@@ -36,6 +36,12 @@ async function migrate() {
   for (const [k, v] of Object.entries(DEFAULT_SETTINGS)) {
     await q('INSERT INTO settings(key, value) VALUES ($1,$2) ON CONFLICT (key) DO NOTHING', [k, v]);
   }
+  // Una sola volta: il creatore del sito appare come "Creator", l'account di Francesco come "Anfibiasub"
+  if (!(await one("SELECT 1 FROM settings WHERE key='nomi_admin_v1'"))) {
+    await q("UPDATE users SET name='Creator' WHERE role='admin' AND lower(email)='ivano.taccucci@libero.it'");
+    await q("UPDATE users SET name='Anfibiasub' WHERE role='admin' AND lower(email)='termoclino@libero.it'");
+    await q("INSERT INTO settings(key, value) VALUES ('nomi_admin_v1','1') ON CONFLICT (key) DO NOTHING");
+  }
 }
 
 async function settings() {

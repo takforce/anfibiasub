@@ -64,6 +64,8 @@ Senza questo passaggio tutto funziona, ma le email non partono (credenziali, nuo
 3. **Barca → Anodi**: il registro lo gestisce il cliente, ma Anfibiasub può aggiungere e correggere.
 4. **Impostazioni**: link della webcam di Loano, numero WhatsApp, email per i promemoria, mesi dei semafori.
 
+5. **Guida**: nel menu, sia per i clienti (`/area/guida`) sia per la gestione (`/admin/guida`). Ogni sezione si può ascoltare: la voce (Elsa, Isabella o Diego) è generata dal server con le voci neurali Microsoft Edge, come in SkyApp; se il server non risponde si usa la voce del telefono. I testi sono in `src/guida.js` (solo italiano).
+
 Semafori (modificabili): pulizia verde fino a 6 mesi, giallo fino a 12, poi rosso. Anodi verde fino a 10 mesi dal montaggio, giallo fino a 12, poi rosso; diventano gialli anche quando arriva la data di avviso scelta dal cliente.
 
 ---

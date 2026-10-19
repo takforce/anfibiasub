@@ -1,0 +1,45 @@
+<%- include('partials/top', { title: titolo }) %>
+<main class="app-main guida" id="main" lang="it">
+<div class="page-top">
+<div>
+<p class="eyebrow">Guida</p>
+<h1><%= titolo %></h1>
+<p class="sub"><%= intro %></p>
+</div>
+</div>
+
+<div class="g-bar" data-gbar>
+<button class="btn g-play-all" type="button" data-play-all>
+<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Ascolta tutta la guida</button>
+<button class="btn btn-ghost g-stop" type="button" data-stop hidden>
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>Ferma</button>
+<label class="g-voice">Voce
+<select data-voice>
+<option value="elsa">Elsa</option>
+<option value="isabella">Isabella</option>
+<option value="diego">Diego</option>
+</select></label>
+<span class="g-status" data-status aria-live="polite"></span>
+</div>
+
+<nav class="g-index" aria-label="Indice">
+<% G.forEach((s, i) => { %><a href="#g<%= i + 1 %>"><span><%= i + 1 %></span><%= s.t %></a><% }) %>
+</nav>
+
+<% G.forEach((s, i) => { %>
+<section class="panel g-sec" id="g<%= i + 1 %>" data-sec>
+<div class="g-head">
+<span class="g-num"><%= i + 1 %></span>
+<h2 data-say><%= s.t %></h2>
+<button class="g-play" type="button" data-play aria-label="Ascolta: <%= s.t %>">
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span>Ascolta</span></button>
+</div>
+<div class="g-body">
+<% (s.p || []).forEach((t) => { %><p data-say><%= t %></p><% }) %>
+<% if (s.li) { %><ul><% s.li.forEach((t) => { %><li data-say><%= t %></li><% }) %></ul><% } %>
+<% (s.p2 || []).forEach((t) => { %><p data-say><%= t %></p><% }) %>
+</div>
+</section>
+<% }) %>
+</main>
+<%- include('partials/bottom', { scripts: ['/js/skytts.js?v=' + ASSET_V, '/js/guida.js?v=' + ASSET_V] }) %>

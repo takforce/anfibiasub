@@ -673,3 +673,10 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
   .dv-rope,.dv-rope2{display:none!important}
   .dv-line{display:block;position:fixed;top:0;bottom:0;z-index:29;pointer-events:none;background:url(/img/sub-cima-fissa.png) center top/100% auto repeat-y}
 }
+/* mai parole spezzate col trattino, in nessuna pagina */
+*{hyphens:manual!important;-webkit-hyphens:manual!important}
+/* niente parole sole a capo: righe bilanciate */
+p,li,.lead,.fs-t,.card-text{text-wrap:pretty}
+h1,h2,h3,.fasi-list b{text-wrap:balance}
+/* da PC i sottotitoli usano più larghezza, così non vanno a capo per una parola */
+@media (min-width:1024px){.lead{max-width:880px}.page-hero .lead{max-width:760px}}

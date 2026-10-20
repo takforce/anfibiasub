@@ -282,7 +282,7 @@ def moduli_html(lang):
 
 def tow_band(lang):
     return f'''<section class="tow" aria-labelledby="tow-t">
-<img src="/img/rimorchiatore.webp" alt="">
+<img src="/img/elansa-traino.webp" alt="">
 <div class="wrap">
 <div class="tow-title">
 <p class="eyebrow">{tx(lang, 'tug')} Elansa · IMO STCW 95</p>
@@ -446,7 +446,7 @@ def build_lang(lang):
     page('chi', lang, N['chi'] + ' · Anfibiasub', T('chi_desc'), chi, og='spianamenti')
 
     # RIMORCHIATORE
-    rim = phero('webcam-loano', N['rimorchiatore'], T('rim_h1'), T('rim_lead'))
+    rim = phero('elansa-traino', N['rimorchiatore'], T('rim_h1'), T('rim_lead'))
     rim_li = ''.join(f'<li>{e(x)}</li>' for x in T('rim_list'))
     rim += f'''<section class="section"><div class="wrap">
 <article class="detail" id="elansa">
@@ -517,7 +517,7 @@ def utilita_html(lang):
 </section>
 <section class="tool-sec" id="webcam"><h2 class="h2">{title['webcam'][lang]}</h2>
 <a class="cam-card" href="{WEBCAM_URL}" target="_blank" rel="noopener">
-<img src="/img/webcam-loano.webp" alt="" loading="lazy"><span class="cam-live">LIVE</span>
+<img src="/img/porto-loano.webp" alt="" loading="lazy"><span class="cam-live">LIVE</span>
 <span class="cam-txt"><strong>{T('cam_title')}</strong><span>{T('cam_sub')} →</span></span>
 </a>
 </section>

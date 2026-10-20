@@ -572,3 +572,14 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 }
 @media (prefers-reduced-motion:reduce){.dv-bub{animation:none}}
 @media (min-width:1700px){.diver{width:min(calc((100vw - var(--wrap)) / 2 - 40px),calc(100vh * .2))}.dv-scr b{font-size:6.2cqw}.dv-scr small{font-size:3cqw}}
+/* tubo e cima: pezzi presi dall'immagine stessa, attacco sfumato */
+@media (min-width:1700px){
+  .dv-hose{left:37.38%;width:5.65%;transform:none;border-radius:0;bottom:calc(100% - 8px);background:url(/img/sub-tubo.png) center bottom/100% auto repeat-y;
+    -webkit-mask-image:linear-gradient(0deg,transparent 0,#000 10px);mask-image:linear-gradient(0deg,transparent 0,#000 10px)}
+  .dv-rope{left:86.38%;width:4.15%;transform:none;opacity:1;bottom:calc(100% - 8px);background:url(/img/sub-cima.png) center bottom/100% auto repeat-y;
+    -webkit-mask-image:linear-gradient(0deg,transparent 0,#000 10px);mask-image:linear-gradient(0deg,transparent 0,#000 10px)}
+  .dv-rope2{left:93.69%;width:4.32%;transform:none;opacity:1;top:calc(100% - 8px);background:url(/img/sub-cima2.png) center top/100% auto repeat-y;
+    -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 10px);mask-image:linear-gradient(180deg,transparent 0,#000 10px)}
+}
+/* niente riga sotto le testate delle pagine interne, come in home */
+.page-hero{border-bottom:0}

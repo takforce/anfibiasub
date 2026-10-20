@@ -91,8 +91,8 @@
           (wv != null ? '<span class="mb-n">' + T.sea + ' ' + num(wv, 1) + ' m</span>' : '') +
           '</div></div>';
       });
-      box.innerHTML = '<div class="mb-frame"><div class="mb-art">' + html + '</div></div>' +
-        (time ? '<p class="mb-upd">' + T.now + ' · ' + T.upd + ' ' + time + '</p>' : '');
+      box.innerHTML = '<div class="mb-frame"><div class="mb-art">' + html + '</div>' +
+        (time ? '<p class="mb-upd">' + T.now + ' · ' + T.upd + ' ' + time + '</p>' : '') + '</div>';
     }).catch(function () { box.innerHTML = '<p class="hint">' + esc(T.na) + '</p>'; });
   }
 
@@ -185,9 +185,8 @@
           '<div class="gb-leg"><span class="c-g">' + G.leg[0] + '</span><span class="c-y">' + G.leg[1] + '</span><span class="c-r">' + G.leg[2] + '</span></div></div>' +
           '<div class="gb-days">' + days.map(dayBtn).join('') + '</div>' +
           '<div class="gb-det"><div class="gb-info">' + detail(D) + '</div><div class="gb-btns">' + books(D) + '</div></div>' +
-          '</div></div></div>' +
-          '<div class="gb-btns-m">' + books(D) + '</div>' +
-          '<p class="mb-upd">' + G.note + '</p>';
+          '</div></div><p class="mb-upd">' + G.note + '</p></div>' +
+          '<div class="gb-btns-m">' + books(D) + '</div>';
         Array.prototype.forEach.call(gbox.querySelectorAll('.gb-day'), function (b) {
           b.addEventListener('click', function () { sel = +b.getAttribute('data-k'); render(); var nb = gbox.querySelector('.gb-day.is-sel'); if (nb) nb.focus({ preventScroll: true }); });
         });

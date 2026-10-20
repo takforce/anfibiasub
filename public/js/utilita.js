@@ -59,11 +59,11 @@
     var M = 'https://marine-api.open-meteo.com/v1/marine?latitude=44.11&longitude=8.29&current=wave_height,sea_surface_temperature&daily=wave_height_max&timezone=Europe%2FRome&forecast_days=4';
     var get = function (u) { return fetch(u).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }); };
 
-    // posizioni nell'immagine meteo-banner.webp (2003 x 512 px), in percentuale
-    var W0 = 2003, H0 = 512;
+    // posizioni nell'immagine meteo-mare.webp (2172 x 724 px), in percentuale
+    var W0 = 2172, H0 = 724;
     var at = function (x, y, r) { return 'left:' + (x / W0 * 100).toFixed(2) + '%;top:' + (y / H0 * 100).toFixed(2) + '%;width:' + (r * 2 / W0 * 100).toFixed(2) + '%;height:' + (r * 2 / H0 * 100).toFixed(2) + '%'; };
-    var BUB = { wind: [908, 212, 86], sea: [1100, 208, 80], air: [897, 381, 78], water: [1103, 381, 80] };
-    var STONES = [[605, 166, 60], [605, 330, 60], [1395, 166, 60], [1395, 330, 60]];
+    var BUB = { wind: [990, 291, 92], sea: [1213, 291, 88], air: [990, 496, 88], water: [1213, 496, 88] };
+    var STONES = [[659, 268, 70], [659, 436, 70], [1537, 268, 70], [1537, 436, 70]];
 
     Promise.all([get(W), get(M).catch(function () { return null; })]).then(function (res) {
       var w = res[0], m = res[1], c = w.current;
@@ -74,7 +74,7 @@
       var title = box.getAttribute('data-title') || '';
       var bub = function (k, html) { var p = BUB[k]; return '<div class="mb-bub mb-' + k + '" style="' + at(p[0], p[1], p[2]) + '"><div>' + html + '</div></div>'; };
       var html =
-        '<div class="mb-plaque" style="left:50.5%;top:8.6%">' + esc(title) + '</div>' +
+        '<div class="mb-plaque" style="left:50.2%;top:17%">' + esc(title) + '</div>' +
         bub('wind', '<span class="mb-v lv-' + lvl(kn) + '">' + arrow(c.wind_direction_10m, 14) + Math.round(kn) + '<small> kn ' + dir(c.wind_direction_10m) + '</small></span>' +
           '<span class="mb-s">' + T.gusts + ' ' + Math.round(c.wind_gusts_10m) + ' kn</span><span class="mb-s mb-x">' + T.force + ' ' + b + ' · ' + esc(T.bf[b]) + '</span><span class="mb-l">' + T.wind + '</span>') +
         bub('sea', '<span class="mb-v">' + (wave != null ? num(wave, 1) + '<small> m</small>' : '—') + '</span><span class="mb-s">' + (wave != null ? esc(stato(wave)) : '') + '</span><span class="mb-l">' + T.sea + '</span>') +

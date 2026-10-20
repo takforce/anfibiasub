@@ -178,9 +178,9 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .meteo-home{padding:20px 0 0}
 .meteo-home+.section{padding-top:44px}
-/* meteo su immagine (meteo-banner.webp 2003x512): i dati sono posizionati sopra in percentuale */
+/* meteo su immagine (meteo-mare.webp 2172x724): i dati sono posizionati sopra in percentuale */
 .mb-frame{position:relative;overflow:hidden;border-radius:22px;border:1px solid var(--line2);background:#0A1B2E}
-.mb-art{position:relative;width:100%;aspect-ratio:2003/512;background:url(/img/meteo-blu.webp) center/100% 100% no-repeat;container-type:inline-size}
+.mb-art{position:relative;width:100%;aspect-ratio:2172/724;background:url(/img/meteo-mare.webp) center/100% 100% no-repeat;container-type:inline-size}
 .mb-plaque{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font-weight:800;color:#fff;font-size:2.15cqw;letter-spacing:.03em;text-shadow:0 2px 6px rgba(0,0,0,.7)}
 .mb-bub,.mb-stone{position:absolute;transform:translate(-50%,-50%);border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center}
 .mb-bub>div,.mb-stone>div{display:flex;flex-direction:column;align-items:center;gap:.25cqw}
@@ -205,8 +205,8 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 .mt-arr{flex:none}
 /* cellulare: si mostra solo la parte centrale dell'immagine (sassi + medusa), ingrandita */
 @media (max-width:767px){
-  .mb-frame{aspect-ratio:1040/512;border-radius:16px}
-  .mb-art{position:absolute;top:0;width:192.6%;left:-46.15%}
+  .mb-frame{aspect-ratio:1080/724;border-radius:16px}
+  .mb-art{position:absolute;top:0;width:201.1%;left:-51.85%}
   .mb-x,.mb-n{display:none}
   .mb-v{font-size:max(15px,2.1cqw)}
   .mb-s{font-size:9.5px}
@@ -380,3 +380,4 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 }
 
 .hero .badges{margin-bottom:0}
+.mb-stone>div{transform:translateY(-7%)}

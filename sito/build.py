@@ -296,7 +296,7 @@ def tow_band(lang):
 
 def cta(lang):
     U = UI[lang]
-    return f'<section class="section band"><div class="wrap split"><div><h2 class="h2">{U["need"]}</h2><p class="lead">{U["need_lead"]}</p></div><div style="display:flex;flex-wrap:wrap;gap:12px"><a class="btn" href="{WA}" target="_blank" rel="noopener">{U["wa"]}</a><a class="btn btn-ghost" href="tel:{TEL_F}">347 011 9832</a></div></div></section>'
+    return f'<section class="section band"><div class="wrap split"><div><h2 class="h2">{U["need"]}</h2><p class="lead">{U["need_lead"]}</p></div><div style="display:flex;flex-wrap:wrap;gap:12px"><a class="btn" href="{WA}" target="_blank" rel="noopener">{U["wa"]}</a></div></div></section>'
 
 
 def phero(img, eyebrow, h1, lead):

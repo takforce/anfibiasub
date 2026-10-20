@@ -29,7 +29,7 @@ UI = {
         'all_services': 'Tutti i servizi', 'all_works': 'Tutti i {n} lavori', 'call_now': 'CHIAMA ORA',
         'foot_about': 'Lavori marittimi subacquei.<br>Base operativa: porto di Loano (SV).',
         'office': 'Ufficio', 'site': 'SITO', 'privacy': 'Privacy e cookie', 'no_cookie': 'Nessun cookie di profilazione',
-        'wa': 'Scrivici su WhatsApp', 'need': 'Serve un intervento?', 'need_lead': 'Scrivici su WhatsApp o chiamaci: ti rispondiamo in giornata.',
+        'wa': 'Scrivici su WhatsApp', 'need': 'Serve un intervento?', 'need_lead': 'Scrivici su WhatsApp: ti rispondiamo in giornata.',
         'lang_label': 'Lingua',
     },
     'en': {
@@ -39,7 +39,7 @@ UI = {
         'all_services': 'All services', 'all_works': 'All {n} projects', 'call_now': 'CALL NOW',
         'foot_about': 'Underwater marine works.<br>Operating base: Loano harbour (SV), Italy.',
         'office': 'Office', 'site': 'WEBSITE', 'privacy': 'Privacy and cookies', 'no_cookie': 'No tracking cookies',
-        'wa': 'Message us on WhatsApp', 'need': 'Need a job done?', 'need_lead': 'Message us on WhatsApp or call us: we reply the same day.',
+        'wa': 'Message us on WhatsApp', 'need': 'Need a job done?', 'need_lead': 'Message us on WhatsApp: we reply the same day.',
         'lang_label': 'Language',
     },
 }

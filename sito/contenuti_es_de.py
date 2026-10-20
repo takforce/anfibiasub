@@ -9,7 +9,7 @@ UI_ES_DE = {
         'all_services': 'Todos los servicios', 'all_works': 'Los {n} trabajos', 'call_now': 'LLÁMANOS',
         'foot_about': 'Trabajos marítimos subacuáticos.<br>Base operativa: puerto de Loano (SV), Italia.',
         'office': 'Oficina', 'site': 'WEB', 'privacy': 'Privacidad y cookies', 'no_cookie': 'Sin cookies de seguimiento',
-        'wa': 'Escríbenos por WhatsApp', 'need': '¿Necesitas una intervención?', 'need_lead': 'Escríbenos por WhatsApp o llámanos: respondemos en el día.',
+        'wa': 'Escríbenos por WhatsApp', 'need': '¿Necesitas una intervención?', 'need_lead': 'Escríbenos por WhatsApp: respondemos en el día.',
         'lang_label': 'Idioma',
     },
     'de': {
@@ -19,7 +19,7 @@ UI_ES_DE = {
         'all_services': 'Alle Leistungen', 'all_works': 'Alle {n} Referenzen', 'call_now': 'JETZT ANRUFEN',
         'foot_about': 'Maritime Unterwasserarbeiten.<br>Einsatzbasis: Hafen von Loano (SV), Italien.',
         'office': 'Büro', 'site': 'WEBSITE', 'privacy': 'Datenschutz und Cookies', 'no_cookie': 'Keine Tracking-Cookies',
-        'wa': 'Schreiben Sie uns auf WhatsApp', 'need': 'Brauchen Sie einen Einsatz?', 'need_lead': 'Schreiben Sie uns auf WhatsApp oder rufen Sie an: Wir antworten noch am selben Tag.',
+        'wa': 'Schreiben Sie uns auf WhatsApp', 'need': 'Brauchen Sie einen Einsatz?', 'need_lead': 'Schreiben Sie uns auf WhatsApp: Wir antworten noch am selben Tag.',
         'lang_label': 'Sprache',
     },
 }

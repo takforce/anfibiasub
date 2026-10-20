@@ -583,3 +583,9 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 }
 /* niente riga sotto le testate delle pagine interne, come in home */
 .page-hero{border-bottom:0}
+.band{border-top:0;border-bottom:0}
+/* PC: nessuno stacco orizzontale, il piè di pagina sfuma nello sfondo */
+@media (min-width:1024px){
+  .site-footer{background:linear-gradient(180deg,rgba(2,8,13,0) 0,rgba(2,8,13,.55) 140px)}
+  .abyss-bg.is-shallow .ab3{display:none}
+}

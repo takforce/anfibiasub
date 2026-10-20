@@ -102,15 +102,18 @@
   var mq = window.matchMedia('(min-width:1024px)');
   var l2 = bg.querySelector('.ab2'), l3 = bg.querySelector('.ab3');
   var val = document.querySelector('[data-depth]'), bar = document.querySelector('[data-depth-bar]'), diver = document.querySelector('.diver');
-  var MAX = 50, ticking = false;
+  var MAX = +bg.getAttribute('data-max') || 50, shallow = bg.classList.contains('is-shallow'), ticking = false;
   function update() {
     ticking = false;
     if (!mq.matches) return;
     var h = document.documentElement.scrollHeight - window.innerHeight;
     var p = h > 0 ? Math.min(1, Math.max(0, window.scrollY / h)) : 0;
     // 0-50%: superficie -> acqua profonda; 50-100%: acqua profonda -> relitto
-    l2.style.opacity = Math.min(1, p * 2).toFixed(3);
-    l3.style.opacity = Math.max(0, p * 2 - 1).toFixed(3);
+    if (shallow) { l2.style.opacity = p.toFixed(3); l3.style.opacity = 0; }
+    else {
+      l2.style.opacity = Math.min(1, p * 2).toFixed(3);
+      l3.style.opacity = Math.max(0, p * 2 - 1).toFixed(3);
+    }
     if (val) val.textContent = (p * MAX).toFixed(1);
     if (bar) bar.style.height = (p * 100).toFixed(1) + '%';
     // il sub scende dall'alto (sotto l'header) fino in fondo allo schermo

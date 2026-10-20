@@ -93,7 +93,7 @@
       });
       box.innerHTML = '<div class="mb-frame"><div class="mb-art">' + html + '</div>' +
         (time ? '<p class="mb-upd">' + T.now + ' · ' + T.upd + ' ' + time + '</p>' : '') + '</div>';
-    }).catch(function () { box.innerHTML = '<p class="hint">' + esc(T.na) + '</p>'; });
+    }).catch(function () { box.insertAdjacentHTML('beforeend', '<p class="hint">' + esc(T.na) + '</p>'); });
   }
 
   // ---------- GIORNI BUONI PER LAVORARE IN ACQUA ----------
@@ -193,7 +193,7 @@
         });
       };
       render();
-    }).catch(function () { gbox.innerHTML = '<p class="hint">' + G.na + '</p>'; });
+    }).catch(function () { gbox.insertAdjacentHTML('beforeend', '<p class="hint">' + G.na + '</p>'); });
   }
 
   // ---------- MARCATORE GPS ----------

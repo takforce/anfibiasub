@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from contenuti import *  # noqa
 from testi_pagine import TX
 from testi_extra import SOS, GB_TITLE
-from fasi_servizi import FASI, FASI_LABEL, FASI_TITLE
+from fasi_servizi import FASI_LABEL, FASI_TITLE, FASI_GEN, FASI_LEAD
 from schede_attrezzatura import SCHEDE, SCHEDE_POS, SCHEDE_UI, FONTI
 from porto_loano import PORTO_CENTER, PORTO_TITLE, PORTO_LEAD, PORTO_MORE, PORTO_PUNTI
 import json as _json
@@ -320,14 +320,13 @@ FASE_ICONS = [  # valutazione, preparazione, attrezzatura, esecuzione, controllo
 ]
 
 
-def fasi_html(sid, lang):
-    if sid not in FASI:
-        return ''
+def fasi_html(lang):
     steps = ''.join(
         f'<li><span class="fs-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{ic}</svg></span>'
         f'<span class="fs-n">{i + 1}</span><b>{e(lab)}</b><span class="fs-t">{e(txt)}</span></li>'
-        for i, (ic, lab, txt) in enumerate(zip(FASE_ICONS, FASI_LABEL[lang], FASI[sid][lang])))
-    return f'<div class="fasi"><p class="fasi-t">{FASI_TITLE[lang]}</p><ol class="fasi-list">{steps}</ol></div>'
+        for i, (ic, lab, txt) in enumerate(zip(FASE_ICONS, FASI_LABEL[lang], FASI_GEN[lang])))
+    return (f'<section class="fasi" id="come-lavoriamo"><p class="eyebrow">{FASI_TITLE[lang]}</p>'
+            f'<p class="lead fasi-lead">{FASI_LEAD[lang]}</p><ol class="fasi-list">{steps}</ol></section>')
 
 
 def detail(item, x, place=None, paras=None, fasi=''):
@@ -368,7 +367,7 @@ def build_lang(lang):
 
 <section class="meteo-home" aria-label="{dict(UTIL)['meteo'][lang]}">
 <div class="wrap">
-<div class="meteo" data-meteo data-lang="{lang}" data-title="{dict(UTIL)['meteo'][lang]}"><p class="hint">{T('meteo_loading')}</p></div>
+<div class="meteo" data-meteo data-lang="{lang}" data-title="{dict(UTIL)['meteo'][lang]}"><div class="mb-frame"><div class="mb-art"></div></div></div>
 </div>
 </section>
 
@@ -425,7 +424,7 @@ def build_lang(lang):
 
     # SERVIZI
     srv = phero('saldature', N['servizi'], T('srv_page_h1'), T('srv_page_lead'))
-    srv += '<div class="wrap"><div>' + ''.join(detail(s, s[lang], paras=s[lang]['body'], fasi=fasi_html(s['id'], lang)) for s in SERVIZI) + '</div></div>' + cta(lang)
+    srv += '<div class="wrap">' + fasi_html(lang) + '<div>' + ''.join(detail(s, s[lang], paras=s[lang]['body']) for s in SERVIZI) + '</div></div>' + cta(lang)
     page('servizi', lang, N['servizi'] + ' · Anfibiasub', T('srv_desc'), srv, og='saldature')
 
     # LAVORI
@@ -447,7 +446,7 @@ def build_lang(lang):
     page('chi', lang, N['chi'] + ' · Anfibiasub', T('chi_desc'), chi, og='spianamenti')
 
     # RIMORCHIATORE
-    rim = phero('rimorchiatore', N['rimorchiatore'], T('rim_h1'), T('rim_lead'))
+    rim = phero('webcam-loano', N['rimorchiatore'], T('rim_h1'), T('rim_lead'))
     rim_li = ''.join(f'<li>{e(x)}</li>' for x in T('rim_list'))
     rim += f'''<section class="section"><div class="wrap">
 <article class="detail" id="elansa">
@@ -513,8 +512,8 @@ def utilita_html(lang):
     anc = table(['Ø mm', 'CP 1-1b', 'CR 1-1b', 'CP 2', 'CR 2', 'CP 3', 'CR 3', T('anchor_join'), 'Kenter'],
                 [(f'<b>{r[0]}</b>',) + tuple(fmt(x, lang) for x in r[1:]) for r in CATENE_ANCORE], T('anchor_cap'))
     live = f'''<section class="tool-sec" id="meteo"><h2 class="vh">{title['meteo'][lang]}</h2>
-<div class="meteo" data-meteo data-lang="{lang}" data-title="{title['meteo'][lang]}"><p class="hint">{T('meteo_loading')}</p></div>
-<div class="gb" data-giorni data-lang="{lang}" data-title="{GB_TITLE[lang]}"></div>
+<div class="meteo" data-meteo data-lang="{lang}" data-title="{title['meteo'][lang]}"><div class="mb-frame"><div class="mb-art"></div></div></div>
+<div class="gb" data-giorni data-lang="{lang}" data-title="{GB_TITLE[lang]}"><div class="gb-frame"><div class="gb-art"></div></div></div>
 </section>
 <section class="tool-sec" id="webcam"><h2 class="h2">{title['webcam'][lang]}</h2>
 <a class="cam-card" href="{WEBCAM_URL}" target="_blank" rel="noopener">

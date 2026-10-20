@@ -272,3 +272,37 @@ FASI = {
                'Vollständige Unterlagen für Auftraggeber und Genehmigungen.'],
     },
 }
+
+# Procedura generale, mostrata una sola volta in cima alla pagina Servizi
+FASI_LEAD = {
+    'it': 'Ogni intervento, dalla pulizia di un\'elica alla costruzione di un porto, segue gli stessi sei passaggi.',
+    'en': 'Every job, from cleaning a propeller to building a port, follows the same six steps.',
+    'es': 'Cada trabajo, desde limpiar una hélice hasta construir un puerto, sigue los mismos seis pasos.',
+    'de': 'Jeder Einsatz, von der Propellerreinigung bis zum Hafenbau, folgt denselben sechs Schritten.',
+}
+FASI_GEN = {
+    'it': ['Sopralluogo o immersione di ispezione per capire il problema e lo stato dei luoghi.',
+           'Piano di lavoro, messa in sicurezza della zona e accordi con porto, cantiere o gruista.',
+           'Scelta di mezzi e attrezzature adatti a quel lavoro, dal casco OTS al pontone.',
+           'Lavoro in acqua con il sub sempre in contatto con la superficie.',
+           'Verifica finale del risultato prima di chiudere l\'intervento.',
+           'Foto, video e rapporto al cliente; per i clienti dell\'area riservata, tutto online.'],
+    'en': ['Site visit or inspection dive to understand the problem and the conditions.',
+           'Work plan, area made safe and arrangements with marina, yard or crane operator.',
+           'Choice of vessels and equipment suited to the job, from the diving helmet to the pontoon.',
+           'Work in the water, with the diver always in contact with the surface.',
+           'Final check of the result before closing the job.',
+           'Photos, video and report for the client; for customer-area users, everything online.'],
+    'es': ['Visita o inmersión de inspección para entender el problema y el estado del lugar.',
+           'Plan de trabajo, zona asegurada y acuerdos con puerto, astillero o gruista.',
+           'Elección de medios y equipos adecuados al trabajo, del casco al pontón.',
+           'Trabajo en el agua con el buzo siempre en contacto con la superficie.',
+           'Control final del resultado antes de cerrar el trabajo.',
+           'Fotos, vídeo e informe al cliente; para el área de clientes, todo en línea.'],
+    'de': ['Ortstermin oder Inspektionstauchgang, um Problem und Lage zu verstehen.',
+           'Arbeitsplan, Sicherung des Bereichs und Absprache mit Hafen, Werft oder Kranführer.',
+           'Wahl der passenden Fahrzeuge und Ausrüstung, vom Taucherhelm bis zum Ponton.',
+           'Arbeit im Wasser, der Taucher immer in Verbindung mit der Oberfläche.',
+           'Abschließende Kontrolle des Ergebnisses.',
+           'Fotos, Video und Bericht für den Kunden; im Kundenbereich alles online.'],
+}

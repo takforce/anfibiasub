@@ -661,3 +661,9 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 .sch-src{margin-top:16px!important;font-size:12px;color:var(--dim)!important}
 .sch-fonti{margin:2px 0 0;padding-left:18px;font-size:12px}
 .sch-fonti a{color:#8fb0c8}
+/* "Come lavoriamo": una sola volta in cima a Servizi */
+.fasi{grid-column:auto;margin:0;padding:48px 0 8px}
+.fasi .eyebrow{margin-bottom:8px}
+.fasi-lead{margin-bottom:20px}
+/* testi giustificati senza parole spezzate */
+.detail p,.card-text,.tool-sec p,.tool-sec .lead,.prose p,.sch-body p{hyphens:manual;-webkit-hyphens:manual}

@@ -114,7 +114,11 @@
       l2.style.opacity = Math.min(1, p * 2).toFixed(3);
       l3.style.opacity = Math.max(0, p * 2 - 1).toFixed(3);
     }
-    if (val) val.textContent = (p * MAX).toFixed(1);
+    // profondità da 1 m (appena sotto la superficie) al massimo della pagina
+    var depth = 1 + p * (MAX - 1);
+    if (val) val.textContent = depth.toFixed(1);
+    // dai 40 m in giù si accende la torcia sul casco
+    if (diver) diver.style.setProperty('--lamp', Math.min(1, Math.max(0, (depth - 40) / 3)).toFixed(2));
     if (bar) bar.style.height = (p * 100).toFixed(1) + '%';
     // il sub scende dall'alto (sotto l'header) fino in fondo allo schermo
     if (diver && diver.offsetHeight) {
@@ -128,4 +132,95 @@
   if (mq.addEventListener) mq.addEventListener('change', req);
   window.addEventListener('load', req);
   update();
+})();
+
+// ---------- Bolle di scarico dell'OTS: escono dalle valvole sotto il mento, a ritmo di respiro ----------
+(function () {
+  var diver = document.querySelector('.diver');
+  if (!diver || !window.matchMedia || !window.requestAnimationFrame) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var mq = window.matchMedia('(min-width:1700px)');
+  var cv = document.createElement('canvas');
+  cv.className = 'dv-canvas';
+  cv.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(cv);
+  var cx = cv.getContext('2d');
+  if (!cx) return;
+  // valvola di scarico sotto il mento, in % dell'immagine del sub
+  var VX = 0.495, VY = 0.262;
+  var BREATH = 4.6, EXHALE = 1.5; // secondi: un ciclo di respiro e la durata dell'espirazione
+  var bubbles = [], last = 0, t0 = 0, running = false, dpr = 1, W = 0, H = 0;
+
+  function size() {
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = Math.max(0, Math.round((window.innerWidth - 1280) / 2 + 40));
+    H = window.innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function spawn(r, scale) {
+    var side = Math.random() < 0.5 ? -1 : 1;
+    var big = Math.random() < 0.35;
+    bubbles.push({
+      x: r.left + r.width * VX + side * r.width * (0.06 + Math.random() * 0.04),
+      y: r.top + r.height * VY + (Math.random() - 0.5) * 6,
+      vx: side * (25 + Math.random() * 55) * scale,     // si allargano ai lati del casco
+      vy: -(8 + Math.random() * 25) * scale,
+      r: (big ? 5 + Math.random() * 6 : 1.5 + Math.random() * 3.5) * scale,
+      w: Math.random() * 6.28, ws: 2 + Math.random() * 3,
+      max: (110 + Math.random() * 90) * scale
+    });
+  }
+  function draw(b) {
+    var squash = b.r > 4 ? 0.62 : 0.9;                 // le bolle grandi sono schiacciate a "fungo"
+    var x = b.x + Math.sin(b.w) * b.r * 0.35;
+    cx.beginPath();
+    cx.ellipse(x, b.y, b.r, b.r * squash, 0, 0, 6.2832);
+    cx.fillStyle = 'rgba(184,237,250,0.10)';
+    cx.fill();
+    cx.lineWidth = Math.max(0.8, b.r * 0.12);
+    cx.strokeStyle = 'rgba(200,240,255,0.75)';
+    cx.stroke();
+    cx.beginPath();
+    cx.ellipse(x - b.r * 0.35, b.y - b.r * squash * 0.35, b.r * 0.28, b.r * squash * 0.2, -0.5, 0, 6.2832);
+    cx.fillStyle = 'rgba(255,255,255,0.55)';
+    cx.fill();
+  }
+  function frame(ts) {
+    if (!running) return;
+    requestAnimationFrame(frame);
+    if (!t0) t0 = ts;
+    var dt = Math.min(0.05, (ts - (last || ts)) / 1000); last = ts;
+    cx.clearRect(0, 0, W, H);
+    var r = diver.getBoundingClientRect();
+    if (!r.width) return;
+    var scale = r.width / 200;
+    // espirazione: sbuffo di bolle, poi pausa mentre inspira
+    var phase = ((ts - t0) / 1000) % BREATH;
+    if (phase < EXHALE) {
+      var k = phase < 0.3 ? 60 : phase < 1 ? 38 : 14;   // più forte all'inizio dello sbuffo
+      var n = k * dt + Math.random() * 0.5;
+      while (n-- >= 1 && bubbles.length < 260) spawn(r, scale);
+    }
+    for (var i = bubbles.length - 1; i >= 0; i--) {
+      var b = bubbles[i];
+      b.vx *= Math.pow(0.18, dt);                          // la spinta laterale si smorza
+      b.vy = Math.max(-b.max, b.vy - 160 * scale * dt);    // la spinta di galleggiamento le accelera verso l'alto
+      b.x += b.vx * dt; b.y += b.vy * dt; b.w += b.ws * dt;
+      b.r *= 1 + 0.04 * dt;                                // salendo si espandono un poco
+      if (b.y < -30 || b.x < -30 || b.x > W + 30) { bubbles.splice(i, 1); continue; }
+      draw(b);
+    }
+  }
+  function check() {
+    var on = mq.matches && !document.hidden && getComputedStyle(diver).display !== 'none';
+    if (on && !running) { size(); running = true; last = 0; requestAnimationFrame(frame); }
+    if (!on && running) { running = false; bubbles = []; cx.clearRect(0, 0, W, H); }
+  }
+  window.addEventListener('resize', function () { if (running) size(); check(); });
+  document.addEventListener('visibilitychange', check);
+  if (mq.addEventListener) mq.addEventListener('change', check);
+  window.addEventListener('load', check);
+  check();
 })();

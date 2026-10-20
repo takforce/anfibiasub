@@ -192,3 +192,5 @@ details.edit[open] summary{margin-bottom:14px}
 .terms-txt h2{font-size:17px;color:var(--white);margin:16px 0 6px}
 .terms-sep{margin-top:26px!important;padding-top:16px;border-top:1px solid var(--line2)}
 @media (max-width:640px){.reg-two{grid-template-columns:1fr}}
+.login-art > img{object-position:58% 50%}
+@media (min-width:900px){.login-art::before{background:linear-gradient(90deg,rgba(5,14,26,.88) 0,rgba(5,14,26,.6) 38%,rgba(5,14,26,.15) 75%,rgba(5,14,26,.05) 100%)}}

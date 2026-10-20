@@ -589,3 +589,16 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
   .site-footer{background:linear-gradient(180deg,rgba(2,8,13,0) 0,rgba(2,8,13,.55) 140px)}
   .abyss-bg.is-shallow .ab3{display:none}
 }
+/* bolle di scarico realistiche (canvas): sostituiscono la colonna continua */
+.dv-bub{display:none!important}
+.dv-canvas{display:none}
+@media (min-width:1700px){.dv-canvas{display:block;position:fixed;left:0;top:0;z-index:31;pointer-events:none}}
+/* torcia frontale sul casco: si accende dai 40 m */
+@media (min-width:1700px){
+  .dv-lamp{position:absolute;left:64%;top:15.1%;width:0;height:0;opacity:var(--lamp,0);transition:opacity .5s}
+  .dv-lamp::before{content:"";position:absolute;left:-5cqw;top:-5cqw;width:10cqw;height:10cqw;border-radius:50%;
+    background:radial-gradient(circle,#fff 0 22%,rgba(184,237,250,.9) 35%,rgba(114,221,251,.35) 60%,transparent 72%);filter:blur(.4px)}
+  .dv-lamp::after{content:"";position:absolute;left:0;top:-30cqw;width:190cqw;height:60cqw;transform-origin:0 50%;transform:rotate(58deg);
+    background:radial-gradient(ellipse 100% 70% at 0 50%,rgba(220,245,255,.5) 0,rgba(114,221,251,.2) 45%,rgba(60,198,245,0) 75%);
+    clip-path:polygon(0 46%,100% 0,100% 100%,0 54%);mix-blend-mode:screen;filter:blur(3px);pointer-events:none}
+}

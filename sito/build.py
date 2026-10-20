@@ -106,7 +106,7 @@ SHALLOW = {'chi', 'rimorchiatore', 'contatti'}  # pagine corte: discesa fino a 3
 def depth_bg(lang, key=''):
     """Sfondo da PC: dalla superficie al relitto mentre si scorre, con profondimetro digitale 0-50 m."""
     return f'''<div class="abyss-bg{' is-shallow' if key in SHALLOW else ''}" aria-hidden="true" data-max="{30 if key in SHALLOW else 50}"><i class="ab1"></i><i class="ab2"></i><i class="ab3"></i><span class="ab-veil"></span></div>
-<div class="diver" aria-hidden="true"><span class="dv-hose"></span><span class="dv-bub"></span><span class="dv-rope"></span><span class="dv-rope2"></span><img src="/img/sub-ots.webp" alt="" width="602" height="1672"><span class="dv-scr"><b data-depth>0.0</b><small>m</small></span></div>'''
+<div class="diver" aria-hidden="true"><span class="dv-hose"></span><span class="dv-bub"></span><span class="dv-rope"></span><span class="dv-rope2"></span><img src="/img/sub-ots.webp" alt="" width="602" height="1672"><span class="dv-lamp"></span><span class="dv-scr"><b data-depth>0.0</b><small>m</small></span></div>'''
 
 
 def sos_dialog(lang):
@@ -317,7 +317,6 @@ def build_lang(lang):
 <section class="meteo-home" aria-label="{dict(UTIL)['meteo'][lang]}">
 <div class="wrap">
 <div class="meteo" data-meteo data-lang="{lang}" data-title="{dict(UTIL)['meteo'][lang]}"><p class="hint">{T('meteo_loading')}</p></div>
-<div class="gb" data-giorni data-lang="{lang}" data-title="{GB_TITLE[lang]}"></div>
 </div>
 </section>
 

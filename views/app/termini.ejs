@@ -1,7 +1,7 @@
 <%- include('../partials/top', { title: L.terms_title }) %>
 <main class="app-main" id="main" style="max-width:820px">
 <h1 class="h2" style="font-size:30px;margin-bottom:18px"><%= L.terms_title %></h1>
-<div class="prose"><% if (termini) { %><%- termini %><% } else { %><p class="hint"><%= L.terms_soon %></p><% } %></div>
+<div class="prose"><%- termini %><h2 class="terms-sep"><%= L.priv_title %></h2><%- privacy %></div>
 <p class="hint" style="margin-top:24px"><a href="/area/registrati">← <%= L.register %></a></p>
 </main>
 <%- include('../partials/bottom') %>

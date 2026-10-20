@@ -48,6 +48,7 @@ r.post('/login', loginLimiter, async (req, res) => {
 // ---------- registrazione autonoma con conferma dell'email ----------
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const TERMINI = require('../termini');
+const PRIVACY_TXT = require('../privacy_testi.json');
 const appBase = (req) => (process.env.APP_URL || `${req.protocol}://${req.get('host')}`).replace(/\/$/, '');
 
 async function sendVerify(req, u) {
@@ -58,7 +59,7 @@ async function sendVerify(req, u) {
     [fill(M.m_ver_p1, { name: esc(u.name) }), M.m_ver_p2, `<span style="color:#7d8b99">${M.m_ver_ignore}</span>`],
     { label: M.m_ver_btn, url: `${appBase(req)}/area/verifica/${tk}` }, u.lang));
 }
-const regView = (res, error, v = {}) => res.render('app/register', { error, v, termini: TERMINI[res.locals.lang] || '', mailOn: mailEnabled() });
+const regView = (res, error, v = {}) => res.render('app/register', { error, v, termini: TERMINI[res.locals.lang] || '', privacy: PRIVACY_TXT[res.locals.lang] || '', mailOn: mailEnabled() });
 
 r.get('/registrati', (req, res) => {
   if (res.locals.user) return res.redirect('/area');
@@ -114,7 +115,7 @@ r.get('/verifica/:tk', async (req, res) => {
     q('UPDATE users SET last_login=now() WHERE id=$1', [u.id]).then(() => res.redirect('/area/home'));
   });
 });
-r.get('/termini', (req, res) => res.render('app/termini', { termini: TERMINI[res.locals.lang] || '' }));
+r.get('/termini', (req, res) => res.render('app/termini', { termini: TERMINI[res.locals.lang] || '', privacy: PRIVACY_TXT[res.locals.lang] || '' }));
 
 r.post('/logout', (req, res) => req.session.destroy(() => res.redirect('/area/login')));
 

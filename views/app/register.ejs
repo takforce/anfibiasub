@@ -30,8 +30,8 @@
 <dialog class="terms-dlg" data-terms-dlg aria-labelledby="terms-t">
 <div class="terms-in">
 <h2 id="terms-t"><%= L.terms_title %></h2>
-<div class="terms-txt prose"><% if (termini) { %><%- termini %><% } else { %><p class="hint"><%= L.terms_soon %></p><% } %></div>
-<button class="btn" type="button" data-terms-ok><%= L.terms_close %></button>
+<div class="terms-txt prose" tabindex="0"><%- termini %><h2 class="terms-sep"><%= L.priv_title %></h2><%- privacy %></div>
+<div class="terms-btns"><button class="btn btn-ghost" type="button" data-terms-x><%= L.terms_x %></button><button class="btn" type="button" data-terms-ok><%= L.terms_close %></button></div>
 </div>
 </dialog>
 <%- include('../partials/bottom', { scripts: ['/js/register.js?v=' + ASSET_V] }) %>

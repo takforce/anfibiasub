@@ -12,6 +12,7 @@
     });
   });
   document.querySelector('[data-terms-ok]').addEventListener('click', function () { dlg.close(); unlock(); box.checked = true; box.focus(); });
+  document.querySelector('[data-terms-x]').addEventListener('click', function () { dlg.close(); });
   dlg.addEventListener('close', unlock);
   // un clic sul testo dell'etichetta quando la casella è bloccata apre i termini
   box.parentNode.addEventListener('click', function (e) {

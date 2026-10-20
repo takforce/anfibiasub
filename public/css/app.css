@@ -187,5 +187,8 @@ details.edit[open] summary{margin-bottom:14px}
 .terms-in{padding:26px;display:flex;flex-direction:column;gap:16px;max-height:80vh}
 .terms-in h2{font-size:22px;color:var(--white)}
 .terms-txt{overflow-y:auto;flex:1;font-size:14px;line-height:1.6}
-.terms-in .btn{align-self:flex-end}
+.terms-btns{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.terms-txt h3{font-size:15px;color:var(--white);margin:14px 0 4px}
+.terms-txt h2{font-size:17px;color:var(--white);margin:16px 0 6px}
+.terms-sep{margin-top:26px!important;padding-top:16px;border-top:1px solid var(--line2)}
 @media (max-width:640px){.reg-two{grid-template-columns:1fr}}

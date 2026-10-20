@@ -514,6 +514,10 @@ if __name__ == '__main__':
     copy_assets()
     for lang in LANGS:
         build_lang(lang)
+    # l'area clienti mostra la stessa informativa privacy nella finestra "Termini e Privacy" della registrazione
+    import json
+    with open(os.path.join(ROOT, 'src', 'privacy_testi.json'), 'w', encoding='utf-8') as f:
+        json.dump({l: TX['priv_body'][l] for l in LANGS}, f, ensure_ascii=False, indent=1)
     if PROD:
         extras_prod()
     else:

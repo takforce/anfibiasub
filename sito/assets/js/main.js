@@ -94,3 +94,29 @@
   dlg.addEventListener('click', function (e) { if (e.target === dlg) close(); });
   Array.prototype.forEach.call(links, function (a) { a.addEventListener('click', function () { setTimeout(close, 300); }); });
 })();
+
+// ---------- Sfondo "discesa" da PC: superficie -> relitto, profondimetro 0-50 m ----------
+(function () {
+  var bg = document.querySelector('.abyss-bg');
+  if (!bg || !window.matchMedia) return;
+  var mq = window.matchMedia('(min-width:1024px)');
+  var l2 = bg.querySelector('.ab2'), l3 = bg.querySelector('.ab3');
+  var val = document.querySelector('[data-depth]'), bar = document.querySelector('[data-depth-bar]');
+  var MAX = 50, ticking = false;
+  function update() {
+    ticking = false;
+    if (!mq.matches) return;
+    var h = document.documentElement.scrollHeight - window.innerHeight;
+    var p = h > 0 ? Math.min(1, Math.max(0, window.scrollY / h)) : 0;
+    // 0-50%: superficie -> acqua profonda; 50-100%: acqua profonda -> relitto
+    l2.style.opacity = Math.min(1, p * 2).toFixed(3);
+    l3.style.opacity = Math.max(0, p * 2 - 1).toFixed(3);
+    if (val) val.textContent = (p * MAX).toFixed(1);
+    if (bar) bar.style.height = (p * 100).toFixed(1) + '%';
+  }
+  function req() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+  window.addEventListener('scroll', req, { passive: true });
+  window.addEventListener('resize', req);
+  if (mq.addEventListener) mq.addEventListener('change', req);
+  update();
+})();

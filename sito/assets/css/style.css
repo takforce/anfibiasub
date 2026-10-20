@@ -514,3 +514,34 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 .page-hero img{opacity:.95}
 .page-hero::before{background:linear-gradient(90deg,rgba(5,14,26,.9) 0,rgba(5,14,26,.7) 35%,rgba(5,14,26,.25) 70%,rgba(5,14,26,.1) 100%)}
 @media (max-width:767px){.page-hero::before{background:linear-gradient(90deg,rgba(5,14,26,.85),rgba(5,14,26,.5))}}
+
+/* ---------- SFONDO "DISCESA" (solo PC): superficie -> relitto, ai lati dei riquadri ---------- */
+.abyss-bg,.depth{display:none}
+@media (min-width:1024px){
+  body{background:#050E1A}
+  .abyss-bg{display:block;position:fixed;inset:0;z-index:-1;pointer-events:none;background:#050E1A}
+  .abyss-bg i{position:absolute;inset:0;background-size:cover;background-position:center;will-change:opacity}
+  .ab1{background-image:url(/img/fondo-1.webp)}
+  .ab2{background-image:url(/img/fondo-2.webp);opacity:0}
+  .ab3{background-image:url(/img/fondo-3.webp);opacity:0}
+  /* velo scuro dietro ai riquadri: le immagini si vedono solo ai lati */
+  .ab-veil{position:absolute;top:0;bottom:0;left:50%;width:min(100%,calc(var(--wrap) + 40px));transform:translateX(-50%);background:rgba(5,14,26,.9);
+    -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 48px,#000 calc(100% - 48px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 48px,#000 calc(100% - 48px),transparent 100%)}
+  /* le sezioni a tutta larghezza lasciano vedere lo sfondo ai lati */
+  .band{background:transparent}
+  .site-footer{background:rgba(2,8,13,.55)}
+  .hero::before,.hero::after,.page-hero::before,.tow::before{left:50%;right:auto;width:calc(min(100%,var(--wrap)) - 56px);transform:translateX(-50%)}
+}
+/* profondimetro digitale nello spazio libero a sinistra */
+@media (min-width:1480px){
+  .depth{display:flex;flex-direction:column;align-items:center;gap:6px;position:fixed;z-index:30;top:50%;left:calc((100vw - var(--wrap)) / 4);transform:translate(-50%,-50%);
+    width:96px;padding:12px 10px 10px;border-radius:16px;background:rgba(3,12,22,.78);border:1px solid rgba(60,198,245,.35);
+    box-shadow:0 0 0 3px rgba(157,119,66,.35),0 10px 30px rgba(0,0,0,.55),inset 0 0 18px rgba(60,198,245,.08);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);pointer-events:none}
+  .dp-l{font-size:9px;letter-spacing:1.6px;color:#8DA9B8;font-weight:700}
+  .dp-v{display:flex;align-items:baseline;gap:2px;font-variant-numeric:tabular-nums;color:#72DDFB;text-shadow:0 0 10px rgba(60,198,245,.6)}
+  .dp-v b{font-size:26px;font-weight:800;letter-spacing:-.5px}
+  .dp-v small{font-size:12px;font-weight:700}
+  .dp-bar{position:relative;width:8px;height:120px;border-radius:4px;background:linear-gradient(180deg,#3CC6F5,#0B3047 55%,#02080D);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+  .dp-bar i{position:absolute;left:0;right:0;top:0;height:0;background:rgba(220,239,245,.28);border-bottom:2px solid #DCEFF5}
+  .dp-s{display:flex;flex-direction:column;align-items:center;font-size:9px;color:#8DA9B8;line-height:1.3}
+}

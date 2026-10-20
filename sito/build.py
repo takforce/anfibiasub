@@ -97,6 +97,15 @@ def header(cur, lang, overlay):
 </header>'''
 
 
+DEPTH_LABEL = {'it': 'PROFONDITÀ', 'en': 'DEPTH', 'es': 'PROFUNDIDAD', 'de': 'TIEFE'}
+
+
+def depth_bg(lang):
+    """Sfondo da PC: dalla superficie al relitto mentre si scorre, con profondimetro digitale 0-50 m."""
+    return f'''<div class="abyss-bg" aria-hidden="true"><i class="ab1"></i><i class="ab2"></i><i class="ab3"></i><span class="ab-veil"></span></div>
+<div class="depth" aria-hidden="true"><span class="dp-l">{DEPTH_LABEL[lang]}</span><span class="dp-v"><b data-depth>0.0</b><small>m</small></span><span class="dp-bar"><i data-depth-bar></i></span><span class="dp-s"><span>0</span><span>50 m</span></span></div>'''
+
+
 def sos_dialog(lang):
     S = SOS[lang]
     return f'''<dialog class="sos-dlg" id="sos-dlg" aria-labelledby="sos-t" data-searching="{e(S['searching'])}" data-nopos="{e(S['nopos'])}" data-acc="{e(S['acc'])}">
@@ -174,6 +183,7 @@ def page(key, lang, title, desc, body, overlay=False, og='porto-loano'):
 <link rel="stylesheet" href="/css/style.css?v={VER}">
 {extra_head}</head>
 <body>
+{depth_bg(lang)}
 {header(key, lang, overlay)}
 <main id="main">
 {body}

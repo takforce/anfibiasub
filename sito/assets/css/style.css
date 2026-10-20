@@ -681,3 +681,5 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
 /* da PC i sottotitoli usano più larghezza, così non vanno a capo per una parola */
 @media (min-width:1024px){.lead{max-width:880px}.page-hero .lead{max-width:760px}}
 .sch-img{display:block;width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:12px;margin:14px 0 4px}
+/* home da PC: niente foto dietro il titolo, si vede lo sfondo della discesa */
+@media (min-width:1024px){.hero .hero-img,.hero::before,.hero::after{display:none}.hero{background:transparent}}

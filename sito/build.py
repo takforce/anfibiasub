@@ -7,6 +7,7 @@ import os, sys, shutil, html, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from contenuti import *  # noqa
 from testi_pagine import TX
+from testi_extra import SOS, GB_TITLE
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROD = '--prod' in sys.argv
@@ -27,6 +28,7 @@ Q_ICON = lambda d: f'<svg aria-hidden="true" width="30" height="30" viewBox="0 0
 QI_AREA = Q_ICON('<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>')
 QI_METEO = Q_ICON('<path d="M3 8h11a3 3 0 1 0-3-3"/><path d="M3 12h16a3 3 0 1 1-3 3"/><path d="M3 16h7"/>')
 QI_GPS = Q_ICON('<path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.6"/>')
+BEACON = '<span class="beacon" aria-hidden="true"><span class="bc-ray"></span><span class="bc-dome"></span><span class="bc-base"></span></span>'
 MENU = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>'
 
 
@@ -82,16 +84,32 @@ def header(cur, lang, overlay):
 {links}
 <a class="nav-lock" href="{area_url(lang)}">{LOCK}{U["area"]}</a>
 {lang_dd}
+<button class="nav-sos" type="button" data-sos>{BEACON}SOS</button>
 <a class="btn nav-btn-mob" href="{url('contatti', lang)}">{U["quote"]}</a>
 </nav>
 </div>
 <nav class="quick wrap" aria-label="{U['area']}">
 <a class="q-tile q-area" href="{area_url(lang)}">{QI_AREA}<strong>{tx(lang, 'q_area')[0]}</strong><span>{tx(lang, 'q_area')[1]}</span></a>
 <a class="q-tile q-help" href="{WA}" target="_blank" rel="noopener">{WA_ICON}<strong>{tx(lang, 'q_help')[0]}</strong><span>{tx(lang, 'q_help')[1]}</span></a>
-<a class="q-tile" href="{url('utilita', lang, 'meteo')}">{QI_METEO}<strong>{tx(lang, 'q_meteo')[0]}</strong><span>{tx(lang, 'q_meteo')[1]}</span></a>
 <a class="q-tile" href="{url('utilita', lang, 'gps')}">{QI_GPS}<strong>{tx(lang, 'q_gps')[0]}</strong><span>{tx(lang, 'q_gps')[1]}</span></a>
+<button class="q-tile q-sos" type="button" data-sos>{BEACON}<strong>SOS</strong></button>
 </nav>
 </header>'''
+
+
+def sos_dialog(lang):
+    S = SOS[lang]
+    return f'''<dialog class="sos-dlg" id="sos-dlg" aria-labelledby="sos-t" data-searching="{e(S['searching'])}" data-nopos="{e(S['nopos'])}" data-acc="{e(S['acc'])}">
+<div class="sos-head">{BEACON}<h2 id="sos-t">{S['title']}</h2></div>
+<p>{S['text']}</p>
+<div class="sos-pos"><span>{S['pos']}</span><strong data-sos-pos>{S['searching']}</strong></div>
+<div class="sos-btns">
+<a class="sos-go" data-sos-to="393470119832" href="https://wa.me/393470119832" target="_blank" rel="noopener">{WA_ICON}{S['to_f']}</a>
+<a class="sos-go" data-sos-to="393470387290" href="https://wa.me/393470387290" target="_blank" rel="noopener">{WA_ICON}{S['to_s']}</a>
+<button class="sos-no" type="button" data-sos-close>{S['cancel']}</button>
+</div>
+<a class="sos-1530" href="tel:1530">{S['emerg']}: <b>1530</b></a>
+</dialog>'''
 
 
 def footer(lang):
@@ -124,6 +142,7 @@ def footer(lang):
 </div>
 </footer>
 <a class="wa" href="{WA}" target="_blank" rel="noopener" aria-label="{U["wa"]}">{WA_ICON}</a>
+{sos_dialog(lang)}
 <script src="/js/main.js?v={VER}"></script>'''
 
 
@@ -283,6 +302,7 @@ def build_lang(lang):
 <section class="meteo-home" aria-label="{dict(UTIL)['meteo'][lang]}">
 <div class="wrap">
 <div class="meteo" data-meteo data-lang="{lang}" data-title="{dict(UTIL)['meteo'][lang]}"><p class="hint">{T('meteo_loading')}</p></div>
+<div class="gb" data-giorni data-lang="{lang}" data-title="{GB_TITLE[lang]}"></div>
 </div>
 </section>
 
@@ -426,6 +446,7 @@ def utilita_html(lang):
                 [(f'<b>{r[0]}</b>',) + tuple(fmt(x, lang) for x in r[1:]) for r in CATENE_ANCORE], T('anchor_cap'))
     live = f'''<section class="tool-sec" id="meteo"><h2 class="vh">{title['meteo'][lang]}</h2>
 <div class="meteo" data-meteo data-lang="{lang}" data-title="{title['meteo'][lang]}"><p class="hint">{T('meteo_loading')}</p></div>
+<div class="gb" data-giorni data-lang="{lang}" data-title="{GB_TITLE[lang]}"></div>
 </section>
 <section class="tool-sec" id="webcam"><h2 class="h2">{title['webcam'][lang]}</h2>
 <a class="cam-card" href="{WEBCAM_URL}" target="_blank" rel="noopener">

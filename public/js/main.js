@@ -59,3 +59,38 @@
   window.addEventListener('resize', fit);
 })();
 
+
+// ---------- SOS: finestra di conferma, posizione GPS e messaggio WhatsApp ----------
+(function () {
+  var dlg = document.getElementById('sos-dlg');
+  if (!dlg) return;
+  var posEl = dlg.querySelector('[data-sos-pos]');
+  var links = dlg.querySelectorAll('[data-sos-to]');
+  var run = 0;
+  function setMsg(lat, lon, acc) {
+    var t = '🆘 SOS - Barca in difficoltà\n';
+    t += lat != null ? 'Posizione: https://maps.google.com/?q=' + lat.toFixed(5) + ',' + lon.toFixed(5) + (acc ? ' (precisione ±' + Math.round(acc) + ' m)' : '') + '\n' : 'Posizione GPS non disponibile.\n';
+    t += 'Inviato dal sito Anfibiasub';
+    Array.prototype.forEach.call(links, function (a) { a.href = 'https://wa.me/' + a.getAttribute('data-sos-to') + '?text=' + encodeURIComponent(t); });
+  }
+  function open() {
+    var my = ++run;
+    posEl.textContent = dlg.getAttribute('data-searching');
+    posEl.classList.remove('is-off');
+    setMsg(null);
+    if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
+    if (!navigator.geolocation) { fail(); return; }
+    navigator.geolocation.getCurrentPosition(function (p) {
+      if (my !== run) return;
+      var c = p.coords;
+      posEl.textContent = c.latitude.toFixed(5) + ', ' + c.longitude.toFixed(5) + ' · ' + dlg.getAttribute('data-acc') + ' ±' + Math.round(c.accuracy) + ' m';
+      setMsg(c.latitude, c.longitude, c.accuracy);
+    }, function () { if (my === run) fail(); }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 });
+    function fail() { posEl.textContent = dlg.getAttribute('data-nopos'); posEl.classList.add('is-off'); }
+  }
+  function close() { run++; if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-sos]'), function (b) { b.addEventListener('click', open); });
+  dlg.querySelector('[data-sos-close]').addEventListener('click', close);
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) close(); });
+  Array.prototype.forEach.call(links, function (a) { a.addEventListener('click', function () { setTimeout(close, 300); }); });
+})();

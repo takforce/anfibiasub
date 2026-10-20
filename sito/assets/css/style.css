@@ -396,3 +396,105 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
   .foot-tel>div{column-gap:6px!important}
   .foot-grid>div:nth-child(2) p{white-space:nowrap}
 }
+
+/* ---------- SOS ---------- */
+.beacon{position:relative;display:inline-block;width:16px;height:16px;flex:none}
+.bc-dome{position:absolute;left:3px;right:3px;top:3px;bottom:3px;border-radius:7px 7px 2px 2px;background:radial-gradient(circle at 50% 40%,#fff 0 18%,#ff4040 45%,#a00 100%);box-shadow:0 0 6px #ff3030;animation:bcBlink 1s steps(2,jump-none) infinite}
+.bc-base{position:absolute;left:1px;right:1px;bottom:0;height:3px;border-radius:1px;background:#ddd}
+.bc-ray{position:absolute;left:50%;top:50%;width:28px;height:28px;margin:-16px 0 0 -14px;border-radius:50%;pointer-events:none;mix-blend-mode:screen;
+  background:conic-gradient(rgba(255,80,80,0) 0deg,rgba(255,80,80,.9) 25deg,rgba(255,80,80,0) 60deg,rgba(255,80,80,0) 180deg,rgba(255,80,80,.9) 205deg,rgba(255,80,80,0) 240deg);animation:bcSpin .9s linear infinite}
+@keyframes bcSpin{to{transform:rotate(360deg)}}
+@keyframes bcBlink{50%{filter:brightness(1.6)}}
+@keyframes sosGlow{50%{box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -2px 0 rgba(0,0,0,.35),0 3px 0 #2a0505,0 0 16px 3px rgba(255,60,60,.6)}}
+.nav-sos{display:inline-flex;align-items:center;gap:8px;margin-left:14px;padding:8px 16px;border-radius:999px;border:1px solid rgba(255,120,120,.5);cursor:pointer;
+  font:inherit;font-weight:800;font-size:14px;letter-spacing:1px;color:#fff;background:linear-gradient(180deg,#9A1E1E,#5E0F0F);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 3px 0 #2a0505,0 6px 12px rgba(0,0,0,.4);animation:sosGlow 1.2s ease-in-out infinite}
+.nav-sos:hover{filter:brightness(1.15)}
+@media (max-width:767px){
+  .nav-sos{display:none}
+  .q-tile.q-sos{border:1px solid rgba(255,120,120,.45);cursor:pointer;font:inherit;flex:0 0 auto;padding:0 12px;
+    background:linear-gradient(180deg,#8E1B1B 0%,#5E0F0F 55%,#430A0A 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -2px 0 rgba(0,0,0,.35),0 3px 0 #2a0505,0 6px 12px rgba(0,0,0,.45);animation:sosGlow 1.2s ease-in-out infinite}
+  .q-sos strong{font-size:11px;letter-spacing:.5px}
+}
+.sos-dlg{max-width:440px;width:calc(100% - 32px);border:1px solid rgba(255,120,120,.45);border-radius:18px;padding:0;color:#fff;background:#0B1F33;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.sos-dlg::backdrop{background:rgba(2,8,16,.75);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.sos-dlg>*{margin-left:20px;margin-right:20px}
+.sos-head{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:16px 20px;background:linear-gradient(180deg,#8E1B1B,#5E0F0F);border-radius:17px 17px 0 0;margin-left:0!important;margin-right:0!important}
+.sos-head .beacon{transform:scale(1.5)}
+.sos-head h2{font-size:19px;line-height:1.25;margin:0}
+.sos-dlg p{font-size:15px;line-height:1.55;color:#cfe0ee;margin-bottom:12px}
+.sos-pos{background:#0F2B47;border-radius:12px;padding:10px 12px;margin-bottom:14px;font-size:13px}
+.sos-pos span{display:block;color:#8fb0c8;margin-bottom:2px}
+.sos-pos strong{font-variant-numeric:tabular-nums;font-weight:700}
+.sos-pos strong.is-off{color:#ffc93c;font-weight:600}
+.sos-btns{display:grid;gap:8px;margin-bottom:14px}
+.sos-go{display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;border-radius:12px;background:#25D366;color:#05210f;font-weight:800;text-decoration:none}
+.sos-go svg{width:20px;height:20px}
+.sos-no{padding:11px;border-radius:12px;border:1px solid #2a4a68;background:transparent;color:#cfe0ee;font:inherit;font-weight:600;cursor:pointer}
+.sos-1530{display:block;margin-bottom:18px;padding:10px 12px;border-radius:12px;background:rgba(255,90,79,.12);color:#ffb3ad;text-decoration:none;font-size:13px;line-height:1.45;text-align:center}
+.sos-1530 b{color:#fff;font-size:16px}
+
+/* ---------- GIORNI BUONI (dentro la cornice) ---------- */
+.gb{margin-top:26px}
+.gb .hint{padding:10px 0}
+.gb-frame{position:relative;border-radius:18px;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.45)}
+.gb-art{position:relative;width:100%;aspect-ratio:1774/591;background:url(/img/giorni-buoni.webp) center/100% 100% no-repeat;container-type:inline-size}
+.gb-in{position:absolute;left:12%;right:12%;top:7.5%;bottom:24%;display:flex;flex-direction:column;gap:1.2cqw}
+.gb-top{display:flex;align-items:baseline;justify-content:space-between;gap:2cqw}
+.gb-title{margin:0;font-size:2.15cqw;font-weight:800;line-height:1.1;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.7)}
+.gb-leg{display:flex;gap:1.4cqw;font-size:1.05cqw;color:#cfe0ee;white-space:nowrap}
+.gb-leg span::before{content:"";display:inline-block;width:.8cqw;height:.8cqw;border-radius:50%;margin-right:.4cqw;background:currentColor;vertical-align:middle}
+.c-g{color:#2ee07a}.c-y{color:#ffc93c}.c-r{color:#ff6a5f}.c-x{color:#7f93a5}
+.gb-days{display:grid;grid-template-columns:repeat(7,1fr);gap:.8cqw}
+.gb-day{display:flex;flex-direction:column;align-items:center;gap:.35cqw;padding:.7cqw .3cqw;border-radius:1.1cqw;cursor:pointer;font:inherit;color:#fff;
+  background:rgba(4,18,32,.62);border:2px solid rgba(120,200,240,.18);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);transition:transform .12s,border-color .12s}
+.gb-day b{font-size:1.15cqw}
+.gb-day small{font-size:.9cqw;color:#bcd2e3;white-space:nowrap}
+.gb-day.is-sel{border-color:#fff;transform:translateY(-.3cqw);background:rgba(10,40,66,.8)}
+.gb-dot{display:block;width:1.6cqw;height:1.6cqw;border-radius:50%;background:currentColor;box-shadow:0 0 .9cqw currentColor}
+.gb-det{display:flex;align-items:center;gap:2cqw;padding:1cqw 1.4cqw;border-radius:1.2cqw;background:rgba(4,18,32,.62);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.gb-info{flex:1;min-width:0}
+.gb-v{font-weight:800;font-size:1.3cqw;margin-bottom:.6cqw}
+.gb-v span{color:#fff;font-weight:600}
+.gb-bar{display:grid;grid-template-columns:repeat(13,1fr);gap:.25cqw}
+.gb-bar i{height:1.5cqw;border-radius:.35cqw;background:currentColor;opacity:.9}
+.gb-bar i.c-x{opacity:.35}
+.gb-hl{display:flex;justify-content:space-between;font-size:.85cqw;color:#9fb8cc;margin-top:.3cqw}
+.gb-btns{display:flex;flex-direction:column;gap:.6cqw;flex:none}
+.gb-book{display:block;padding:.75cqw 1.6cqw;border-radius:999px;background:#25D366;color:#05210f;font-weight:800;font-size:1.05cqw;text-decoration:none;text-align:center;white-space:nowrap}
+.gb-book:hover{filter:brightness(1.08)}
+.gb-no{display:block;padding:.75cqw 1.6cqw;border-radius:999px;background:#3a4a58;color:#c3d0db;font-weight:700;font-size:1.05cqw;white-space:nowrap}
+.gb-btns-m{display:none}
+@media (max-width:767px){
+  .gb{margin-top:18px}
+  .gb-frame{border-radius:16px}
+  .gb-art{aspect-ratio:1/1;background-size:auto 100%;background-position:50% 50%}
+  .gb-in{left:5%;right:5%;top:6%;bottom:24%;gap:8px}
+  .gb-top{flex-direction:column;gap:4px}
+  .gb-title{font-size:16px}
+  .gb-leg{gap:10px;font-size:10.5px}
+  .gb-leg span::before{width:7px;height:7px;margin-right:4px}
+  .gb-days{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:3px 1px}
+  .gb-days::-webkit-scrollbar{display:none}
+  .gb-day{flex:0 0 62px;gap:3px;padding:6px 2px;border-radius:11px}
+  .gb-day b{font-size:11.5px}
+  .gb-day small{font-size:9.5px}
+  .gb-day.is-sel{transform:none}
+  .gb-dot{width:14px;height:14px;box-shadow:0 0 8px currentColor}
+  .gb-det{padding:8px 10px;border-radius:12px}
+  .gb-v{font-size:12.5px;margin-bottom:5px}
+  .gb-bar{gap:2px}.gb-bar i{height:12px;border-radius:3px}
+  .gb-hl{font-size:9.5px}
+  .gb-det .gb-btns{display:none}
+  .gb-btns-m{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .gb-btns-m .gb-book,.gb-btns-m .gb-no{font-size:13.5px;padding:11px 8px}
+  .gb-btns-m .gb-no{grid-column:1/-1;text-align:center}
+}
+@media (max-width:767px){
+  .q-tile .beacon{display:inline-block}.q-tile .beacon span{display:block}
+  .gb-day{flex-basis:68px}
+  .gb-btns-m .gb-book{white-space:normal;font-size:12.5px;padding:11px 6px;line-height:1.25;display:flex;align-items:center;justify-content:center}
+}
+.gb-leg{background:rgba(4,18,32,.65);padding:.35cqw 1cqw;border-radius:999px}
+@media (max-width:767px){.gb-leg{padding:3px 10px;align-self:flex-start}}

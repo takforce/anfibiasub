@@ -96,6 +96,106 @@
     }).catch(function () { box.innerHTML = '<p class="hint">' + esc(T.na) + '</p>'; });
   }
 
+  // ---------- GIORNI BUONI PER LAVORARE IN ACQUA ----------
+  // Ogni ora dalle 6 alle 18: verde = onda <= 0,5 m e vento <= 12 kn (raffiche <= 20);
+  // giallo = onda <= 0,9 m e vento <= 17 kn; rosso = oltre, o temporale.
+  var gbox = document.querySelector('[data-giorni]');
+  if (gbox) {
+    var gl = gbox.getAttribute('data-lang') || 'it';
+    var GT = {
+      it: { v: { g: 'Ottimo per lavorare in acqua', y: 'Si lavora solo in alcune ore', r: 'Mare mosso: meglio rimandare', x: 'Giornata finita' }, best: 'ore migliori', wave: 'Onda', wind: 'Vento',
+            leg: ['Ottimo', 'Alcune ore', 'Mosso'], book: 'Prenota con', no: 'Giorno sconsigliato', today: 'Oggi', days: ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'],
+            note: 'Indicazione automatica dalle previsioni: la decisione finale è sempre di Anfibiasub.', na: 'Previsioni non disponibili in questo momento.' },
+      en: { v: { g: 'Great for work in the water', y: 'Work possible only at some hours', r: 'Rough sea: better postpone', x: 'Day over' }, best: 'best hours', wave: 'Waves', wind: 'Wind',
+            leg: ['Great', 'Some hours', 'Rough'], book: 'Book with', no: 'Not recommended', today: 'Today', days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            note: 'Automatic indication from the forecast: the final decision is always Anfibiasub\'s.', na: 'Forecast not available right now.' },
+      es: { v: { g: 'Ideal para trabajar en el agua', y: 'Se trabaja solo algunas horas', r: 'Mar movido: mejor aplazar', x: 'Día terminado' }, best: 'mejores horas', wave: 'Ola', wind: 'Viento',
+            leg: ['Ideal', 'Algunas horas', 'Movido'], book: 'Reservar con', no: 'Día desaconsejado', today: 'Hoy', days: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+            note: 'Indicación automática según la previsión: la decisión final es siempre de Anfibiasub.', na: 'Previsión no disponible en este momento.' },
+      de: { v: { g: 'Ideal für Arbeiten im Wasser', y: 'Arbeiten nur zu einigen Stunden', r: 'Bewegte See: besser verschieben', x: 'Tag vorbei' }, best: 'beste Stunden', wave: 'Welle', wind: 'Wind',
+            leg: ['Ideal', 'Einige Stunden', 'Bewegt'], book: 'Buchen bei', no: 'Nicht empfohlen', today: 'Heute', days: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
+            note: 'Automatische Angabe aus der Vorhersage: Die Entscheidung trifft immer Anfibiasub.', na: 'Vorhersage derzeit nicht verfügbar.' },
+    };
+    var G = GT[gl] || GT.it;
+    var IT_DAYS = ['domenica', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato'];
+    var IT_MON = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+    var PEOPLE = [['Francesco', '393470119832'], ['Simone', '393470387290']];
+    var gnum = function (v) { var s = v.toFixed(1); return gl === 'en' ? s : s.replace('.', ','); };
+    var gesc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+    var gget = function (u) { return fetch(u).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }); };
+    var GW = 'https://api.open-meteo.com/v1/forecast?latitude=44.1286&longitude=8.2589&hourly=wind_speed_10m,wind_gusts_10m,weather_code&wind_speed_unit=kn&timezone=Europe%2FRome&forecast_days=7';
+    var GM = 'https://marine-api.open-meteo.com/v1/marine?latitude=44.11&longitude=8.29&hourly=wave_height&timezone=Europe%2FRome&forecast_days=7';
+    var H1 = 6, H2 = 18;
+    var hc = function (h) {
+      if (h.code >= 95) return 'r';
+      var wv = h.wave == null ? 0 : h.wave;
+      if (wv <= 0.5 && h.wind <= 12 && h.gust <= 20) return 'g';
+      if (wv <= 0.9 && h.wind <= 17) return 'y';
+      return 'r';
+    };
+    Promise.all([gget(GW), gget(GM).catch(function () { return null; })]).then(function (res) {
+      var w = res[0].hourly, m = res[1] && res[1].hourly ? res[1].hourly : null;
+      var waveAt = {};
+      if (m) m.time.forEach(function (t, i) { waveAt[t] = m.wave_height[i]; });
+      var now = new Date(), byDay = {}, order = [];
+      w.time.forEach(function (t, i) {
+        var hr = +t.slice(11, 13);
+        if (hr < H1 || hr > H2) return;
+        var d = t.slice(0, 10);
+        if (!byDay[d]) { byDay[d] = []; order.push(d); }
+        var past = new Date(t + ':00') < new Date(now.getTime() - 3600000);
+        byDay[d].push({ h: hr, wind: w.wind_speed_10m[i], gust: w.wind_gusts_10m[i], code: w.weather_code[i], wave: waveAt[t] != null ? waveAt[t] : null, past: past });
+      });
+      var days = order.slice(0, 7).map(function (d, i) {
+        var hs = byDay[d], live = hs.filter(function (h) { return !h.past; });
+        hs.forEach(function (h) { h.c = h.past ? 'x' : hc(h); });
+        var ng = live.filter(function (h) { return h.c === 'g'; }).length, ny = live.filter(function (h) { return h.c === 'y'; }).length;
+        var c = !live.length ? 'x' : ng >= 8 || (ng && ng === live.length) ? 'g' : ng >= 3 || ng + ny >= 6 ? 'y' : 'r';
+        var run = function (ok) { var bs = 0, bl = 0, cs = 0, cl = 0; hs.forEach(function (h, k) { if (ok(h.c)) { if (!cl) cs = k; cl++; if (cl > bl) { bl = cl; bs = cs; } } else cl = 0; }); return bl ? [hs[bs].h, hs[bs + bl - 1].h + 1] : null; };
+        var best = run(function (x) { return x === 'g'; }) || run(function (x) { return x === 'g' || x === 'y'; });
+        var src = live.length ? live : hs;
+        var mx = function (k) { var v = null; src.forEach(function (h) { if (h[k] != null && (v == null || h[k] > v)) v = h[k]; }); return v; };
+        var dt = new Date(d + 'T12:00:00');
+        return { d: d, dt: dt, i: i, hs: hs, c: c, best: c === 'r' || c === 'x' ? null : best, wave: mx('wave'), wind: mx('wind'),
+                 lab: i === 0 ? G.today : G.days[dt.getDay()] + ' ' + dt.getDate() };
+      });
+      var sel = 0;
+      for (var k = 0; k < days.length; k++) if (days[k].c === 'g') { sel = k; break; }
+      if (days[sel].c === 'x' && days[1]) sel = 1;
+
+      var dayBtn = function (D, k) {
+        return '<button type="button" class="gb-day' + (k === sel ? ' is-sel' : '') + '" data-k="' + k + '"><b>' + gesc(D.lab) + '</b><i class="gb-dot c-' + D.c + '"></i>' +
+          '<small>' + (D.wave != null ? gnum(D.wave) + ' m · ' : '') + Math.round(D.wind) + ' kn</small></button>';
+      };
+      var books = function (D) {
+        if (D.c === 'r' || D.c === 'x') return '<span class="gb-no">' + G.no + '</span>';
+        var when = IT_DAYS[D.dt.getDay()] + ' ' + D.dt.getDate() + ' ' + IT_MON[D.dt.getMonth()];
+        var msg = 'Ciao, vorrei prenotare un intervento per ' + when + (D.best ? ' (ore migliori ' + D.best[0] + '-' + D.best[1] + ')' : '') + '.';
+        return PEOPLE.map(function (p) { return '<a class="gb-book" href="https://wa.me/' + p[1] + '?text=' + encodeURIComponent(msg) + '" target="_blank" rel="noopener">' + G.book + ' ' + p[0] + '</a>'; }).join('');
+      };
+      var detail = function (D) {
+        var bar = D.hs.map(function (h) { return '<i class="c-' + h.c + '" title="' + h.h + ':00"></i>'; }).join('');
+        return '<div class="gb-v c-' + D.c + '">' + G.v[D.c] + (D.best ? ' · <span>' + G.best + ' ' + D.best[0] + '–' + D.best[1] + '</span>' : '') + '</div>' +
+          '<div class="gb-bar">' + bar + '</div><div class="gb-hl"><span>' + H1 + ':00</span><span>12:00</span><span>' + H2 + ':00</span></div>';
+      };
+      var render = function () {
+        var D = days[sel];
+        gbox.innerHTML = '<div class="gb-frame"><div class="gb-art"><div class="gb-in">' +
+          '<div class="gb-top"><h3 class="gb-title">' + gesc(gbox.getAttribute('data-title') || '') + '</h3>' +
+          '<div class="gb-leg"><span class="c-g">' + G.leg[0] + '</span><span class="c-y">' + G.leg[1] + '</span><span class="c-r">' + G.leg[2] + '</span></div></div>' +
+          '<div class="gb-days">' + days.map(dayBtn).join('') + '</div>' +
+          '<div class="gb-det"><div class="gb-info">' + detail(D) + '</div><div class="gb-btns">' + books(D) + '</div></div>' +
+          '</div></div></div>' +
+          '<div class="gb-btns-m">' + books(D) + '</div>' +
+          '<p class="mb-upd">' + G.note + '</p>';
+        Array.prototype.forEach.call(gbox.querySelectorAll('.gb-day'), function (b) {
+          b.addEventListener('click', function () { sel = +b.getAttribute('data-k'); render(); var nb = gbox.querySelector('.gb-day.is-sel'); if (nb) nb.focus({ preventScroll: true }); });
+        });
+      };
+      render();
+    }).catch(function () { gbox.innerHTML = '<p class="hint">' + G.na + '</p>'; });
+  }
+
   // ---------- MARCATORE GPS ----------
   var el = document.querySelector('[data-gps]');
   if (el && window.L) {

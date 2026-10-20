@@ -101,7 +101,7 @@
   if (!bg || !window.matchMedia) return;
   var mq = window.matchMedia('(min-width:1024px)');
   var l2 = bg.querySelector('.ab2'), l3 = bg.querySelector('.ab3');
-  var val = document.querySelector('[data-depth]'), bar = document.querySelector('[data-depth-bar]'), diver = document.querySelector('.diver');
+  var val = document.querySelector('[data-depth]'), bar = document.querySelector('[data-depth-bar]'), diver = document.querySelector('.diver'), line = document.querySelector('.dv-line');
   var MAX = +bg.getAttribute('data-max') || 50, shallow = bg.classList.contains('is-shallow'), ticking = false;
   function update() {
     ticking = false;
@@ -124,6 +124,12 @@
     if (diver && diver.offsetHeight) {
       var top = 170, room = window.innerHeight - top - diver.offsetHeight - 16;
       diver.style.transform = 'translate(-50%,' + Math.round(top + Math.max(0, room) * p) + 'px)';
+    }
+    // la cima resta ferma: segue solo la posizione orizzontale del sub
+    if (line && diver.offsetWidth) {
+      var dr = diver.getBoundingClientRect(), lw = dr.width * 22 / 602;
+      line.style.width = lw.toFixed(1) + 'px';
+      line.style.left = (dr.left + dr.width * 546 / 602 - lw / 2).toFixed(1) + 'px';
     }
   }
   function req() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }

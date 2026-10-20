@@ -254,8 +254,6 @@ def mezzi_html(lang):
             k = SCHEDE_POS.get((ci, vi))
             if k:
                 lis += f'<li><button class="sch-btn" type="button" data-sch="{k}">{e(v)}{INFO}</button></li>'
-            elif (ci, vi) == (0, 0):
-                lis += f'<li><a class="sch-btn" href="{url("rimorchiatore", lang)}">{e(v)} →</a></li>'
             else:
                 lis += f'<li>{e(v)}</li>'
         cols += f'<div class="tool-col"><h3>{t.upper()}</h3><ul class="list">{lis}</ul></div>'
@@ -268,7 +266,8 @@ def schede_dialog(lang):
     for k, d in SCHEDE.items():
         fun, imp, car = d[lang]
         fonti = ''.join(f'<li><a href="{FONTI[f][1]}" target="_blank" rel="noopener">{e(FONTI[f][0])}</a></li>' for f in d['fonti'])
-        bodies += (f'<div class="sch-body" data-sch-body="{k}" hidden>'
+        foto = f'<img class="sch-img" src="/img/{d["img"]}.webp" alt="" loading="lazy">' if d.get('img') else ''
+        bodies += (f'<div class="sch-body" data-sch-body="{k}" hidden>{foto}'
                    f'<h3>{U["fun"]}</h3><p>{e(fun)}</p><h3>{U["imp"]}</h3><p>{e(imp)}</p>'
                    f'<h3>{U["car"]}</h3><ul class="rim-list">{"".join(f"<li>{e(c)}</li>" for c in car)}</ul>'
                    + (f'<p class="sch-src">{U["fonti"]}:</p><ul class="sch-fonti">{fonti}</ul>' if fonti else '') + '</div>')

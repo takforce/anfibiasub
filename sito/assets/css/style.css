@@ -510,3 +510,7 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 @media (max-width:767px){.mb-frame .mb-upd,.gb-frame .mb-upd{border-radius:8px}}
 @media (max-width:767px){.gb{display:none!important}}
 @media (min-width:1280px){.hero .badges{flex-wrap:nowrap;justify-content:space-between;gap:18px}.hero .badge{gap:10px}.hero .badge svg{width:26px;height:26px}.hero .badge span span{font-size:12.5px;white-space:nowrap}.hero .badge strong{white-space:nowrap}}
+/* testate pagine interne: foto ben visibile, scura solo dietro al testo */
+.page-hero img{opacity:.95}
+.page-hero::before{background:linear-gradient(90deg,rgba(5,14,26,.9) 0,rgba(5,14,26,.7) 35%,rgba(5,14,26,.25) 70%,rgba(5,14,26,.1) 100%)}
+@media (max-width:767px){.page-hero::before{background:linear-gradient(90deg,rgba(5,14,26,.85),rgba(5,14,26,.5))}}

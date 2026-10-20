@@ -73,7 +73,7 @@ def header(cur, lang, overlay):
 <header class="site-header{'' if overlay else ' solid'}">
 <div class="wrap nav-row">
 <a class="logo" href="{url('home', lang)}" aria-label="Anfibiasub, home">
-<img class="logo-img" src="/img/logo-casco-96.png" alt="" width="52" height="52">
+<img class="logo-img" src="/img/logo-libero.png" alt="" width="64" height="64">
 <span class="logo-txt"><span class="logo-name">ANFIBIA<span class="hl">SUB</span></span><span class="logo-sub">{U["tagline"]}</span></span>
 </a>
 <a class="btn nav-cta" href="{url('contatti', lang)}">{U["quote"]}</a>
@@ -94,7 +94,7 @@ def footer(lang):
 <div class="wrap">
 <div class="foot-grid">
 <div class="foot-brand">
-<img src="/img/logo-casco-96.png" alt="Anfibiasub" width="72" height="72">
+<img src="/img/logo-libero.png" alt="Anfibiasub" width="80" height="80">
 <p>{U["foot_about"]}</p>
 </div>
 <div>

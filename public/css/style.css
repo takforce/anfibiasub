@@ -315,7 +315,7 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
   .kick-d{display:none}.kick-m{display:inline}
   .hero-body{padding-top:96px}
   .hero-lead{font-size:14.5px;line-height:1.6;text-align:justify;hyphens:auto;-webkit-hyphens:auto}
-  .quick{display:flex;gap:6px;margin:0 0 22px}
+  .quick{display:flex;gap:6px;margin:0 auto;padding-bottom:8px}
   .q-tile{position:relative;display:flex;flex:1 1 auto;align-items:center;justify-content:center;gap:4px;height:36px;padding:0 6px;border-radius:11px;text-decoration:none;overflow:hidden;
     background:linear-gradient(180deg,#1C4466 0%,#0F2B47 55%,#0A1F35 100%);border:1px solid rgba(120,200,240,.28);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -2px 0 rgba(0,0,0,.35),0 3px 0 #061424,0 6px 12px rgba(0,0,0,.45);transition:transform .08s,box-shadow .08s}
@@ -324,7 +324,6 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
   .q-tile strong{color:#fff;font-size:10px;font-weight:700;letter-spacing:.1px;white-space:nowrap;text-shadow:0 1px 1px rgba(0,0,0,.5)}
   .q-tile span{display:none}
   .q-tile:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -1px 0 rgba(0,0,0,.35),0 1px 0 #061424,0 2px 5px rgba(0,0,0,.4)}
-}
 }
 /* titoli grandi: mai parole spezzate col trattino */
 .hero h1,.page-hero h1,.h2{hyphens:manual;-webkit-hyphens:manual}
@@ -381,3 +380,19 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 
 .hero .badges{margin-bottom:0}
 .mb-stone>div{transform:translateY(-7%)}
+
+/* cellulare: 4 tasti fissi nell'header, spazio sopra ridotto; footer compatto */
+@media (max-width:767px){
+  .site-header .nav-row{padding-top:6px;padding-bottom:6px}
+  .hero-body{padding-top:12px}
+  .foot-grid{grid-template-columns:minmax(0,1fr) auto;gap:14px 10px}
+  .foot-tel{gap:0}
+  .foot-tel>div{display:grid!important;grid-template-columns:auto auto;column-gap:8px;align-items:baseline;line-height:1.5}
+  .foot-tel h3{min-width:0;margin:0!important;letter-spacing:1.2px;font-size:10.5px;white-space:nowrap}
+  .foot-tel p{white-space:nowrap;text-align:right}
+  .foot-links{display:none}
+  .foot-grid>div:nth-child(2) h3,.foot-grid>div:nth-child(2) p,.foot-tel h3,.foot-tel p{line-height:22px;margin:0!important;font-size:12px}
+  .foot-grid>div:nth-child(2) h3,.foot-tel h3{font-size:10px;letter-spacing:1px}
+  .foot-tel>div{column-gap:6px!important}
+  .foot-grid>div:nth-child(2) p{white-space:nowrap}
+}

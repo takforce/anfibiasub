@@ -85,6 +85,12 @@ def header(cur, lang, overlay):
 <a class="btn nav-btn-mob" href="{url('contatti', lang)}">{U["quote"]}</a>
 </nav>
 </div>
+<nav class="quick wrap" aria-label="{U['area']}">
+<a class="q-tile q-area" href="{area_url(lang)}">{QI_AREA}<strong>{tx(lang, 'q_area')[0]}</strong><span>{tx(lang, 'q_area')[1]}</span></a>
+<a class="q-tile q-help" href="{WA}" target="_blank" rel="noopener">{WA_ICON}<strong>{tx(lang, 'q_help')[0]}</strong><span>{tx(lang, 'q_help')[1]}</span></a>
+<a class="q-tile" href="{url('utilita', lang, 'meteo')}">{QI_METEO}<strong>{tx(lang, 'q_meteo')[0]}</strong><span>{tx(lang, 'q_meteo')[1]}</span></a>
+<a class="q-tile" href="{url('utilita', lang, 'gps')}">{QI_GPS}<strong>{tx(lang, 'q_gps')[0]}</strong><span>{tx(lang, 'q_gps')[1]}</span></a>
+</nav>
 </header>'''
 
 
@@ -267,12 +273,6 @@ def build_lang(lang):
     home = f'''<section class="hero" aria-label="{T('intro')}">
 <img class="hero-img" src="/img/porto-loano.webp" alt="{T('hero_alt')}" fetchpriority="high">
 <div class="wrap hero-body">
-<nav class="quick" aria-label="{U['area']}">
-<a class="q-tile q-area" href="{area_url(lang)}">{QI_AREA}<strong>{T('q_area')[0]}</strong><span>{T('q_area')[1]}</span></a>
-<a class="q-tile q-help" href="{WA}" target="_blank" rel="noopener">{WA_ICON}<strong>{T('q_help')[0]}</strong><span>{T('q_help')[1]}</span></a>
-<a class="q-tile" href="{url('utilita', lang, 'meteo')}">{QI_METEO}<strong>{T('q_meteo')[0]}</strong><span>{T('q_meteo')[1]}</span></a>
-<a class="q-tile" href="{url('utilita', lang, 'gps')}">{QI_GPS}<strong>{T('q_gps')[0]}</strong><span>{T('q_gps')[1]}</span></a>
-</nav>
 <p class="hero-kicker"><span class="kick-d">{T('hero_kicker')}</span><span class="kick-m">{T('hero_kicker_m')}</span></p>
 <h1>{T('hero_h1')}</h1>
 <p class="hero-lead">{T('hero_lead')}</p>

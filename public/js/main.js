@@ -101,7 +101,7 @@
   if (!bg || !window.matchMedia) return;
   var mq = window.matchMedia('(min-width:1024px)');
   var l2 = bg.querySelector('.ab2'), l3 = bg.querySelector('.ab3');
-  var val = document.querySelector('[data-depth]'), bar = document.querySelector('[data-depth-bar]');
+  var val = document.querySelector('[data-depth]'), bar = document.querySelector('[data-depth-bar]'), diver = document.querySelector('.diver');
   var MAX = 50, ticking = false;
   function update() {
     ticking = false;
@@ -113,10 +113,16 @@
     l3.style.opacity = Math.max(0, p * 2 - 1).toFixed(3);
     if (val) val.textContent = (p * MAX).toFixed(1);
     if (bar) bar.style.height = (p * 100).toFixed(1) + '%';
+    // il sub scende dall'alto (sotto l'header) fino in fondo allo schermo
+    if (diver && diver.offsetHeight) {
+      var top = 170, room = window.innerHeight - top - diver.offsetHeight - 16;
+      diver.style.transform = 'translate(-50%,' + Math.round(top + Math.max(0, room) * p) + 'px)';
+    }
   }
   function req() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
   window.addEventListener('scroll', req, { passive: true });
   window.addEventListener('resize', req);
   if (mq.addEventListener) mq.addEventListener('change', req);
+  window.addEventListener('load', req);
   update();
 })();

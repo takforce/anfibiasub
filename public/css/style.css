@@ -178,8 +178,8 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 .meteo-home{padding:20px 0 0}
 .meteo-home+.section{padding-top:44px}
 /* meteo su immagine (meteo-banner.webp 2003x512): i dati sono posizionati sopra in percentuale */
-.mb-frame{position:relative;overflow:hidden;border-radius:22px;border:1px solid rgba(120,200,210,.2);background:#0A3442}
-.mb-art{position:relative;width:100%;aspect-ratio:2003/512;background:url(/img/meteo-banner.webp) center/100% 100% no-repeat;container-type:inline-size}
+.mb-frame{position:relative;overflow:hidden;border-radius:22px;border:1px solid var(--line2);background:#0A1B2E}
+.mb-art{position:relative;width:100%;aspect-ratio:2003/512;background:url(/img/meteo-blu.webp) center/100% 100% no-repeat;container-type:inline-size}
 .mb-plaque{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font-weight:800;color:#fff;font-size:2.15cqw;letter-spacing:.03em;text-shadow:0 2px 6px rgba(0,0,0,.7)}
 .mb-bub,.mb-stone{position:absolute;transform:translate(-50%,-50%);border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center}
 .mb-bub>div,.mb-stone>div{display:flex;flex-direction:column;align-items:center;gap:.25cqw}

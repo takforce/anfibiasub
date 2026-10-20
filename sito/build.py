@@ -143,8 +143,8 @@ def page(key, lang, title, desc, body, overlay=False, og='porto-loano'):
 <meta property="og:image" content="{SITE_URL}/img/{og}.webp">
 <meta property="og:locale" content="{locale}">
 <meta name="theme-color" content="#050E1A">
-<link rel="icon" href="/favicon.png?v=2" type="image/png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2">
+<link rel="icon" href="/favicon.png?v=3" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
 <link rel="preload" href="/fonts/montserrat-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/css/style.css?v={VER}">
 {extra_head}</head>

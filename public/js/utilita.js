@@ -100,7 +100,8 @@
   // Ogni ora dalle 6 alle 18: verde = onda <= 0,5 m e vento <= 12 kn (raffiche <= 20);
   // giallo = onda <= 0,9 m e vento <= 17 kn; rosso = oltre, o temporale.
   var gbox = document.querySelector('[data-giorni]');
-  if (gbox) {
+  // da cellulare la sezione è nascosta: non scarico nemmeno le previsioni
+  if (gbox && gbox.offsetParent !== null) {
     var gl = gbox.getAttribute('data-lang') || 'it';
     var GT = {
       it: { v: { g: 'Ottimo per lavorare in acqua', y: 'Si lavora solo in alcune ore', r: 'Mare mosso: meglio rimandare', x: 'Giornata finita' }, best: 'ore migliori', wave: 'Onda', wind: 'Vento',

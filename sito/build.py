@@ -516,7 +516,7 @@ def utilita_html(lang):
 </section>
 <section class="tool-sec" id="webcam"><h2 class="h2">{title['webcam'][lang]}</h2>
 <a class="cam-card" href="{WEBCAM_URL}" target="_blank" rel="noopener">
-<img src="/img/porto-loano.webp" alt="" loading="lazy"><span class="cam-live">LIVE</span>
+<img src="/img/webcam-loano.webp" alt="" loading="lazy"><span class="cam-live">LIVE</span>
 <span class="cam-txt"><strong>{T('cam_title')}</strong><span>{T('cam_sub')} →</span></span>
 </a>
 </section>

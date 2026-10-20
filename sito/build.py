@@ -8,6 +8,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from contenuti import *  # noqa
 from testi_pagine import TX
 from testi_extra import SOS, GB_TITLE
+from fasi_servizi import FASI, FASI_LABEL, FASI_TITLE
+from schede_attrezzatura import SCHEDE, SCHEDE_POS, SCHEDE_UI, FONTI
+from porto_loano import PORTO_CENTER, PORTO_TITLE, PORTO_LEAD, PORTO_MORE, PORTO_PUNTI
+import json as _json
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROD = '--prod' in sys.argv
@@ -241,7 +245,35 @@ def team_html(lang):
 
 
 def mezzi_html(lang):
-    return ''.join(f'<div class="tool-col"><h3>{t.upper()}</h3><ul class="list">{"".join(f"<li>{e(v)}</li>" for v in vs)}</ul></div>' for t, vs in MEZZI[lang])
+    """Elenco mezzi e attrezzatura: le voci con scheda tecnica diventano pulsanti che la aprono."""
+    INFO = '<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>'
+    cols = ''
+    for ci, (t, vs) in enumerate(MEZZI[lang]):
+        lis = ''
+        for vi, v in enumerate(vs):
+            k = SCHEDE_POS.get((ci, vi))
+            if k:
+                lis += f'<li><button class="sch-btn" type="button" data-sch="{k}">{e(v)}{INFO}</button></li>'
+            elif (ci, vi) == (0, 0):
+                lis += f'<li><a class="sch-btn" href="{url("rimorchiatore", lang)}">{e(v)} →</a></li>'
+            else:
+                lis += f'<li>{e(v)}</li>'
+        cols += f'<div class="tool-col"><h3>{t.upper()}</h3><ul class="list">{lis}</ul></div>'
+    return cols
+
+
+def schede_dialog(lang):
+    U = SCHEDE_UI[lang]
+    bodies = ''
+    for k, d in SCHEDE.items():
+        fun, imp, car = d[lang]
+        fonti = ''.join(f'<li><a href="{FONTI[f][1]}" target="_blank" rel="noopener">{e(FONTI[f][0])}</a></li>' for f in d['fonti'])
+        bodies += (f'<div class="sch-body" data-sch-body="{k}" hidden>'
+                   f'<h3>{U["fun"]}</h3><p>{e(fun)}</p><h3>{U["imp"]}</h3><p>{e(imp)}</p>'
+                   f'<h3>{U["car"]}</h3><ul class="rim-list">{"".join(f"<li>{e(c)}</li>" for c in car)}</ul>'
+                   + (f'<p class="sch-src">{U["fonti"]}:</p><ul class="sch-fonti">{fonti}</ul>' if fonti else '') + '</div>')
+    return (f'<dialog class="sch-dlg" id="sch-dlg" aria-labelledby="sch-t"><div class="sch-head"><h2 id="sch-t" data-sch-title></h2>'
+            f'<button class="sch-x" type="button" data-sch-close aria-label="{U["close"]}">×</button></div>{bodies}</dialog>')
 
 
 def moduli_html(lang):
@@ -278,14 +310,34 @@ def phero(img, eyebrow, h1, lead):
 </section>'''
 
 
-def detail(item, x, place=None, paras=None):
+FASE_ICONS = [  # valutazione, preparazione, attrezzatura, esecuzione, controllo, documentazione
+    '<path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/><path d="M20 20l-4-4"/>',
+    '<path d="M9 4h6v3H9z"/><path d="M7 5H5v15h14V5h-2"/><path d="M8.5 12l2.2 2.2L15.5 10"/>',
+    '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.5-.5-.5-2.5z"/>',
+    '<circle cx="12" cy="9" r="5"/><path d="M8 13.5V20h8v-6.5"/><circle cx="12" cy="9" r="2.2"/>',
+    '<path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>',
+    '<path d="M3 8h3l2-3h8l2 3h3v11H3z"/><circle cx="12" cy="13" r="3.5"/>',
+]
+
+
+def fasi_html(sid, lang):
+    if sid not in FASI:
+        return ''
+    steps = ''.join(
+        f'<li><span class="fs-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{ic}</svg></span>'
+        f'<span class="fs-n">{i + 1}</span><b>{e(lab)}</b><span class="fs-t">{e(txt)}</span></li>'
+        for i, (ic, lab, txt) in enumerate(zip(FASE_ICONS, FASI_LABEL[lang], FASI[sid][lang])))
+    return f'<div class="fasi"><p class="fasi-t">{FASI_TITLE[lang]}</p><ol class="fasi-list">{steps}</ol></div>'
+
+
+def detail(item, x, place=None, paras=None, fasi=''):
     pos = f' style="object-position:{item["pos"]}"' if item.get('pos') else ''
     ps = ''.join(f'<p>{e(p)}</p>' for p in (paras or [x['d']]))
     pl = f'<span class="card-place">{e(place)}</span>' if place else ''
     return f'''<article class="detail" id="{item["id"]}">
 <div class="detail-img"><img src="/img/{item["img"]}.webp" alt="" width="1536" height="1024" loading="lazy"{pos}></div>
 <div>{pl}<h2>{e(x["t"])}</h2>{ps}</div>
-</article>'''
+{fasi}</article>'''
 
 
 B_ICONS = [
@@ -373,7 +425,7 @@ def build_lang(lang):
 
     # SERVIZI
     srv = phero('saldature', N['servizi'], T('srv_page_h1'), T('srv_page_lead'))
-    srv += '<div class="wrap"><div>' + ''.join(detail(s, s[lang], paras=s[lang]['body']) for s in SERVIZI) + '</div></div>' + cta(lang)
+    srv += '<div class="wrap"><div>' + ''.join(detail(s, s[lang], paras=s[lang]['body'], fasi=fasi_html(s['id'], lang)) for s in SERVIZI) + '</div></div>' + cta(lang)
     page('servizi', lang, N['servizi'] + ' · Anfibiasub', T('srv_desc'), srv, og='saldature')
 
     # LAVORI
@@ -387,8 +439,10 @@ def build_lang(lang):
     chi += f'''<section class="section band" id="mezzi"><div class="wrap">
 <p class="eyebrow">{T('mezzi_eyebrow')}</p>
 <h2 class="h2">{T('mezzi_h2')}</h2>
-<p class="lead" style="margin-bottom:34px">{T('mezzi_lead')}</p>
+<p class="lead" style="margin-bottom:10px">{T('mezzi_lead')}</p>
+<p class="hint sch-hint">{SCHEDE_UI[lang]['hint']}</p>
 <div class="g4">{mezzi_html(lang)}</div>
+{schede_dialog(lang)}
 </div></section>''' + tow_band(lang)
     page('chi', lang, N['chi'] + ' · Anfibiasub', T('chi_desc'), chi, og='spianamenti')
 
@@ -397,7 +451,7 @@ def build_lang(lang):
     rim_li = ''.join(f'<li>{e(x)}</li>' for x in T('rim_list'))
     rim += f'''<section class="section"><div class="wrap">
 <article class="detail" id="elansa">
-<div class="detail-img"><img src="/img/rimorchiatore.webp" alt="{T('tug')} Elansa" width="1536" height="1024" loading="lazy"></div>
+<div class="detail-img"><img src="/img/rimorchiatore.webp" alt="{T('tug')} Elansa" width="1256" height="832" loading="lazy"></div>
 <div><span class="card-place">{T('rim_cert')} · {T('rim_base')}</span><h2>{T('rim_what')}</h2>
 <ul class="rim-list">{rim_li}</ul>
 </div>
@@ -464,7 +518,7 @@ def utilita_html(lang):
 </section>
 <section class="tool-sec" id="webcam"><h2 class="h2">{title['webcam'][lang]}</h2>
 <a class="cam-card" href="{WEBCAM_URL}" target="_blank" rel="noopener">
-<img src="/img/rimorchiatore.webp" alt="" loading="lazy"><span class="cam-live">LIVE</span>
+<img src="/img/webcam-loano.webp" alt="" loading="lazy"><span class="cam-live">LIVE</span>
 <span class="cam-txt"><strong>{T('cam_title')}</strong><span>{T('cam_sub')} →</span></span>
 </a>
 </section>
@@ -479,6 +533,12 @@ def utilita_html(lang):
 <a class="btn is-off" data-gps-link="wa" target="_blank" rel="noopener">{T('gps_wa')}</a>
 <button class="btn btn-ghost is-off" type="button" data-gps-copy data-done="{T('copied')}">{T('gps_copy')}</button>
 </div>
+</section>
+<section class="tool-sec" id="porto"><h2 class="h2">{PORTO_TITLE[lang]}</h2>
+<p class="lead" style="margin-bottom:18px">{PORTO_LEAD[lang]}</p>
+<div class="porto-wrap"><div class="porto-map" data-porto data-center="{PORTO_CENTER[0]},{PORTO_CENTER[1]}" data-more="{PORTO_MORE[lang]}" data-punti="{e(_json.dumps([{'id': i, 'p': ll, 'img': '/img/' + im + '-sm.webp', 't': t[lang][0], 'd': t[lang][1], 'u': url(k, lang, an)} for i, ll, im, (k, an), t in PORTO_PUNTI], ensure_ascii=False))}"></div>
+<ol class="porto-list" data-porto-list></ol></div>
+<p class="hint" data-porto-edit hidden></p>
 </section>'''
     h += f'''<div class="wrap">
 {live}

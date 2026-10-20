@@ -602,3 +602,62 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
     background:radial-gradient(ellipse 100% 70% at 0 50%,rgba(220,245,255,.5) 0,rgba(114,221,251,.2) 45%,rgba(60,198,245,0) 75%);
     clip-path:polygon(0 46%,100% 0,100% 100%,0 54%);mix-blend-mode:screen;filter:blur(3px);pointer-events:none}
 }
+/* descrizioni giustificate in Servizi, Lavori eseguiti e Utilità (tutte le lingue) */
+.detail p,.card-text,.tool-sec p,.tool-sec .lead,.prose p{text-align:justify;hyphens:auto;-webkit-hyphens:auto}
+/* mappa del porto di Loano (Utilità) */
+.porto-wrap{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:16px;align-items:start}
+.porto-map{height:460px;border-radius:16px;overflow:hidden;border:1px solid var(--line2);background:#0E2E4A}
+.porto-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.porto-list button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line2);background:var(--bg2);color:var(--txt);font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.porto-list button:hover{border-color:var(--cyan)}
+.porto-list button span,.porto-pin span{display:grid;place-items:center;flex:none;width:26px;height:26px;border-radius:50%;background:var(--cyan);color:#05223a;font-weight:800;font-size:13px}
+.porto-pin{background:none;border:0}
+.porto-pin span{width:34px;height:34px;font-size:15px;border:3px solid #fff;box-shadow:0 0 0 3px rgba(60,198,245,.35),0 4px 10px rgba(0,0,0,.45)}
+.porto-pop img{display:block;width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:8px}
+.porto-pop b{display:block;font-size:14px;margin-bottom:4px;color:#071D30}
+.porto-pop p{margin:0 0 8px!important;font-size:13px;line-height:1.45;color:#26384a;text-align:left}
+.porto-pop a{font-weight:700;color:#0b6fa4}
+@media (max-width:900px){.porto-wrap{grid-template-columns:1fr}.porto-map{height:360px}.porto-list{grid-template-columns:1fr 1fr}}
+@media (max-width:480px){.porto-list{grid-template-columns:1fr}}
+/* "Come lavoriamo": fasi sotto ogni servizio */
+.fasi{grid-column:1/-1;margin-top:6px}
+.fasi-t{font-size:12px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--cyan);margin:0 0 12px}
+.fasi-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;counter-reset:f}
+.fasi-list li{position:relative;display:flex;flex-direction:column;gap:6px;padding:14px 12px 14px;border-radius:14px;background:rgba(11,48,71,.35);border:1px solid rgba(120,200,240,.16)}
+.fasi-list li:not(:last-child)::after{content:"";position:absolute;top:30px;right:-10px;width:10px;height:2px;background:rgba(60,198,245,.45)}
+.fs-ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:var(--cyan);background:rgba(60,198,245,.1);border:1px solid rgba(60,198,245,.25)}
+.fs-ic svg{width:20px;height:20px}
+.fs-n{position:absolute;top:12px;right:12px;font-size:11px;font-weight:800;color:#5d7a90}
+.fasi-list b{font-size:13.5px;color:#fff}
+.fs-t{font-size:12.5px;line-height:1.5;color:var(--muted);hyphens:auto;-webkit-hyphens:auto}
+@media (max-width:1100px){.fasi-list{grid-template-columns:repeat(3,minmax(0,1fr))}.fasi-list li:nth-child(3n)::after{display:none}}
+@media (max-width:640px){
+  .fasi-list{grid-template-columns:1fr;gap:6px}
+  .fasi-list li{display:grid;grid-template-columns:34px 1fr;column-gap:12px;row-gap:2px;padding:10px 12px}
+  .fasi-list li .fs-ic{grid-row:1/3}
+  .fasi-list li::after{display:none}
+  .fs-n{top:10px}
+}
+/* da cellulare le fasi scorrono in orizzontale, così la pagina resta corta */
+@media (max-width:640px){
+  .fasi-list{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:8px;padding-bottom:6px;scrollbar-width:none}
+  .fasi-list::-webkit-scrollbar{display:none}
+  .fasi-list li{flex:0 0 72%;scroll-snap-align:start;display:flex;flex-direction:column;padding:12px}
+}
+/* schede tecniche attrezzatura (Chi siamo) */
+.sch-hint{margin:0 0 26px;color:var(--cyan)}
+.sch-btn{display:inline-flex;align-items:center;gap:7px;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;text-decoration:underline;text-decoration-color:rgba(60,198,245,.45);text-underline-offset:3px}
+.sch-btn:hover{color:var(--cyan)}
+.sch-btn svg{flex:none;color:var(--cyan)}
+.sch-dlg{max-width:560px;width:calc(100% - 32px);max-height:calc(100vh - 40px);border:1px solid rgba(157,119,66,.6);border-radius:18px;padding:0;color:var(--txt);background:#0B1F33;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.sch-dlg::backdrop{background:rgba(2,8,16,.75);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.sch-head{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;background:linear-gradient(180deg,#123049,#0B1F33);border-bottom:1px solid rgba(60,198,245,.2)}
+.sch-head h2{margin:0;font-size:19px;line-height:1.25;color:#fff}
+.sch-x{flex:none;width:36px;height:36px;border-radius:50%;border:1px solid #2a4a68;background:transparent;color:#cfe0ee;font-size:22px;line-height:1;cursor:pointer}
+.sch-body{padding:6px 20px 20px}
+.sch-body h3{margin:14px 0 4px;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan)}
+.sch-body p{margin:0;color:#cfe0ee;line-height:1.55;text-align:justify;hyphens:auto}
+.sch-body .rim-list{margin-top:6px;gap:8px;font-size:14.5px;color:#cfe0ee}
+.sch-src{margin-top:16px!important;font-size:12px;color:var(--dim)!important}
+.sch-fonti{margin:2px 0 0;padding-left:18px;font-size:12px}
+.sch-fonti a{color:#8fb0c8}

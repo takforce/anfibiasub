@@ -245,3 +245,45 @@
     });
   }
 })();
+
+// ---------- MAPPA DEL PORTO DI LOANO: punti dei lavori Anfibiasub ----------
+(function () {
+  var el = document.querySelector('[data-porto]');
+  if (!el || !window.L) return;
+  var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var punti = [];
+  try { punti = JSON.parse(el.getAttribute('data-punti') || '[]'); } catch (e) { return; }
+  var c = (el.getAttribute('data-center') || '44.1334,8.266').split(',').map(Number);
+  var more = el.getAttribute('data-more') || '';
+  var edit = /[?&]modifica\b/.test(location.search);
+  var map = L.map(el, { scrollWheelZoom: false, tap: true }).setView(c, 16);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
+  var list = document.querySelector('[data-porto-list]');
+  var out = document.querySelector('[data-porto-edit]');
+  var markers = [];
+  function showCoords() {
+    if (!out) return;
+    out.hidden = false;
+    out.textContent = markers.map(function (m, i) { var p = m.getLatLng(); return punti[i].id + ': [' + p.lat.toFixed(5) + ', ' + p.lng.toFixed(5) + ']'; }).join('   ');
+  }
+  punti.forEach(function (pt, i) {
+    var icon = L.divIcon({ className: 'porto-pin', html: '<span>' + (i + 1) + '</span>', iconSize: [34, 34], iconAnchor: [17, 17], popupAnchor: [0, -16] });
+    var m = L.marker(pt.p, { icon: icon, draggable: edit, title: pt.t }).addTo(map);
+    m.bindPopup('<div class="porto-pop"><img src="' + esc(pt.img) + '" alt="" loading="lazy"><b>' + (i + 1) + '. ' + esc(pt.t) + '</b><p>' + esc(pt.d) + '</p>' +
+      '<a href="' + esc(pt.u) + '">' + esc(more) + ' →</a></div>', { maxWidth: 260, minWidth: 220 });
+    if (edit) m.on('dragend', showCoords);
+    markers.push(m);
+    if (list) {
+      var li = document.createElement('li');
+      li.innerHTML = '<button type="button"><span>' + (i + 1) + '</span>' + esc(pt.t) + '</button>';
+      li.querySelector('button').addEventListener('click', function () {
+        map.setView(pt.p, Math.max(map.getZoom(), 16), { animate: true });
+        m.openPopup();
+        if (window.innerWidth < 768) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+      list.appendChild(li);
+    }
+  });
+  if (markers.length) map.fitBounds(L.featureGroup(markers).getBounds().pad(0.35));
+  if (edit) showCoords();
+})();

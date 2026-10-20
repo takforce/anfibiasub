@@ -195,6 +195,7 @@ UTIL_SEZIONI = [
     ('meteo', 'Meteomare Loano', 'Loano marine weather'),
     ('webcam', 'Webcam Loano', 'Loano webcam'),
     ('gps', 'Marcatore GPS', 'GPS marker'),
+    ('porto', 'Porto di Loano', 'Port of Loano'),
     ('vento', 'Scala del vento', 'Wind scale'),
     ('cime', 'Cime', 'Ropes'),
     ('cavi', 'Cavi in acciaio', 'Steel wire'),

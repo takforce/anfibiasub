@@ -171,6 +171,7 @@ UTIL_ES_DE = {
     'meteo': ('Meteo marina Loano', 'Seewetter Loano'),
     'webcam': ('Webcam Loano', 'Webcam Loano'),
     'gps': ('Marcador GPS', 'GPS-Markierung'),
+    'porto': ('Puerto de Loano', 'Hafen Loano'),
     'vento': ('Escala del viento', 'Windskala'),
     'cime': ('Cabos', 'Tauwerk'),
     'cavi': ('Cables de acero', 'Stahlseile'),

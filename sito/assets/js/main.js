@@ -224,3 +224,20 @@
   window.addEventListener('load', check);
   check();
 })();
+
+// ---------- Schede tecniche dell'attrezzatura (Chi siamo) ----------
+(function () {
+  var dlg = document.getElementById('sch-dlg');
+  if (!dlg) return;
+  var title = dlg.querySelector('[data-sch-title]');
+  function open(btn) {
+    var k = btn.getAttribute('data-sch');
+    Array.prototype.forEach.call(dlg.querySelectorAll('[data-sch-body]'), function (b) { b.hidden = b.getAttribute('data-sch-body') !== k; });
+    title.textContent = btn.textContent.trim();
+    if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
+  }
+  function close() { if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-sch]'), function (b) { b.addEventListener('click', function () { open(b); }); });
+  dlg.querySelector('[data-sch-close]').addEventListener('click', close);
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) close(); });
+})();

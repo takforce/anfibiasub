@@ -41,6 +41,19 @@ app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 // (serve quando il sito sta su anfibiasub.it e qui resta solo clienti.anfibiasub.it).
 const serveSite = process.env.SERVE_SITE !== 'off';
 if (!serveSite) app.get('/', (req, res) => res.redirect('/area'));
+// anfibiasub.it senza www -> www.anfibiasub.it; vecchi indirizzi del sito Joomla (/it/...) -> pagine nuove
+const OLD_URLS = require('./src/redirects.json');
+app.use((req, res, next) => {
+  const host = (req.headers.host || '').toLowerCase();
+  if (host === 'anfibiasub.it') return res.redirect(301, 'https://www.anfibiasub.it' + req.originalUrl);
+  if (serveSite && (req.method === 'GET' || req.method === 'HEAD')) {
+    const p = req.path.length > 1 ? req.path.replace(/\/+$/, '') : req.path;
+    const to = OLD_URLS[p] || OLD_URLS[p + '/'];
+    if (to) return res.redirect(301, to);
+    if (/^\/en\/.+/.test(p) && !/\.[a-z0-9]+$/i.test(p) && !require('fs').existsSync(path.join(__dirname, 'public', p + '.html'))) return res.redirect(301, '/en/');
+  }
+  next();
+});
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: '7d', index: serveSite ? 'index.html' : false, extensions: ['html'],
   // le pagine html vanno sempre ricontrollate, così dopo un aggiornamento anche il telefono vede la versione nuova

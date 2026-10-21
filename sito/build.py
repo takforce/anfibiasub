@@ -559,7 +559,7 @@ def copy_assets():
             shutil.copy2(s, d)
 
 
-def extras_prod():
+def old_redirects():
     # Reindirizzamenti dai vecchi indirizzi Joomla, così i link salvati e Google non portano a pagine vuote
     old = {
         '/it/': '/', '/it': '/', '/it/chi-siamo': '/chi-siamo.html', '/it/contatti': '/contatti.html',
@@ -576,6 +576,11 @@ def extras_prod():
            'algeria': 'algeria', 'malta': 'malta', 'sostituzione-anodi': 'sostituzione-anodi'}
     for k, v in lav.items():
         old[f'/it/lavori-eseguiti/{k}'] = f'/lavori.html#{v}'
+    return old
+
+
+def extras_prod():
+    old = old_redirects()
     lines = ['# Anfibiasub - generato da sito/build.py --prod', 'Options -Indexes', 'DirectoryIndex index.html', '',
              '# HTTPS e www', 'RewriteEngine On', 'RewriteCond %{HTTPS} off', 'RewriteRule ^ https://www.anfibiasub.it%{REQUEST_URI} [L,R=301]',
              'RewriteCond %{HTTP_HOST} ^anfibiasub\\.it$ [NC]', 'RewriteRule ^ https://www.anfibiasub.it%{REQUEST_URI} [L,R=301]', '',
@@ -609,6 +614,9 @@ if __name__ == '__main__':
         build_lang(lang)
     # l'area clienti mostra la stessa informativa privacy nella finestra "Termini e Privacy" della registrazione
     import json
+    # vecchi indirizzi /it/... -> nuove pagine, usati dal server su Railway
+    with open(os.path.join(ROOT, 'src', 'redirects.json'), 'w', encoding='utf-8') as f:
+        _json.dump(old_redirects(), f, ensure_ascii=False, indent=0)
     with open(os.path.join(ROOT, 'src', 'privacy_testi.json'), 'w', encoding='utf-8') as f:
         json.dump({l: TX['priv_body'][l] for l in LANGS}, f, ensure_ascii=False, indent=1)
     if PROD:

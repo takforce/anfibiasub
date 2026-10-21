@@ -247,3 +247,33 @@
   dlg.querySelector('[data-sch-close]').addEventListener('click', close);
   dlg.addEventListener('click', function (e) { if (e.target === dlg) close(); });
 })();
+
+// ---------- Richiedi un preventivo: modulo in finestra -> WhatsApp precompilato ----------
+(function () {
+  var dlg = document.getElementById('q-dlg');
+  if (!dlg || !dlg.showModal) return;   // senza <dialog> resta il link alla pagina Contatti
+  var f = dlg.querySelector('form');
+  function msg() {
+    var v = function (n) { return (f.elements[n].value || '').trim(); };
+    var t = 'Richiesta preventivo dal sito Anfibiasub\n\n';
+    t += 'Nome: ' + v('nome') + '\nServizio: ' + v('servizio') + '\n';
+    if (v('barca')) t += 'Barca: ' + v('barca') + '\n';
+    if (v('posto')) t += 'Porto / posto barca: ' + v('posto') + '\n';
+    if (v('data')) { var d = v('data').split('-'); t += 'Data preferita: ' + d[2] + '/' + d[1] + '/' + d[0] + '\n'; }
+    if (v('descrizione')) t += '\n' + v('descrizione');
+    return t;
+  }
+  function close() { dlg.close(); }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-quote]'), function (a) {
+    a.addEventListener('click', function (e) { e.preventDefault(); dlg.showModal(); });
+  });
+  Array.prototype.forEach.call(dlg.querySelectorAll('[data-q-to]'), function (a) {
+    a.addEventListener('click', function (e) {
+      if (!f.checkValidity()) { e.preventDefault(); f.reportValidity(); return; }
+      a.href = 'https://wa.me/' + a.getAttribute('data-q-to') + '?text=' + encodeURIComponent(msg());
+      setTimeout(close, 300);
+    });
+  });
+  dlg.querySelector('[data-q-close]').addEventListener('click', close);
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) close(); });
+})();

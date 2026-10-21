@@ -717,3 +717,17 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
 .mb-stone,.mb-stone b{color:#DCEFF5;text-shadow:0 1px 2px rgba(0,0,0,.8)}
 .mb-t{color:#fff}
 .mb-k{background:rgba(2,8,13,.55)}
+/* Modulo "Richiedi un preventivo" (stessa finestra dell'SOS, intestazione blu) */
+.q-dlg{max-width:520px;border-color:rgba(60,198,245,.45);max-height:calc(100dvh - 24px);overflow:auto}
+.q-head{background:linear-gradient(180deg,#14507E,#0B2F4E)!important}
+.q-form{display:grid;gap:10px;margin-bottom:14px}
+.q-form label{display:grid;gap:4px;font-size:13px;font-weight:600;color:#8fb0c8}
+.q-form input,.q-form select,.q-form textarea{font:inherit;font-size:15px;font-weight:500;color:#fff;background:#0F2B47;border:1px solid #2a4a68;border-radius:10px;padding:10px 12px;width:100%;box-sizing:border-box}
+.q-form textarea{resize:vertical;min-height:72px}
+.q-form input:focus,.q-form select:focus,.q-form textarea:focus{outline:2px solid #3CC6F5;outline-offset:1px;border-color:transparent}
+.q-form input::placeholder,.q-form textarea::placeholder{color:#5f7f99}
+.q-form select option{background:#0B1F33}
+.q-form input[type=date]{color-scheme:dark}
+.q-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:520px){.q-2{grid-template-columns:1fr}}
+.q-req{font-size:12px;color:#8fb0c8}

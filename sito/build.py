@@ -7,7 +7,7 @@ import os, sys, shutil, html, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from contenuti import *  # noqa
 from testi_pagine import TX
-from testi_extra import SOS, GB_TITLE
+from testi_extra import SOS, GB_TITLE, QUOTE
 from fasi_servizi import FASI_LABEL, FASI_TITLE, FASI_GEN, FASI_LEAD
 from schede_attrezzatura import SCHEDE, SCHEDE_POS, SCHEDE_UI, FONTI
 from porto_loano import PORTO_CENTER, PORTO_TITLE, PORTO_LEAD, PORTO_MORE, PORTO_PUNTI
@@ -82,14 +82,14 @@ def header(cur, lang, overlay):
 <img class="logo-img" src="/img/logo-libero.png" alt="" width="64" height="64">
 <span class="logo-txt"><span class="logo-name">ANFIBIA<span class="hl">SUB</span></span><span class="logo-sub">{U["tagline"]}</span></span>
 </a>
-<a class="btn nav-cta" href="{url('contatti', lang)}">{U["quote"]}</a>
+<a class="btn nav-cta" data-quote href="{url('contatti', lang)}">{U["quote"]}</a>
 <button class="menu-btn" type="button" aria-label="{U["menu_open"]}" aria-expanded="false" aria-controls="nav">{MENU}</button>
 <nav class="nav" id="nav" aria-label="Menu">
 {links}
 <a class="nav-lock" href="{area_url(lang)}">{LOCK}{U["area"]}</a>
 {lang_dd}
 <button class="nav-sos" type="button" data-sos>{BEACON}SOS</button>
-<a class="btn nav-btn-mob" href="{url('contatti', lang)}">{U["quote"]}</a>
+<a class="btn nav-btn-mob" data-quote href="{url('contatti', lang)}">{U["quote"]}</a>
 </nav>
 </div>
 <nav class="quick wrap" aria-label="{U['area']}">
@@ -128,6 +128,29 @@ def sos_dialog(lang):
 </dialog>'''
 
 
+def quote_dialog(lang):
+    Q = QUOTE[lang]
+    opts = ''.join(f'<option value="{e(x["it"]["t"])}">{x[lang]["t"]}</option>' for x in SERVIZI) + f'<option value="Altro">{Q["other"]}</option>'
+    return f'''<dialog class="sos-dlg q-dlg" id="q-dlg" aria-labelledby="q-t">
+<div class="sos-head q-head"><h2 id="q-t">{Q['title']}</h2></div>
+<p>{Q['text']}</p>
+<form class="q-form" novalidate>
+<label>{Q['name']} *<input name="nome" required autocomplete="name" maxlength="80"></label>
+<label>{Q['service']} *<select name="servizio" required><option value="">{Q['choose']}</option>{opts}</select></label>
+<div class="q-2"><label>{Q['boat']}<input name="barca" placeholder="{e(Q['boat_ph'])}" maxlength="80"></label>
+<label>{Q['place']}<input name="posto" placeholder="{e(Q['place_ph'])}" maxlength="80"></label></div>
+<label>{Q['desc']}<textarea name="descrizione" rows="3" placeholder="{e(Q['desc_ph'])}" maxlength="600"></textarea></label>
+<label class="q-date">{Q['date']}<input name="data" type="date"></label>
+<small class="q-req">* {Q['req']}</small>
+</form>
+<div class="sos-btns">
+<a class="sos-go" data-q-to="393470119832" href="https://wa.me/393470119832" target="_blank" rel="noopener">{WA_ICON}{Q['to_f']}</a>
+<a class="sos-go" data-q-to="393470387290" href="https://wa.me/393470387290" target="_blank" rel="noopener">{WA_ICON}{Q['to_s']}</a>
+<button class="sos-no" type="button" data-q-close>{Q['cancel']}</button>
+</div>
+</dialog>'''
+
+
 def footer(lang):
     U = UI[lang]
     return f'''<footer class="site-footer">
@@ -159,6 +182,7 @@ def footer(lang):
 </footer>
 <a class="wa" href="{WA}" target="_blank" rel="noopener" aria-label="{U["wa"]}">{WA_ICON}</a>
 {sos_dialog(lang)}
+{quote_dialog(lang)}
 <script src="/js/main.js?v={VER}"></script>'''
 
 

@@ -41,3 +41,36 @@ GB_TITLE = {
     'es': 'Previsión de intervenciones',
     'de': 'Einsatzprognose',
 }
+
+# Modulo "Richiedi un preventivo": finestra con campi, invio su WhatsApp con messaggio precompilato.
+# Il messaggio arriva sempre in italiano (lo leggono Francesco e Simone); qui solo le etichette a video.
+QUOTE = {
+    'it': {
+        'title': 'Richiedi un preventivo', 'text': 'Compila i campi: si apre WhatsApp con il messaggio già scritto, devi solo premere invio.',
+        'name': 'Nome e cognome', 'service': 'Servizio richiesto', 'choose': 'Scegli…', 'other': 'Altro',
+        'boat': 'Barca', 'boat_ph': 'Tipo, modello, lunghezza', 'place': 'Porto e posto barca', 'place_ph': 'Es. Marina di Loano, pontile 5',
+        'desc': 'Descrizione', 'desc_ph': 'Cosa serve, eventuali problemi', 'date': 'Data preferita',
+        'to_f': 'Invia a Francesco', 'to_s': 'Invia a Simone', 'cancel': 'Annulla', 'req': 'obbligatorio',
+    },
+    'en': {
+        'title': 'Request a quote', 'text': 'Fill in the fields: WhatsApp opens with the message ready, you just press send.',
+        'name': 'Full name', 'service': 'Service needed', 'choose': 'Choose…', 'other': 'Other',
+        'boat': 'Boat', 'boat_ph': 'Type, model, length', 'place': 'Port and berth', 'place_ph': 'E.g. Marina di Loano, pontoon 5',
+        'desc': 'Description', 'desc_ph': 'What you need, any problems', 'date': 'Preferred date',
+        'to_f': 'Send to Francesco', 'to_s': 'Send to Simone', 'cancel': 'Cancel', 'req': 'required',
+    },
+    'es': {
+        'title': 'Pedir presupuesto', 'text': 'Rellena los campos: se abre WhatsApp con el mensaje ya escrito, solo tienes que enviarlo.',
+        'name': 'Nombre y apellidos', 'service': 'Servicio solicitado', 'choose': 'Elige…', 'other': 'Otro',
+        'boat': 'Barco', 'boat_ph': 'Tipo, modelo, eslora', 'place': 'Puerto y amarre', 'place_ph': 'Ej. Marina di Loano, pantalán 5',
+        'desc': 'Descripción', 'desc_ph': 'Qué necesitas, posibles problemas', 'date': 'Fecha preferida',
+        'to_f': 'Enviar a Francesco', 'to_s': 'Enviar a Simone', 'cancel': 'Cancelar', 'req': 'obligatorio',
+    },
+    'de': {
+        'title': 'Angebot anfordern', 'text': 'Felder ausfüllen: WhatsApp öffnet sich mit der fertigen Nachricht, Sie müssen nur noch senden.',
+        'name': 'Vor- und Nachname', 'service': 'Gewünschte Leistung', 'choose': 'Auswählen…', 'other': 'Sonstiges',
+        'boat': 'Boot', 'boat_ph': 'Typ, Modell, Länge', 'place': 'Hafen und Liegeplatz', 'place_ph': 'z. B. Marina di Loano, Steg 5',
+        'desc': 'Beschreibung', 'desc_ph': 'Was benötigt wird, eventuelle Probleme', 'date': 'Wunschtermin',
+        'to_f': 'An Francesco senden', 'to_s': 'An Simone senden', 'cancel': 'Abbrechen', 'req': 'Pflichtfeld',
+    },
+}

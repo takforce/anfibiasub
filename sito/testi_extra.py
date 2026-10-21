@@ -36,8 +36,8 @@ SOS = {
 
 # Titolo della sezione "Giorni buoni" (usato come aria-label e titolo nella cornice)
 GB_TITLE = {
-    'it': 'Giorni buoni per lavorare in acqua',
-    'en': 'Good days for work in the water',
-    'es': 'Días buenos para trabajar en el agua',
-    'de': 'Gute Tage für Arbeiten im Wasser',
+    'it': 'Previsione interventi',
+    'en': 'Job forecast',
+    'es': 'Previsión de intervenciones',
+    'de': 'Einsatzprognose',
 }

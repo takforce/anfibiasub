@@ -707,3 +707,7 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
   .mb-l{font-size:7.5px;letter-spacing:.08em}
   .mb-frame .mb-upd{font-size:8.5px}
 }
+/* nuova cornice "Previsione interventi" (2172x724) */
+.gb-art{aspect-ratio:2172/724}
+.gb-in{left:13%;right:13.5%;top:17.5%;bottom:22%;gap:1cqw}
+.gb-day{padding:.5cqw .3cqw}

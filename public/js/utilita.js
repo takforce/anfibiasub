@@ -55,15 +55,15 @@
     var wicon = function (c, size) { var g = wg(c); return '<svg class="mt-wx" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" aria-label="' + esc(T.wx[g]) + '" role="img">' + ICONS[g] + '</svg>'; };
     // freccia: la direzione meteo indica da dove arriva il vento, la freccia punta dove soffia
     var arrow = function (deg, size) { return '<svg class="mt-arr" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" aria-hidden="true" style="transform:rotate(' + ((deg + 180) % 360) + 'deg)"><path d="M12 3l5 9h-3.5v9h-3v-9H7z" fill="currentColor"/></svg>'; };
-    var W = 'https://api.open-meteo.com/v1/forecast?latitude=44.1286&longitude=8.2589&current=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&wind_speed_unit=kn&timezone=Europe%2FRome&forecast_days=4';
-    var M = 'https://marine-api.open-meteo.com/v1/marine?latitude=44.11&longitude=8.29&current=wave_height,sea_surface_temperature&daily=wave_height_max&timezone=Europe%2FRome&forecast_days=4';
+    var W = 'https://api.open-meteo.com/v1/forecast?latitude=44.1286&longitude=8.2589&current=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&wind_speed_unit=kn&timezone=Europe%2FRome&forecast_days=6';
+    var M = 'https://marine-api.open-meteo.com/v1/marine?latitude=44.11&longitude=8.29&current=wave_height,sea_surface_temperature&daily=wave_height_max&timezone=Europe%2FRome&forecast_days=6';
     var get = function (u) { return fetch(u).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }); };
 
     // posizioni nell'immagine meteo-mare.webp (2172 x 724 px), in percentuale
     var W0 = 2172, H0 = 724;
     var at = function (x, y, r) { return 'left:' + (x / W0 * 100).toFixed(2) + '%;top:' + (y / H0 * 100).toFixed(2) + '%;width:' + (r * 2 / W0 * 100).toFixed(2) + '%;height:' + (r * 2 / H0 * 100).toFixed(2) + '%'; };
-    var BUB = { wind: [990, 291, 92], sea: [1213, 291, 88], air: [990, 496, 88], water: [1213, 496, 88] };
-    var STONES = [[659, 268, 70], [659, 436, 70], [1537, 268, 70], [1537, 436, 70]];
+    var BUB = { wind: [1087, 320, 108], sea: [928, 488, 88], air: [1245, 484, 88] };
+    var STONES = [[650, 247, 54], [650, 365, 54], [649, 488, 54], [1524, 245, 54], [1524, 362, 54], [1524, 482, 54]];
 
     Promise.all([get(W), get(M).catch(function () { return null; })]).then(function (res) {
       var w = res[0], m = res[1], c = w.current;
@@ -78,17 +78,16 @@
         bub('wind', '<span class="mb-v lv-' + lvl(kn) + '">' + arrow(c.wind_direction_10m, 14) + Math.round(kn) + '<small> kn ' + dir(c.wind_direction_10m) + '</small></span>' +
           '<span class="mb-s">' + T.gusts + ' ' + Math.round(c.wind_gusts_10m) + ' kn</span><span class="mb-s mb-x">' + T.force + ' ' + b + ' · ' + esc(T.bf[b]) + '</span><span class="mb-l">' + T.wind + '</span>') +
         bub('sea', '<span class="mb-v">' + (wave != null ? num(wave, 1) + '<small> m</small>' : '—') + '</span><span class="mb-s">' + (wave != null ? esc(stato(wave)) : '') + '</span><span class="mb-l">' + T.sea + '</span>') +
-        bub('air', '<span class="mb-v">' + Math.round(c.temperature_2m) + '°</span><span class="mb-s">' + esc(T.wx[wg(c.weather_code)]) + '</span><span class="mb-l">' + T.air + '</span>') +
-        bub('water', '<span class="mb-v">' + (sst != null ? Math.round(sst) + '°' : '—') + '</span><span class="mb-l">' + T.water + '</span>');
-      (w.daily.time || []).slice(0, 4).forEach(function (d, i) {
+        bub('air', '<span class="mb-v">' + Math.round(c.temperature_2m) + '°' + (sst != null ? '<small> / ' + Math.round(sst) + '°</small>' : '') + '</span>' +
+          '<span class="mb-s">' + esc(T.wx[wg(c.weather_code)]) + '</span><span class="mb-l">' + T.air + (sst != null ? ' · ' + T.water : '') + '</span>');
+      (w.daily.time || []).slice(0, 6).forEach(function (d, i) {
         var dt = new Date(d + 'T12:00:00');
         var wv = m && m.daily ? m.daily.wave_height_max[i] : null;
         var dk = w.daily.wind_speed_10m_max[i], p = STONES[i];
-        html += '<div class="mb-stone" style="' + at(p[0], p[1], p[2]) + '" title="' + T.gusts + ' ' + Math.round(w.daily.wind_gusts_10m_max[i]) + ' kn"><div>' +
+        html += '<div class="mb-stone" style="' + at(p[0], p[1], p[2]) + '" title="' + Math.round(w.daily.temperature_2m_max[i]) + '°/' + Math.round(w.daily.temperature_2m_min[i]) + '° · ' + Math.round(dk) + ' kn ' + dir(w.daily.wind_direction_10m_dominant[i]) + ' · ' + T.gusts + ' ' + Math.round(w.daily.wind_gusts_10m_max[i]) + ' kn' + (wv != null ? ' · ' + T.sea + ' ' + num(wv, 1) + ' m' : '') + '"><div>' +
           '<b>' + (i === 0 ? T.today : T.days[dt.getDay()] + ' ' + dt.getDate()) + '</b>' +
-          '<span class="mb-t">' + wicon(w.daily.weather_code[i], 16) + Math.round(w.daily.temperature_2m_max[i]) + '°<em>/' + Math.round(w.daily.temperature_2m_min[i]) + '°</em></span>' +
-          '<span class="mb-k lv-' + lvl(dk) + '">' + arrow(w.daily.wind_direction_10m_dominant[i], 11) + Math.round(dk) + ' kn ' + dir(w.daily.wind_direction_10m_dominant[i]) + '</span>' +
-          (wv != null ? '<span class="mb-n">' + T.sea + ' ' + num(wv, 1) + ' m</span>' : '') +
+          '<span class="mb-t">' + wicon(w.daily.weather_code[i], 16) + Math.round(w.daily.temperature_2m_max[i]) + '°</span>' +
+          '<span class="mb-k lv-' + lvl(dk) + '">' + arrow(w.daily.wind_direction_10m_dominant[i], 11) + Math.round(dk) + ' kn</span>' +
           '</div></div>';
       });
       box.innerHTML = '<div class="mb-frame"><div class="mb-art">' + html + '</div>' +

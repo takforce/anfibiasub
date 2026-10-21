@@ -711,3 +711,9 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
 .gb-art{aspect-ratio:2172/724}
 .gb-in{left:13%;right:13.5%;top:17.5%;bottom:22%;gap:1cqw}
 .gb-day{padding:.5cqw .3cqw}
+/* pietre meteo: disco blu scuro come lo sfondo, testo chiaro */
+.mb-stone::before{content:"";position:absolute;inset:6%;border-radius:50%;background:radial-gradient(circle,rgba(7,29,48,.92) 0,rgba(7,29,48,.88) 62%,rgba(7,29,48,.55) 100%);box-shadow:inset 0 0 6px rgba(0,0,0,.6)}
+.mb-stone>div{position:relative;z-index:1}
+.mb-stone,.mb-stone b{color:#DCEFF5;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+.mb-t{color:#fff}
+.mb-k{background:rgba(2,8,13,.55)}

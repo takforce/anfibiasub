@@ -7,7 +7,7 @@ import os, sys, shutil, html, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from contenuti import *  # noqa
 from testi_pagine import TX
-from testi_extra import SOS, GB_TITLE, QUOTE
+from testi_extra import SOS, GB_TITLE, QUOTE, CALL
 from fasi_servizi import FASI_LABEL, FASI_TITLE, FASI_GEN, FASI_LEAD
 from schede_attrezzatura import SCHEDE, SCHEDE_POS, SCHEDE_UI, FONTI
 from porto_loano import PORTO_CENTER, PORTO_TITLE, PORTO_LEAD, PORTO_MORE, PORTO_PUNTI
@@ -151,6 +151,18 @@ def quote_dialog(lang):
 </dialog>'''
 
 
+def call_dialog(lang):
+    C = CALL[lang]
+    row = lambda n, tel, num: f'''<div class="c-row"><div><span>{n}</span><a href="tel:{tel}">{num}</a></div><a class="c-wa" href="https://wa.me/{tel.lstrip('+')}" target="_blank" rel="noopener" aria-label="{C['wa']} {n}">{WA_ICON}</a></div>'''
+    return f'''<dialog class="sos-dlg q-dlg c-dlg" id="c-dlg" aria-labelledby="c-t">
+<div class="sos-head q-head"><h2 id="c-t">{C['title']}</h2></div>
+<p>{C['text']}</p>
+{row('Francesco', TEL_F, ('' if lang == 'it' else '+39 ') + '347 011 9832')}
+{row('Simone', TEL_S, ('' if lang == 'it' else '+39 ') + '347 038 7290')}
+<div class="sos-btns"><button class="sos-no" type="button" data-c-close>{C['close']}</button></div>
+</dialog>'''
+
+
 def footer(lang):
     U = UI[lang]
     return f'''<footer class="site-footer">
@@ -183,6 +195,7 @@ def footer(lang):
 <a class="wa" href="{WA}" target="_blank" rel="noopener" aria-label="{U["wa"]}">{WA_ICON}</a>
 {sos_dialog(lang)}
 {quote_dialog(lang)}
+{call_dialog(lang)}
 <script src="/js/main.js?v={VER}"></script>'''
 
 
@@ -312,7 +325,7 @@ def tow_band(lang):
 <h2 class="h2" id="tow-t" style="margin:0">{tx(lang, 'tow_h')}</h2>
 </div>
 <p class="tow-text">{tx(lang, 'tow_p')}</p>
-<a class="btn" href="tel:{TEL_F}">{UI[lang]["call_now"]} {ARROW}</a>
+<a class="btn" data-call href="tel:{TEL_F}">{UI[lang]["call_now"]} {ARROW}</a>
 </div>
 </section>'''
 

@@ -74,3 +74,11 @@ QUOTE = {
         'to_f': 'An Francesco senden', 'to_s': 'An Simone senden', 'cancel': 'Abbrechen', 'req': 'Pflichtfeld',
     },
 }
+
+# "Chiama ora" da PC: finestra con i numeri (dal cellulare resta la chiamata diretta).
+CALL = {
+    'it': {'title': 'Chiamaci', 'text': 'Dal computer non si può telefonare: chiama questi numeri dal cellulare oppure scrivici su WhatsApp.', 'wa': 'WhatsApp', 'close': 'Chiudi'},
+    'en': {'title': 'Call us', 'text': 'You can\'t make calls from a computer: dial these numbers from your phone or message us on WhatsApp.', 'wa': 'WhatsApp', 'close': 'Close'},
+    'es': {'title': 'Llámanos', 'text': 'Desde el ordenador no se puede llamar: marca estos números desde el móvil o escríbenos por WhatsApp.', 'wa': 'WhatsApp', 'close': 'Cerrar'},
+    'de': {'title': 'Rufen Sie uns an', 'text': 'Vom Computer aus kann man nicht telefonieren: Wählen Sie diese Nummern mit dem Handy oder schreiben Sie uns auf WhatsApp.', 'wa': 'WhatsApp', 'close': 'Schließen'},
+}

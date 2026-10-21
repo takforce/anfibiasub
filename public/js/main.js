@@ -277,3 +277,16 @@
   dlg.querySelector('[data-q-close]').addEventListener('click', close);
   dlg.addEventListener('click', function (e) { if (e.target === dlg) close(); });
 })();
+
+// ---------- "Chiama ora" da PC: finestra con i numeri (sul cellulare resta la chiamata) ----------
+(function () {
+  var dlg = document.getElementById('c-dlg');
+  if (!dlg || !dlg.showModal) return;
+  var pc = window.matchMedia('(hover: hover) and (pointer: fine)');
+  Array.prototype.forEach.call(document.querySelectorAll('[data-call]'), function (a) {
+    a.addEventListener('click', function (e) { if (!pc.matches) return; e.preventDefault(); dlg.showModal(); });
+  });
+  function close() { dlg.close(); }
+  dlg.querySelector('[data-c-close]').addEventListener('click', close);
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) close(); });
+})();

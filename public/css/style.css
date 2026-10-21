@@ -180,7 +180,7 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 .meteo-home+.section{padding-top:44px}
 /* meteo su immagine (meteo-mare.webp 2172x724): i dati sono posizionati sopra in percentuale */
 .mb-frame{position:relative;overflow:hidden;border-radius:22px;border:1px solid var(--line2);background:#0A1B2E}
-.mb-art{position:relative;width:100%;aspect-ratio:2172/724;background:url(/img/meteo-mare.webp) center/100% 100% no-repeat;container-type:inline-size}
+.mb-art{position:relative;width:100%;aspect-ratio:2172/724;background:url(/img/meteo-mare.webp?v=648992) center/100% 100% no-repeat;container-type:inline-size}
 .mb-plaque{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font-weight:800;color:#fff;font-size:2.15cqw;letter-spacing:.03em;text-shadow:0 2px 6px rgba(0,0,0,.7)}
 .mb-bub,.mb-stone{position:absolute;transform:translate(-50%,-50%);border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center}
 .mb-bub>div,.mb-stone>div{display:flex;flex-direction:column;align-items:center;gap:.25cqw}
@@ -439,7 +439,7 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 .gb{margin-top:26px}
 .gb .hint{padding:10px 0}
 .gb-frame{position:relative;border-radius:18px;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.45)}
-.gb-art{position:relative;width:100%;aspect-ratio:1774/591;background:url(/img/giorni-buoni.webp) center/100% 100% no-repeat;container-type:inline-size}
+.gb-art{position:relative;width:100%;aspect-ratio:1774/591;background:url(/img/giorni-buoni.webp?v=a370b7) center/100% 100% no-repeat;container-type:inline-size}
 .gb-in{position:absolute;left:12%;right:12%;top:7.5%;bottom:24%;display:flex;flex-direction:column;gap:1.2cqw}
 .gb-top{display:flex;align-items:baseline;justify-content:space-between;gap:2cqw}
 .gb-title{margin:0;font-size:2.15cqw;font-weight:800;line-height:1.1;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.7)}
@@ -521,9 +521,9 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
   body{background:#050E1A}
   .abyss-bg{display:block;position:fixed;inset:0;z-index:-1;pointer-events:none;background:#050E1A}
   .abyss-bg i{position:absolute;inset:0;background-size:cover;background-position:center;will-change:opacity}
-  .ab1{background-image:url(/img/fondo-1.webp)}
-  .ab2{background-image:url(/img/fondo-2.webp);opacity:0}
-  .ab3{background-image:url(/img/fondo-3.webp);opacity:0}
+  .ab1{background-image:url(/img/fondo-1.webp?v=b0ff57)}
+  .ab2{background-image:url(/img/fondo-2.webp?v=ce84d5);opacity:0}
+  .ab3{background-image:url(/img/fondo-3.webp?v=c5e12d);opacity:0}
   /* velo scuro dietro ai riquadri: le immagini si vedono solo ai lati */
   .ab-veil{position:absolute;top:0;bottom:0;left:50%;width:min(100%,calc(var(--wrap) + 40px));transform:translateX(-50%);background:rgba(5,14,26,.9);
     -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 48px,#000 calc(100% - 48px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 48px,#000 calc(100% - 48px),transparent 100%)}
@@ -574,11 +574,11 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 @media (min-width:1700px){.diver{width:min(calc((100vw - var(--wrap)) / 2 - 40px),calc(100vh * .2))}.dv-scr b{font-size:6.2cqw}.dv-scr small{font-size:3cqw}}
 /* tubo e cima: pezzi presi dall'immagine stessa, attacco sfumato */
 @media (min-width:1700px){
-  .dv-hose{left:37.38%;width:5.65%;transform:none;border-radius:0;bottom:calc(100% - 8px);background:url(/img/sub-tubo.png) center bottom/100% auto repeat-y;
+  .dv-hose{left:37.38%;width:5.65%;transform:none;border-radius:0;bottom:calc(100% - 8px);background:url(/img/sub-tubo.png?v=365ccc) center bottom/100% auto repeat-y;
     -webkit-mask-image:linear-gradient(0deg,transparent 0,#000 10px);mask-image:linear-gradient(0deg,transparent 0,#000 10px)}
-  .dv-rope{left:86.38%;width:4.15%;transform:none;opacity:1;bottom:calc(100% - 8px);background:url(/img/sub-cima.png) center bottom/100% auto repeat-y;
+  .dv-rope{left:86.38%;width:4.15%;transform:none;opacity:1;bottom:calc(100% - 8px);background:url(/img/sub-cima.png?v=7a3d2d) center bottom/100% auto repeat-y;
     -webkit-mask-image:linear-gradient(0deg,transparent 0,#000 10px);mask-image:linear-gradient(0deg,transparent 0,#000 10px)}
-  .dv-rope2{left:93.69%;width:4.32%;transform:none;opacity:1;top:calc(100% - 8px);background:url(/img/sub-cima2.png) center top/100% auto repeat-y;
+  .dv-rope2{left:93.69%;width:4.32%;transform:none;opacity:1;top:calc(100% - 8px);background:url(/img/sub-cima2.png?v=650cef) center top/100% auto repeat-y;
     -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 10px);mask-image:linear-gradient(180deg,transparent 0,#000 10px)}
 }
 /* niente riga sotto le testate delle pagine interne, come in home */
@@ -671,7 +671,7 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 .dv-line{display:none}
 @media (min-width:1700px){
   .dv-rope,.dv-rope2{display:none!important}
-  .dv-line{display:block;position:fixed;top:0;bottom:0;z-index:29;pointer-events:none;background:url(/img/sub-cima-fissa.png) center top/100% auto repeat-y}
+  .dv-line{display:block;position:fixed;top:0;bottom:0;z-index:29;pointer-events:none;background:url(/img/sub-cima-fissa.png?v=95d305) center top/100% auto repeat-y}
 }
 /* mai parole spezzate col trattino, in nessuna pagina */
 *{hyphens:manual!important;-webkit-hyphens:manual!important}

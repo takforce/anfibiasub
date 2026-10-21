@@ -23,7 +23,20 @@ AREA = 'https://clienti.anfibiasub.it/area/login' if PROD else '/area/login'
 e = html.escape
 import hashlib
 _A = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets')
-VER = hashlib.md5(b''.join(open(os.path.join(_A, f), 'rb').read() for f in ('css/style.css', 'js/main.js', 'js/utilita.js'))).hexdigest()[:8]
+import re as _re
+_IMG = os.path.join(_A, 'img')
+_IMGV = {}
+def imgv(m):
+    # aggiunge ?v=<impronta> agli indirizzi /img/...: se cambio un'immagine col nome uguale, i telefoni non tengono la vecchia in cache
+    n = m.group(1)
+    if n not in _IMGV:
+        f = os.path.join(_IMG, n)
+        _IMGV[n] = hashlib.md5(open(f, 'rb').read()).hexdigest()[:6] if os.path.isfile(f) else ''
+    return f'/img/{n}?v={_IMGV[n]}' if _IMGV[n] else m.group(0)
+def bust(t):
+    return _re.sub(r'/img/([\w./-]+?\.(?:webp|png|jpe?g|svg|gif))(?![\w?])', imgv, t)
+VER = hashlib.md5(b''.join(open(os.path.join(_A, f), 'rb').read() for f in ('css/style.css', 'js/main.js', 'js/utilita.js'))
+                  + b''.join(open(os.path.join(_IMG, f), 'rb').read() for f in sorted(os.listdir(_IMG)) if os.path.isfile(os.path.join(_IMG, f)))).hexdigest()[:8]
 ARROW = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'
 LOCK = '<svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'
 WA_ICON = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>'
@@ -239,7 +252,7 @@ def page(key, lang, title, desc, body, overlay=False, og='porto-loano'):
     path = os.path.join(OUT, fname)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w', encoding='utf-8') as f:
-        f.write(doc)
+        f.write(bust(doc))
 
 
 # ---------------- blocchi ----------------
@@ -594,6 +607,10 @@ def copy_assets():
             shutil.copytree(s, d, dirs_exist_ok=True)
         else:
             shutil.copy2(s, d)
+    for rel in ('css/style.css', 'js/main.js', 'js/utilita.js'):
+        d = os.path.join(OUT, rel)
+        t = open(d, encoding='utf-8').read()
+        open(d, 'w', encoding='utf-8').write(bust(t))
 
 
 def old_redirects():

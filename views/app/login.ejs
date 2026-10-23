@@ -13,9 +13,8 @@
 <div style="display:flex;justify-content:flex-end;font-size:13px"><a href="/area/password"><%= L.forgot %></a></div>
 <button class="btn" type="submit" style="justify-content:center"><%= L.enter.toUpperCase() %></button>
 </form>
-<p class="hint" style="margin:30px 0 10px;text-align:center"><%= L.no_access %></p>
-<div class="form">
-<a class="btn" href="/area/registrati" style="justify-content:center"><%= L.register.toUpperCase() %></a>
+<div class="form" style="margin-top:14px">
+<a class="btn" href="/area/registrati" style="justify-content:center;text-align:center"><%= (L.no_access + ' ' + L.register).toUpperCase() %></a>
 <a class="btn" href="<%= SITE_HOME[lang] %>" style="justify-content:center"><%= L.home.toUpperCase() %></a>
 </div>
 </main>

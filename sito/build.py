@@ -122,7 +122,7 @@ SHALLOW = {'chi', 'contatti'}  # pagine corte: discesa fino a 30 m, senza relitt
 
 def depth_bg(lang, key=''):
     """Sfondo da PC: dalla superficie al relitto mentre si scorre, con profondimetro digitale 0-50 m."""
-    return f'''<div class="abyss-bg{' is-shallow' if key in SHALLOW else ''}" aria-hidden="true" data-max="{30 if key in SHALLOW else 50}"><i class="ab1"></i><i class="ab2"></i><i class="ab3"></i><span class="ab-veil"></span></div>
+    return f'''<div class="abyss-bg{' is-shallow' if key in SHALLOW else ''}" aria-hidden="true" data-max="{30 if key in SHALLOW else 50}"><i class="ab-l"></i><i class="ab-r"></i><span class="ab-veil"></span></div>
 <span class="dv-line" aria-hidden="true"></span><div class="diver" aria-hidden="true"><span class="dv-hose"></span><span class="dv-bub"></span><span class="dv-rope"></span><span class="dv-rope2"></span><img src="/img/sub-ots.webp" alt="" width="602" height="1672"><span class="dv-lamp"></span><span class="dv-scr"><b data-depth>0.0</b><small>m</small></span></div>'''
 
 

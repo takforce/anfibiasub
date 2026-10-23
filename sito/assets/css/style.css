@@ -521,9 +521,6 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
   body{background:#050E1A}
   .abyss-bg{display:block;position:fixed;inset:0;z-index:-1;pointer-events:none;background:#050E1A}
   .abyss-bg i{position:absolute;inset:0;background-size:cover;background-position:center;will-change:opacity}
-  .ab1{background-image:url(/img/fondo-1.webp)}
-  .ab2{background-image:url(/img/fondo-2.webp);opacity:0}
-  .ab3{background-image:url(/img/fondo-3.webp);opacity:0}
   /* velo scuro dietro ai riquadri: le immagini si vedono solo ai lati */
   .ab-veil{position:absolute;top:0;bottom:0;left:50%;width:min(100%,calc(var(--wrap) + 40px));transform:translateX(-50%);background:rgba(5,14,26,.9);
     -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 48px,#000 calc(100% - 48px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 48px,#000 calc(100% - 48px),transparent 100%)}
@@ -587,7 +584,6 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 /* PC: nessuno stacco orizzontale, il piè di pagina sfuma nello sfondo */
 @media (min-width:1024px){
   .site-footer{background:linear-gradient(180deg,rgba(2,8,13,0) 0,rgba(2,8,13,.55) 140px)}
-  .abyss-bg.is-shallow .ab3{display:none}
 }
 /* bolle di scarico realistiche (canvas): sostituiscono la colonna continua */
 .dv-bub{display:none!important}
@@ -739,3 +735,10 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
 .c-wa{display:grid;place-items:center;width:48px;height:48px;border-radius:12px;background:#25D366;color:#05210f;flex:none}
 .c-wa svg{width:24px;height:24px}
 .c-dlg .sos-btns{margin-top:4px}
+
+/* sfondo "discesa" con due immagini verticali ai lati (0-50 m) che scorrono con la pagina */
+@media (min-width:1024px){
+  .abyss-bg .ab-l,.abyss-bg .ab-r{inset:auto;top:0;background-size:100% 100%;background-repeat:no-repeat;will-change:transform}
+  .abyss-bg .ab-l{left:0;background-image:url(/img/discesa-sx.webp)}
+  .abyss-bg .ab-r{right:0;background-image:url(/img/discesa-dx.webp)}
+}

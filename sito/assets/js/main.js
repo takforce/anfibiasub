@@ -100,7 +100,7 @@
   var bg = document.querySelector('.abyss-bg');
   if (!bg || !window.matchMedia) return;
   var mq = window.matchMedia('(min-width:1024px)');
-  var l2 = bg.querySelector('.ab2'), l3 = bg.querySelector('.ab3');
+  var sl = bg.querySelector('.ab-l'), sr = bg.querySelector('.ab-r'), veil = bg.querySelector('.ab-veil'), RATIO = 4515 / 821;
   var val = document.querySelector('[data-depth]'), bar = document.querySelector('[data-depth-bar]'), diver = document.querySelector('.diver'), line = document.querySelector('.dv-line');
   var MAX = +bg.getAttribute('data-max') || 50, shallow = bg.classList.contains('is-shallow'), ticking = false;
   function update() {
@@ -108,11 +108,15 @@
     if (!mq.matches) return;
     var h = document.documentElement.scrollHeight - window.innerHeight;
     var p = h > 0 ? Math.min(1, Math.max(0, window.scrollY / h)) : 0;
-    // 0-50%: superficie -> acqua profonda; 50-100%: acqua profonda -> relitto
-    if (shallow) { l2.style.opacity = p.toFixed(3); l3.style.opacity = 0; }
-    else {
-      l2.style.opacity = Math.min(1, p * 2).toFixed(3);
-      l3.style.opacity = Math.max(0, p * 2 - 1).toFixed(3);
+    // due immagini verticali ai lati (0-50 m): scorrono dalla superficie al fondale insieme alla pagina
+    if (sl && sr && veil) {
+      var vw = window.innerWidth, vh = window.innerHeight, side = Math.max(0, (vw - veil.offsetWidth) / 2) + 48;
+      var ih = Math.max(side * RATIO, vh * 2), iw = ih / RATIO;
+      var y = -Math.round((ih - vh) * p * (shallow ? 0.6 : 1));
+      sl.style.width = sr.style.width = Math.round(iw) + 'px';
+      sl.style.height = sr.style.height = Math.round(ih) + 'px';
+      sl.style.left = Math.round(side - iw) + 'px';
+      sl.style.transform = sr.style.transform = 'translate3d(0,' + y + 'px,0)';
     }
     // profondità da 1 m (appena sotto la superficie) al massimo della pagina
     var depth = 1 + p * (MAX - 1);

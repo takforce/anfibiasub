@@ -123,6 +123,7 @@
     if (val) val.textContent = depth.toFixed(1);
     // dai 40 m in giù si accende la torcia sul casco
     if (diver) diver.style.setProperty('--lamp', Math.min(1, Math.max(0, (depth - 40) / 3)).toFixed(2));
+    if (diver && diver.okAt) diver.okAt(depth);
     if (bar) bar.style.height = (p * 100).toFixed(1) + '%';
     // il sub scende dall'alto (sotto l'header) fino in fondo allo schermo
     if (diver && diver.offsetHeight) {
@@ -293,4 +294,49 @@
   function close() { dlg.close(); }
   dlg.querySelector('[data-c-close]').addEventListener('click', close);
   dlg.addEventListener('click', function (e) { if (e.target === dlg) close(); });
+})();
+
+// ---------- Arrivato sul fondo (50 m): il sub fa il segno OK, una volta per pagina ----------
+(function () {
+  var diver = document.querySelector('.diver'), v = diver && diver.querySelector('.dv-ok');
+  if (!v || !v.canPlayType) return;
+  // Safari non mostra la trasparenza dei video webm: lì resta la foto ferma
+  var safari = /^((?!chrome|chromium|android|edg).)*safari/i.test(navigator.userAgent);
+  if (safari || !v.canPlayType('video/webm; codecs="vp9"')) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var loaded = false, done = false, fading = false;
+  function shown() { return diver.offsetWidth > 0; }
+  diver.okAt = function (depth) {
+    if (done || !shown()) return;
+    if (!loaded && depth > 38) { loaded = true; v.preload = 'auto'; v.src = '/img/sub-ok.webm'; }
+    if (depth >= 49.9 && loaded) {
+      done = true;
+      v.currentTime = 0;
+      var p = v.play();
+      if (p && p.then) p.then(function () { diver.classList.add('is-ok'); }).catch(function () { done = false; });
+      else diver.classList.add('is-ok');
+    }
+  };
+  // negli ultimi istanti il video sfuma sulla foto ferma
+  v.addEventListener('timeupdate', function () {
+    if (!fading && v.duration && v.currentTime > v.duration - 0.45) { fading = true; diver.classList.remove('is-ok'); }
+  });
+  v.addEventListener('ended', function () { diver.classList.remove('is-ok'); });
+})();
+
+// ---------- Cellulare: in fondo alla home il sub fa OK in continuo (parte solo quando è visibile) ----------
+(function () {
+  var box = document.querySelector('.m-ok'), v = box && box.querySelector('video');
+  if (!v || !('IntersectionObserver' in window)) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (!box.offsetWidth) return;
+      if (e.isIntersecting) {
+        if (!v.src) v.src = v.canPlayType('video/mp4; codecs="avc1.42E01E"') ? '/img/sub-ok-mobile.mp4' : '/img/sub-ok-mobile.webm';
+        var p = v.play(); if (p && p.catch) p.catch(function () {});
+      } else if (v.src) v.pause();
+    });
+  }, { rootMargin: '200px 0px' });
+  io.observe(box);
 })();

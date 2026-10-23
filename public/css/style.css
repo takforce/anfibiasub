@@ -809,3 +809,22 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
   .m-lav .card-title{font-size:12.5px;line-height:1.3}
   .m-lav .card-text{display:none}
 }
+
+/* segno OK a 50 m: video trasparente sopra la foto del sub (solo PC largo) */
+.dv-ok{display:none}
+@media (min-width:1700px){
+  .dv-ok{display:block;position:absolute;left:-26.54%;top:0;width:126.77%;height:auto;opacity:0;pointer-events:none;
+    filter:drop-shadow(0 10px 24px rgba(0,0,0,.6));transition:opacity .4s}
+  .diver img{transition:opacity .4s}
+  .dv-scr{transition:opacity .25s}
+  .diver.is-ok .dv-ok{opacity:1}
+  .diver.is-ok img,.diver.is-ok .dv-scr{opacity:0}
+}
+
+/* cellulare: sub sul fondale in fondo alla home */
+.m-ok{display:none}
+@media (max-width:767px){
+  .m-ok{display:block;margin:0 auto -10px;max-width:420px}
+  .m-ok video{display:block;width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;
+    -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 18%,#000 82%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 18%,#000 82%,transparent 100%)}
+}

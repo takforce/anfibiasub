@@ -123,7 +123,7 @@ SHALLOW = {'chi', 'contatti'}  # pagine corte: discesa fino a 30 m, senza relitt
 def depth_bg(lang, key=''):
     """Sfondo da PC: dalla superficie al relitto mentre si scorre, con profondimetro digitale 0-50 m."""
     return f'''<div class="abyss-bg{' is-shallow' if key in SHALLOW else ''}" aria-hidden="true" data-max="{30 if key in SHALLOW else 50}"><i class="ab-l"></i><i class="ab-r"></i><span class="ab-veil"></span></div>
-<span class="dv-line" aria-hidden="true"></span><div class="diver" aria-hidden="true"><span class="dv-hose"></span><span class="dv-bub"></span><span class="dv-rope"></span><span class="dv-rope2"></span><img src="/img/sub-ots.webp" alt="" width="602" height="1672"><span class="dv-lamp"></span><span class="dv-scr"><b data-depth>0.0</b><small>m</small></span></div>'''
+<span class="dv-line" aria-hidden="true"></span><div class="diver" aria-hidden="true"><span class="dv-hose"></span><span class="dv-bub"></span><span class="dv-rope"></span><span class="dv-rope2"></span><img src="/img/sub-ots.webp" alt="" width="602" height="1672"><video class="dv-ok" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><span class="dv-lamp"></span><span class="dv-scr"><b data-depth>0.0</b><small>m</small></span></div>'''
 
 
 def sos_dialog(lang):
@@ -439,6 +439,8 @@ def build_lang(lang):
 <div class="g3">{''.join(job_card(l, lang) for l in LAVORI[:6])}</div>
 </div>
 </section>
+
+<div class="m-ok" aria-hidden="true"><video muted loop playsinline preload="none" poster="/img/sub-ok-mobile.webp" width="540" height="720"></video></div>
 
 <section class="section band m-hide" id="area" aria-labelledby="area-t">
 <div class="wrap split">

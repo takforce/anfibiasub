@@ -17,13 +17,12 @@ PAGES = {
     'lavori':   {'it': 'lavori.html',    'en': 'en/works.html',    'es': 'es/trabajos.html',   'de': 'de/referenzen.html'},
     'utilita':  {'it': 'utilita.html',   'en': 'en/tools.html',    'es': 'es/utilidades.html', 'de': 'de/nuetzliches.html'},
     'contatti': {'it': 'contatti.html',  'en': 'en/contact.html',  'es': 'es/contacto.html',   'de': 'de/kontakt.html'},
-    'rimorchiatore': {'it': 'rimorchiatore.html', 'en': 'en/tug.html', 'es': 'es/remolcador.html', 'de': 'de/schlepper.html'},
     'privacy':  {'it': 'privacy.html',   'en': 'en/privacy.html',  'es': 'es/privacidad.html', 'de': 'de/datenschutz.html'},
 }
 
 UI = {
     'it': {
-        'nav': [('home', 'Home'), ('servizi', 'Servizi'), ('lavori', 'Lavori eseguiti'), ('utilita', 'Utilità'), ('chi', 'Chi siamo'), ('rimorchiatore', 'Rimorchiatore'), ('contatti', 'Contatti')],
+        'nav': [('home', 'Home'), ('servizi', 'Servizi'), ('lavori', 'Lavori eseguiti'), ('utilita', 'Utilità'), ('chi', 'Chi siamo'), ('contatti', 'Contatti')],
         'area': 'Area clienti', 'quote': 'Richiedi un preventivo', 'skip': 'Vai al contenuto',
         'menu_open': 'Apri il menu', 'tagline': 'LAVORI MARITTIMI SUBACQUEI', 'more': 'Scopri',
         'all_services': 'Tutti i servizi', 'all_works': 'Tutti i lavori', 'call_now': 'CHIAMA ORA',
@@ -33,7 +32,7 @@ UI = {
         'lang_label': 'Lingua',
     },
     'en': {
-        'nav': [('home', 'Home'), ('servizi', 'Services'), ('lavori', 'Our work'), ('utilita', 'Tools'), ('chi', 'About us'), ('rimorchiatore', 'Tug'), ('contatti', 'Contact')],
+        'nav': [('home', 'Home'), ('servizi', 'Services'), ('lavori', 'Our work'), ('utilita', 'Tools'), ('chi', 'About us'), ('contatti', 'Contact')],
         'area': 'Customer area', 'quote': 'Request a quote', 'skip': 'Skip to content',
         'menu_open': 'Open menu', 'tagline': 'UNDERWATER MARINE WORKS', 'more': 'Learn more',
         'all_services': 'All services', 'all_works': 'All projects', 'call_now': 'CALL NOW',
@@ -88,11 +87,9 @@ SERVIZI = [
                        'We also handle maintenance: fitting anodes and zincs, sealing leaks, adding repair sleeves.'])),
     dict(id='recuperi', img='recuperi',
          it=dict(t='Recuperi', short='Oggetti persi in mare: palloni di sollevamento per i pezzi piccoli, pontone per quelli grandi.',
-                 body=['Recuperiamo oggetti persi in mare. Per quelli di dimensioni contenute usiamo palloni di sollevamento a paracadute; per quelli più pesanti interveniamo con il pontone.',
-                       'Con il rimorchiatore Elansa recuperiamo anche imbarcazioni in difficoltà.']),
+                 body=['Recuperiamo oggetti persi in mare. Per quelli di dimensioni contenute usiamo palloni di sollevamento a paracadute; per quelli più pesanti interveniamo con il pontone.']),
          en=dict(t='Salvage and recovery', short='Objects lost at sea: lift bags for small items, a pontoon for large ones.',
-                 body=['We recover objects lost at sea. For smaller items we use parachute lift bags; for heavier ones we work from our pontoon.',
-                       'With the tug Elansa we also recover boats in difficulty.'])),
+                 body=['We recover objects lost at sea. For smaller items we use parachute lift bags; for heavier ones we work from our pontoon.'])),
     dict(id='alaggi', img='alaggi',
          it=dict(t='Alaggi e vari', short='Alaggio e varo di imbarcazioni anche di grandi dimensioni, con travel lift o altri mezzi.',
                  body=['Eseguiamo alaggi e vari di imbarcazioni di grandi dimensioni con l\'ausilio del travel lift o di altri mezzi.',
@@ -171,11 +168,11 @@ TEAM = [
 ]
 
 MEZZI = {
-    'it': [('In mare', ['Rimorchiatore Elansa (IMO STCW 95)', 'Imbarcazione da lavoro Bianca Maria', 'Pilotina di servizio Golondrina', 'Motopontone', 'Gommone 8 posti trasportabile']),
+    'it': [('In mare', ['Imbarcazione da lavoro Bianca Maria', 'Pilotina di servizio Golondrina', 'Motopontone', 'Gommone 8 posti trasportabile']),
            ('Immersione', ['Elmetti Morgan per immersioni oltre i 12 m', 'Telefono subacqueo', 'ROV filoguidato con videocamera', 'Container attrezzato per supporto vitale', 'Compressori Coltri, anche trasportabili']),
            ('Lavorazioni', ['Motosaldatrice e pinza da saldatura subacquea', 'Torcia da taglio metalli subacquea', 'Fioretto ad aria compressa', 'Idropulitrice ad acqua calda e idrosabbiatrice', 'Draga e sorbona per scavi subacquei']),
            ('A terra', ['Autocarro Opel Combo', 'Toyota 4x4 per località impervie', 'Carrello stradale per gommone e pilotina', 'Container magazzino', 'GPS per posizionamento satellitare'])],
-    'en': [('At sea', ['Tug Elansa (IMO STCW 95)', 'Work boat Bianca Maria', 'Service launch Golondrina', 'Motorised pontoon', 'Transportable 8-seat RIB']),
+    'en': [('At sea', ['Work boat Bianca Maria', 'Service launch Golondrina', 'Motorised pontoon', 'Transportable 8-seat RIB']),
            ('Diving', ['Morgan helmets for dives beyond 12 m', 'Underwater telephone', 'Tethered ROV with camera', 'Life-support container', 'Coltri compressors, portable too']),
            ('Work tools', ['Welding generator and underwater welding torch', 'Underwater metal-cutting torch', 'Pneumatic rock drill', 'Hot-water pressure washer and sandblaster', 'Dredge and suction pump for underwater digging']),
            ('On land', ['Opel Combo van', 'Toyota 4x4 for rough terrain', 'Road trailer for RIB and launch', 'Storage container', 'Satellite GPS positioning'])],

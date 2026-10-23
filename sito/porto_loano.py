@@ -45,10 +45,4 @@ PORTO_PUNTI = [
         'es': ('Asistencia a los barcos', 'Limpieza de hélices y cascos, cambio de ánodos e inspecciones en el propio amarre, sin varada.'),
         'de': ('Bootsservice', 'Reinigung von Propellern und Rümpfen, Anodenwechsel und Inspektionen direkt am Liegeplatz, ohne Kranen.'),
     }),
-    ('base', [44.1336, 8.2643], 'elansa-porto', ('rimorchiatore', ''), {
-        'it': ('Base Anfibiasub e rimorchiatore Elansa', 'Da qui partiamo per lavori, recuperi e assistenza alle imbarcazioni in difficoltà.'),
-        'en': ('Anfibiasub base and Elansa tug', 'From here we leave for jobs, recoveries and assistance to boats in trouble.'),
-        'es': ('Base Anfibiasub y remolcador Elansa', 'Desde aquí salimos para trabajos, rescates y asistencia a barcos en apuros.'),
-        'de': ('Anfibiasub-Basis und Schlepper Elansa', 'Von hier fahren wir zu Arbeiten, Bergungen und zur Hilfe für Boote in Not.'),
-    }),
 ]

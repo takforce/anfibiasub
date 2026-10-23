@@ -4,7 +4,6 @@
 
 # posizione nell'elenco MEZZI (colonna, voce) -> chiave della scheda
 SCHEDE_POS = {
-    (0, 0): 'elansa',
     (1, 0): 'casco', (1, 1): 'telefono', (1, 2): 'rov', (1, 3): 'supporto', (1, 4): 'compressori',
     (2, 0): 'saldatura', (2, 1): 'taglio', (2, 2): 'fioretto', (2, 3): 'idropulitrice', (2, 4): 'draga',
 }
@@ -26,31 +25,6 @@ FONTI = {
 
 # chiave -> {'fonti': [...], lingua: (funzione, impiego, [caratteristiche])}
 SCHEDE = {
-    'elansa': {'fonti': [], 'img': 'elansa-porto-sm',
-        'it': ('Rimorchiatore di Anfibiasub, con base al porto di Loano.',
-               'Recupero e rimorchio di imbarcazioni in difficoltà, assistenza ai lavori in mare, trasporto di attrezzature e supporto ai sub.',
-               ['Equipaggio con certificazione IMO STCW 95 per il lavoro in mare.',
-                'Ampio ponte di lavoro libero per caricare attrezzature, palloni di sollevamento e materiali.',
-                'Parabordi laterali per affiancare in sicurezza barche e pontili.',
-                'In grado di rimorchiare imbarcazioni più grandi di lui fino al porto.']),
-        'en': ('Anfibiasub\'s tug, based in the port of Loano.',
-               'Recovery and towing of boats in trouble, support for work at sea, transport of equipment and diver support.',
-               ['Crew certified IMO STCW 95 for work at sea.',
-                'Large open work deck to load equipment, lift bags and materials.',
-                'Side fenders to come alongside boats and pontoons safely.',
-                'Able to tow boats larger than itself back to port.']),
-        'es': ('Remolcador de Anfibiasub, con base en el puerto de Loano.',
-               'Rescate y remolque de barcos en apuros, apoyo a trabajos en el mar, transporte de equipos y apoyo a los buzos.',
-               ['Tripulación con certificación IMO STCW 95 para el trabajo en el mar.',
-                'Amplia cubierta de trabajo libre para cargar equipos, globos de elevación y materiales.',
-                'Defensas laterales para abarloarse con seguridad a barcos y pantalanes.',
-                'Capaz de remolcar barcos más grandes que él hasta el puerto.']),
-        'de': ('Schlepper von Anfibiasub mit Basis im Hafen von Loano.',
-               'Bergung und Schleppen von Booten in Not, Unterstützung bei Arbeiten auf See, Transport von Ausrüstung und Taucherunterstützung.',
-               ['Besatzung mit IMO-STCW-95-Zertifizierung für die Arbeit auf See.',
-                'Großes freies Arbeitsdeck für Ausrüstung, Hebesäcke und Material.',
-                'Seitliche Fender, um sicher an Booten und Stegen anzulegen.',
-                'Kann Boote, die größer sind als er selbst, in den Hafen schleppen.'])},
     'casco': {'fonti': ['km'],
         'it': ('Casco rigido da lavoro: il sub respira aria che arriva dalla superficie e parla con chi lo assiste.',
                'Lavori oltre i 12 m e immersioni lunghe: costruzione di porti, saldature, demolizioni.',

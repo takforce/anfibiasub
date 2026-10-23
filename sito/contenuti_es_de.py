@@ -3,7 +3,7 @@
 
 UI_ES_DE = {
     'es': {
-        'nav': [('home', 'Inicio'), ('servizi', 'Servicios'), ('lavori', 'Trabajos realizados'), ('utilita', 'Utilidades'), ('chi', 'Quiénes somos'), ('rimorchiatore', 'Remolcador'), ('contatti', 'Contacto')],
+        'nav': [('home', 'Inicio'), ('servizi', 'Servicios'), ('lavori', 'Trabajos realizados'), ('utilita', 'Utilidades'), ('chi', 'Quiénes somos'), ('contatti', 'Contacto')],
         'area': 'Área de clientes', 'quote': 'Pedir presupuesto', 'skip': 'Ir al contenido',
         'menu_open': 'Abrir el menú', 'tagline': 'TRABAJOS MARÍTIMOS SUBACUÁTICOS', 'more': 'Ver más',
         'all_services': 'Todos los servicios', 'all_works': 'Todos los trabajos', 'call_now': 'LLÁMANOS',
@@ -13,7 +13,7 @@ UI_ES_DE = {
         'lang_label': 'Idioma',
     },
     'de': {
-        'nav': [('home', 'Start'), ('servizi', 'Leistungen'), ('lavori', 'Referenzen'), ('utilita', 'Nützliches'), ('chi', 'Über uns'), ('rimorchiatore', 'Schlepper'), ('contatti', 'Kontakt')],
+        'nav': [('home', 'Start'), ('servizi', 'Leistungen'), ('lavori', 'Referenzen'), ('utilita', 'Nützliches'), ('chi', 'Über uns'), ('contatti', 'Kontakt')],
         'area': 'Kundenbereich', 'quote': 'Angebot anfordern', 'skip': 'Zum Inhalt',
         'menu_open': 'Menü öffnen', 'tagline': 'MARITIME UNTERWASSERARBEITEN', 'more': 'Mehr erfahren',
         'all_services': 'Alle Leistungen', 'all_works': 'Alle Referenzen', 'call_now': 'JETZT ANRUFEN',
@@ -68,11 +68,9 @@ SERVIZI_ES_DE = {
                       'Auch die Wartung übernehmen wir: Montage von Anoden und Zinkanoden, Abdichten von Lecks, Setzen von Reparaturmuffen.'])),
     'recuperi': dict(
         es=dict(t='Recuperaciones', short='Objetos perdidos en el mar: globos de elevación para piezas pequeñas, pontón para las grandes.',
-                body=['Recuperamos objetos perdidos en el mar. Para los de tamaño reducido usamos globos de elevación tipo paracaídas; para los más pesados intervenimos con el pontón.',
-                      'Con el remolcador Elansa recuperamos también embarcaciones en dificultad.']),
+                body=['Recuperamos objetos perdidos en el mar. Para los de tamaño reducido usamos globos de elevación tipo paracaídas; para los más pesados intervenimos con el pontón.']),
         de=dict(t='Bergungen', short='Im Meer verlorene Gegenstände: Hebesäcke für kleine Teile, Ponton für große.',
-                body=['Wir bergen im Meer verlorene Gegenstände. Für kleinere Teile verwenden wir Fallschirm-Hebesäcke, für schwerere arbeiten wir vom Ponton aus.',
-                      'Mit dem Schlepper Elansa bergen wir auch Boote in Not.'])),
+                body=['Wir bergen im Meer verlorene Gegenstände. Für kleinere Teile verwenden wir Fallschirm-Hebesäcke, für schwerere arbeiten wir vom Ponton aus.'])),
     'alaggi': dict(
         es=dict(t='Varadas y botaduras', short='Varada y botadura de embarcaciones, también de gran tamaño, con travel lift u otros medios.',
                 body=['Realizamos varadas y botaduras de embarcaciones de gran tamaño con travel lift u otros medios.',
@@ -148,11 +146,11 @@ TEAM_ES_DE = {
 }
 
 MEZZI_ES_DE = {
-    'es': [('En el mar', ['Remolcador Elansa (IMO STCW 95)', 'Embarcación de trabajo Bianca Maria', 'Lancha de servicio Golondrina', 'Pontón motorizado', 'Neumática transportable de 8 plazas']),
+    'es': [('En el mar', ['Embarcación de trabajo Bianca Maria', 'Lancha de servicio Golondrina', 'Pontón motorizado', 'Neumática transportable de 8 plazas']),
            ('Inmersión', ['Cascos Morgan para inmersiones de más de 12 m', 'Teléfono subacuático', 'ROV filoguiado con cámara', 'Contenedor equipado de soporte vital', 'Compresores Coltri, también portátiles']),
            ('Trabajos', ['Motosoldadora y pinza de soldadura subacuática', 'Antorcha de corte subacuática', 'Perforadora neumática', 'Hidrolimpiadora de agua caliente e hidroarenadora', 'Draga y succionadora para excavaciones subacuáticas']),
            ('En tierra', ['Furgoneta Opel Combo', 'Toyota 4x4 para zonas de difícil acceso', 'Remolque de carretera para neumática y lancha', 'Contenedor almacén', 'GPS para posicionamiento por satélite'])],
-    'de': [('Auf See', ['Schlepper Elansa (IMO STCW 95)', 'Arbeitsboot Bianca Maria', 'Dienstboot Golondrina', 'Motorponton', 'Transportables Schlauchboot für 8 Personen']),
+    'de': [('Auf See', ['Arbeitsboot Bianca Maria', 'Dienstboot Golondrina', 'Motorponton', 'Transportables Schlauchboot für 8 Personen']),
            ('Tauchen', ['Morgan-Helme für Tauchgänge über 12 m', 'Unterwassertelefon', 'Kabelgeführtes ROV mit Kamera', 'Ausgerüsteter Container für Lebenserhaltung', 'Coltri-Kompressoren, auch tragbar']),
            ('Arbeitsgeräte', ['Schweißgenerator und Unterwasser-Schweißzange', 'Unterwasser-Schneidbrenner', 'Druckluft-Bohrhammer', 'Heißwasser-Hochdruckreiniger und Sandstrahler', 'Bagger und Saugpumpe für Unterwasseraushub']),
            ('An Land', ['Transporter Opel Combo', 'Toyota 4x4 für unwegsames Gelände', 'Straßenanhänger für Schlauchboot und Dienstboot', 'Lagercontainer', 'GPS für Satellitenpositionierung'])],

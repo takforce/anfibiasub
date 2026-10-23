@@ -117,7 +117,7 @@ def header(cur, lang, overlay):
 DEPTH_LABEL = {'it': 'PROFONDITÀ', 'en': 'DEPTH', 'es': 'PROFUNDIDAD', 'de': 'TIEFE'}
 
 
-SHALLOW = {'chi', 'rimorchiatore', 'contatti'}  # pagine corte: discesa fino a 30 m, senza relitto
+SHALLOW = {'chi', 'contatti'}  # pagine corte: discesa fino a 30 m, senza relitto
 
 
 def depth_bg(lang, key=''):
@@ -215,7 +215,7 @@ def footer(lang):
 def page(key, lang, title, desc, body, overlay=False, og='porto-loano'):
     extra_head = '<link rel="stylesheet" href="/vendor/leaflet/leaflet.css">\n' if key == 'utilita' else ''
     extra_js = (f'<script src="/vendor/leaflet/leaflet.js"></script>\n<script src="/js/utilita.js?v={VER}"></script>\n' if key == 'utilita'
-                else f'<script src="/js/utilita.js?v={VER}"></script>\n' if key == 'home' else '')
+                else '')
     fname = PAGES[key][lang]
     alternates = ''.join(f'<link rel="alternate" hreflang="{l}" href="{SITE_URL + url(key, l)}">\n' for l in LANGS)
     locale = {'it': 'it_IT', 'en': 'en_GB', 'es': 'es_ES', 'de': 'de_DE'}[lang]
@@ -329,20 +329,6 @@ def moduli_html(lang):
     return ''.join(f'<div class="module"><strong>{e(a)}</strong><span>{e(b)}</span></div>' for a, b in MODULI[lang])
 
 
-def tow_band(lang):
-    return f'''<section class="tow" aria-labelledby="tow-t">
-<img src="/img/elansa-traino.webp" alt="">
-<div class="wrap">
-<div class="tow-title">
-<p class="eyebrow">{tx(lang, 'tug')} Elansa · IMO STCW 95</p>
-<h2 class="h2" id="tow-t" style="margin:0">{tx(lang, 'tow_h')}</h2>
-</div>
-<p class="tow-text">{tx(lang, 'tow_p')}</p>
-<a class="btn" data-call href="tel:{TEL_F}">{UI[lang]["call_now"]} {ARROW}</a>
-</div>
-</section>'''
-
-
 def cta(lang):
     U = UI[lang]
     return f'<section class="section band"><div class="wrap split"><div><h2 class="h2">{U["need"]}</h2><p class="lead">{U["need_lead"]}</p></div><div style="display:flex;flex-wrap:wrap;gap:12px"><a class="btn" href="{WA}" target="_blank" rel="noopener">{U["wa"]}</a></div></div></section>'
@@ -392,7 +378,6 @@ B_ICONS = [
     '<svg viewBox="0 0 24 24" fill="none" stroke="#3CC6F5" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>',
     '<svg viewBox="0 0 24 24" fill="none" stroke="#3CC6F5" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/></svg>',
     '<svg viewBox="0 0 24 24" fill="none" stroke="#3CC6F5" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M2 8c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 13c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 18c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/></svg>',
-    '<svg viewBox="0 0 24 24" fill="none" stroke="#3CC6F5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16l2 4h13l3-6H3z"/><path d="M7 14V9h7l2 5"/><path d="M10 9V5"/><path d="M2 21c2 0 2-1 4-1s2 1 4 1 2-1 4-1 2 1 4 1 2-1 4-1"/></svg>',
     '<svg viewBox="0 0 24 24" fill="none" stroke="#3CC6F5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h3l2-3h8l2 3h3v11H3z"/><circle cx="12" cy="13" r="3.5"/></svg>',
 ]
 
@@ -411,12 +396,6 @@ def build_lang(lang):
 <h1>{T('hero_h1')}</h1>
 <p class="hero-lead">{T('hero_lead')}</p>
 <div class="badges">{badges}</div>
-</div>
-</section>
-
-<section class="meteo-home" aria-label="{dict(UTIL)['meteo'][lang]}">
-<div class="wrap">
-<div class="meteo" data-meteo data-lang="{lang}" data-title="{dict(UTIL)['meteo'][lang]}"><div class="mb-frame"><div class="mb-art"></div></div></div>
 </div>
 </section>
 
@@ -466,9 +445,7 @@ def build_lang(lang):
 </div>
 <div class="modules">{moduli_html(lang)}</div>
 </div>
-</section>
-
-{tow_band(lang)}'''
+</section>'''
     page('home', lang, 'Anfibiasub · ' + T('home_title'), T('home_desc'), home, overlay=True)
 
     # SERVIZI
@@ -491,21 +468,9 @@ def build_lang(lang):
 <p class="hint sch-hint">{SCHEDE_UI[lang]['hint']}</p>
 <div class="g4">{mezzi_html(lang)}</div>
 {schede_dialog(lang)}
-</div></section>''' + tow_band(lang)
+</div></section>'''
     page('chi', lang, N['chi'] + ' · Anfibiasub', T('chi_desc'), chi, og='spianamenti')
 
-    # RIMORCHIATORE
-    rim = phero('elansa-traino', N['rimorchiatore'], T('rim_h1'), T('rim_lead'))
-    rim_li = ''.join(f'<li>{e(x)}</li>' for x in T('rim_list'))
-    rim += f'''<section class="section"><div class="wrap">
-<article class="detail" id="elansa">
-<div class="detail-img"><img src="/img/rimorchiatore.webp" alt="{T('tug')} Elansa" width="1256" height="832" loading="lazy"></div>
-<div><span class="card-place">{T('rim_cert')} · {T('rim_base')}</span><h2>{T('rim_what')}</h2>
-<ul class="rim-list">{rim_li}</ul>
-</div>
-</article>
-</div></section>''' + cta(lang)
-    page('rimorchiatore', lang, N['rimorchiatore'] + ' · Anfibiasub', T('rim_desc'), rim, og='rimorchiatore')
 
     # UTILITÀ
     page('utilita', lang, N['utilita'] + ' · Anfibiasub', T('uti_desc'), utilita_html(lang), og='catenarie')
@@ -617,7 +582,10 @@ def old_redirects():
     # Reindirizzamenti dai vecchi indirizzi Joomla, così i link salvati e Google non portano a pagine vuote
     old = {
         '/it/': '/', '/it': '/', '/it/chi-siamo': '/chi-siamo.html', '/it/contatti': '/contatti.html',
-        '/it/attrezzatura': '/chi-siamo.html#mezzi', '/it/rimorchiatore': '/rimorchiatore.html',
+        '/it/attrezzatura': '/chi-siamo.html#mezzi', '/it/rimorchiatore': '/',
+        # pagina Rimorchiatore tolta (ottobre 2026)
+        '/rimorchiatore.html': '/', '/rimorchiatore': '/', '/en/tug.html': '/en/', '/en/tug': '/en/',
+        '/es/remolcador.html': '/es/', '/es/remolcador': '/es/', '/de/schlepper.html': '/de/', '/de/schlepper': '/de/',
         '/it/utilita/vento': '/utilita.html#vento', '/it/utilita/cime': '/utilita.html#cime', '/it/utilita/cavi': '/utilita.html#cavi', '/it/utilita/catene': '/utilita.html#catene',
     }
     svc = {'lavori-edili-subacquei': 'edili', 'metalmeccanica-subacquea': 'metalmeccanica', 'recuperi': 'recuperi', 'alaggi-e-vari': 'alaggi',

@@ -314,7 +314,7 @@
   }
   diver.okAt = function (depth) {
     if (!diver.offsetWidth) return;
-    if (!loaded && depth > 38) { loaded = true; v.preload = 'auto'; v.src = '/img/sub-ok-4.webm'; }
+    if (!loaded && depth > 38) { loaded = true; v.preload = 'auto'; v.src = '/img/sub-ok-5.webm'; }
     if (depth < 45 && !playing) armed = true;           // risalito: al prossimo arrivo sul fondo lo rifà
     if (depth >= 49.9 && armed && loaded && !playing) {
       armed = false; playing = true;

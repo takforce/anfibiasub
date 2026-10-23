@@ -333,7 +333,7 @@
     es.forEach(function (e) {
       if (!box.offsetWidth) return;
       if (e.isIntersecting) {
-        if (!v.src) v.src = v.canPlayType('video/mp4; codecs="avc1.42E01E"') ? '/img/sub-ok-mobile.mp4' : '/img/sub-ok-mobile.webm';
+        if (!v.src) v.src = v.canPlayType('video/mp4; codecs="avc1.42E01E"') ? '/img/sub-ok-mobile-2.mp4' : '/img/sub-ok-mobile-2.webm';
         var p = v.play(); if (p && p.catch) p.catch(function () {});
       } else if (v.src) v.pause();
     });

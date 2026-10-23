@@ -440,7 +440,7 @@ def build_lang(lang):
 </div>
 </section>
 
-<div class="m-ok" aria-hidden="true"><video muted loop playsinline preload="none" poster="/img/sub-ok-mobile.webp" width="540" height="720"></video></div>
+<div class="m-ok" aria-hidden="true"><video muted loop playsinline preload="none" poster="/img/sub-ok-mobile-2.webp" width="540" height="720"></video></div>
 
 <section class="section band m-hide" id="area" aria-labelledby="area-t">
 <div class="wrap split">

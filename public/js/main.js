@@ -308,7 +308,7 @@
   function shown() { return diver.offsetWidth > 0; }
   diver.okAt = function (depth) {
     if (done || !shown()) return;
-    if (!loaded && depth > 38) { loaded = true; v.preload = 'auto'; v.src = '/img/sub-ok.webm'; }
+    if (!loaded && depth > 38) { loaded = true; v.preload = 'auto'; v.src = '/img/sub-ok-2.webm'; }
     if (depth >= 49.9 && loaded) {
       done = true;
       v.currentTime = 0;

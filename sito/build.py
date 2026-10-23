@@ -395,6 +395,7 @@ def build_lang(lang):
 <p class="hero-kicker"><span class="kick-d">{T('hero_kicker')}</span><span class="kick-m">{T('hero_kicker_m')}</span></p>
 <h1>{T('hero_h1')}</h1>
 <p class="hero-lead">{T('hero_lead')}</p>
+<div class="hero-cta"><a class="hc-q" data-quote href="{url('contatti', lang)}">{U['quote']}</a><a class="hc-c" data-call href="tel:{TEL_F}">{U['call_now'].capitalize()}</a></div>
 <div class="badges">{badges}</div>
 </div>
 </section>

@@ -158,7 +158,7 @@
   if (!cx) return;
   // valvola di scarico sotto il mento, in % dell'immagine del sub
   var VX = 0.495, VY = 0.262;
-  var BREATH = 4.6, EXHALE = 1.5; // secondi: un ciclo di respiro e la durata dell'espirazione
+  var BREATH = 10, EXHALE = 1.5; // secondi: un ciclo di respiro e la durata dell'espirazione
   var bubbles = [], last = 0, t0 = 0, running = false, dpr = 1, W = 0, H = 0;
 
   function size() {

@@ -400,7 +400,7 @@ def build_lang(lang):
 </div>
 </section>
 
-<section class="section m-hide" id="servizi" aria-labelledby="srv-t">
+<section class="section m-srv" id="servizi" aria-labelledby="srv-t">
 <div class="wrap">
 <div class="sec-head">
 <div>

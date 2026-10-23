@@ -771,3 +771,26 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
 }
 /* home da PC: il pulsante preventivo è nella prima schermata, niente doppione nell'intestazione */
 @media (min-width:1024px){body:has(.hero-cta) .nav-cta{display:none}}
+
+/* ---------- HOME DA CELLULARE: prima schermata sul mare, centrata, e i servizi ---------- */
+@media (max-width:767px){
+  .hero .hero-img{display:none}
+  .hero{background:url(/img/hero-luce.webp) center top/cover no-repeat}
+  .hero::before{background:linear-gradient(180deg,rgba(5,14,26,.25) 0,rgba(5,14,26,.55) 55%,var(--bg) 100%)}
+  .hero::after{display:none}
+  .hero-body{text-align:center;padding-top:34px;padding-bottom:18px}
+  .hero-kicker{justify-content:center;color:#fff;font-weight:700;text-shadow:0 1px 3px #000,0 0 12px rgba(0,0,0,.9)}
+  .hero h1{text-shadow:0 3px 20px rgba(0,0,0,.55)}
+  .hero h1 .fit{margin:0 auto}
+  .hero-lead{text-align:center;hyphens:manual;-webkit-hyphens:manual;margin-bottom:6px}
+  /* servizi: 6 riquadri in 2 colonne, solo foto e nome */
+  .m-srv{padding-top:22px;padding-bottom:30px;background:linear-gradient(180deg,var(--bg) 0,rgba(11,48,71,.35) 60%,var(--bg) 100%)}
+  .m-srv .sec-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;margin-bottom:18px}
+  .m-srv .lead{margin:0 auto}
+  .m-srv .g3{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .m-srv .card{border-radius:14px}
+  .m-srv .card img{aspect-ratio:4/3;height:auto}
+  .m-srv .card-body{padding:10px 10px 12px;text-align:center}
+  .m-srv .card-title{font-size:12px;line-height:1.3;letter-spacing:.3px}
+  .m-srv .card-text,.m-srv .card-more{display:none}
+}

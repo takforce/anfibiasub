@@ -296,7 +296,7 @@
   dlg.addEventListener('click', function (e) { if (e.target === dlg) close(); });
 })();
 
-// ---------- Arrivato sul fondo (50 m): il sub fa il segno OK, una volta per pagina ----------
+// ---------- Arrivato sul fondo (50 m): il sub fa il segno OK, ogni volta che tocca il fondo ----------
 (function () {
   var diver = document.querySelector('.diver'), v = diver && diver.querySelector('.dv-ok');
   if (!v || !v.canPlayType) return;
@@ -304,24 +304,31 @@
   var safari = /^((?!chrome|chromium|android|edg).)*safari/i.test(navigator.userAgent);
   if (safari || !v.canPlayType('video/webm; codecs="vp9"')) return;
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var loaded = false, done = false, fading = false;
-  function shown() { return diver.offsetWidth > 0; }
+  var loaded = false, armed = true, playing = false;
+  function show() { diver.classList.remove('ok-out'); diver.classList.add('is-ok'); }
+  function hide() { diver.classList.add('ok-out'); diver.classList.remove('is-ok'); }
+  // il video compare di colpo solo quando il primo fotogramma è già disegnato
+  function whenFrame(cb) {
+    if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(function () { cb(); });
+    else v.addEventListener('playing', function h() { v.removeEventListener('playing', h); setTimeout(cb, 60); });
+  }
   diver.okAt = function (depth) {
-    if (done || !shown()) return;
-    if (!loaded && depth > 38) { loaded = true; v.preload = 'auto'; v.src = '/img/sub-ok-2.webm'; }
-    if (depth >= 49.9 && loaded) {
-      done = true;
-      v.currentTime = 0;
+    if (!diver.offsetWidth) return;
+    if (!loaded && depth > 38) { loaded = true; v.preload = 'auto'; v.src = '/img/sub-ok-3.webm'; }
+    if (depth < 45 && !playing) armed = true;           // risalito: al prossimo arrivo sul fondo lo rifà
+    if (depth >= 49.9 && armed && loaded && !playing) {
+      armed = false; playing = true;
+      try { v.currentTime = 0; } catch (e) {}
+      whenFrame(show);
       var p = v.play();
-      if (p && p.then) p.then(function () { diver.classList.add('is-ok'); }).catch(function () { done = false; });
-      else diver.classList.add('is-ok');
+      if (p && p.catch) p.catch(function () { playing = false; armed = true; hide(); });
     }
   };
   // negli ultimi istanti il video sfuma sulla foto ferma
   v.addEventListener('timeupdate', function () {
-    if (!fading && v.duration && v.currentTime > v.duration - 0.45) { fading = true; diver.classList.remove('is-ok'); }
+    if (playing && v.duration && v.currentTime > v.duration - 0.45 && diver.classList.contains('is-ok')) hide();
   });
-  v.addEventListener('ended', function () { diver.classList.remove('is-ok'); });
+  v.addEventListener('ended', function () { hide(); playing = false; });
 })();
 
 // ---------- Cellulare: in fondo alla home il sub fa OK in continuo (parte solo quando è visibile) ----------

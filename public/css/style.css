@@ -828,3 +828,9 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
   .m-ok video{display:block;width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;
     -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 18%,#000 82%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 18%,#000 82%,transparent 100%)}
 }
+
+/* segno OK: compare di colpo (primo fotogramma già pronto), sfuma solo alla fine */
+@media (min-width:1700px){
+  .dv-ok,.diver img,.dv-scr{transition:none}
+  .diver.ok-out .dv-ok,.diver.ok-out img,.diver.ok-out .dv-scr{transition:opacity .4s}
+}

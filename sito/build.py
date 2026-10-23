@@ -215,7 +215,7 @@ def footer(lang):
 def page(key, lang, title, desc, body, overlay=False, og='porto-loano'):
     extra_head = '<link rel="stylesheet" href="/vendor/leaflet/leaflet.css">\n' if key == 'utilita' else ''
     extra_js = (f'<script src="/vendor/leaflet/leaflet.js"></script>\n<script src="/js/utilita.js?v={VER}"></script>\n' if key == 'utilita'
-                else '')
+                else f'<script src="/js/utilita.js?v={VER}"></script>\n' if key == 'home' else '')
     fname = PAGES[key][lang]
     alternates = ''.join(f'<link rel="alternate" hreflang="{l}" href="{SITE_URL + url(key, l)}">\n' for l in LANGS)
     locale = {'it': 'it_IT', 'en': 'en_GB', 'es': 'es_ES', 'de': 'de_DE'}[lang]
@@ -414,6 +414,10 @@ def build_lang(lang):
 </div>
 </section>
 
+<section class="m-meteo" aria-label="{dict(UTIL)['meteo'][lang]}"><div class="wrap">
+<div class="meteo" data-meteo data-lang="{lang}" data-title="{dict(UTIL)['meteo'][lang]}"><div class="mb-frame"><div class="mb-art"></div></div></div>
+</div></section>
+
 <section class="section band m-hide" aria-labelledby="chi-t">
 <div class="wrap">
 <p class="eyebrow">{N['chi']}</p>
@@ -423,7 +427,7 @@ def build_lang(lang):
 </div>
 </section>
 
-<section class="section m-hide" aria-labelledby="lav-t">
+<section class="section m-lav" aria-labelledby="lav-t">
 <div class="wrap">
 <div class="sec-head">
 <div>

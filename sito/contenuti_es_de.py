@@ -26,11 +26,11 @@ UI_ES_DE = {
 
 SERVIZI_ES_DE = {
     'pulizia-eliche': dict(
-        es=dict(t='Limpieza y regeneración de hélices', short='Desincrustamos hélices de cualquier tamaño en el agua, sin varar el barco ni el buque.',
+        es=dict(t='Limpieza de hélices', short='Desincrustamos hélices de cualquier tamaño en el agua, sin varar el barco ni el buque.',
                 body=['Tras años de pruebas hemos desarrollado un método para limpiar y desincrustar hélices de cualquier tamaño directamente en el agua. Sin varada y sin astillero: los costes se reducen a la mitad.',
                       'Las algas y los pequeños moluscos en la obra viva frenan el barco: se pierde velocidad, aumenta el consumo y el motor trabaja forzado. Como la prevención en el dentista, el mantenimiento regular cuesta poco y se amortiza enseguida con el combustible ahorrado.',
                       'Nuestro sistema reduce el esfuerzo del buzo y no contamina el agua del puerto.']),
-        de=dict(t='Propellerreinigung und -aufbereitung', short='Wir entfernen Bewuchs an Propellern jeder Größe im Wasser, ohne Boot oder Schiff aus dem Wasser zu holen.',
+        de=dict(t='Propellerreinigung', short='Wir entfernen Bewuchs an Propellern jeder Größe im Wasser, ohne Boot oder Schiff aus dem Wasser zu holen.',
                 body=['Nach jahrelanger Entwicklung reinigen wir Propeller jeder Größe direkt im Wasser. Kein Kranen, keine Werft: Die Kosten halbieren sich.',
                       'Algen und kleine Muscheln am Unterwasserschiff bremsen das Boot: Es verliert an Geschwindigkeit, verbraucht mehr Kraftstoff und der Motor wird stärker belastet. Wie die Vorsorge beim Zahnarzt kostet regelmäßige Pflege wenig und macht sich durch den gesparten Kraftstoff sofort bezahlt.',
                       'Unser Verfahren entlastet den Taucher und verschmutzt das Hafenwasser nicht.'])),
@@ -49,20 +49,20 @@ SERVIZI_ES_DE = {
                 body=['Opferanoden schützen Propeller, Wellen und Metallteile vor galvanischer Korrosion. Sind sie verbraucht, korrodiert das Metall des Bootes.',
                       'Wir prüfen, fotografieren und tauschen sie im Wasser. Im Kundenbereich finden Sie das Einbaudatum und eine Erinnerung für die nächste Kontrolle.'])),
     'edili': dict(
-        es=dict(t='Obras civiles subacuáticas', short='Nivelaciones, colocación de bloques prefabricados, hormigonado, sacos y demoliciones.',
+        es=dict(t='Obras civiles', short='Nivelaciones, colocación de bloques prefabricados, hormigonado, sacos y demoliciones.',
                 body=['Hemos construido las partes sumergidas de tres grandes puertos deportivos. En el fondo preparamos nivelaciones de grava sobre las bases colocadas por la grúa.',
                       'Encima colocamos bloques prefabricados de hormigón armado de 3 x 2 metros con precisión milimétrica: desde el fondo guiamos al gruista con el teléfono subacuático, porque él no ve el bloque sumergido.',
                       'Realizamos hormigonados bajo el agua, tanto en puertos en construcción como en muelles erosionados por el mar, ensacados y demoliciones con martillos neumáticos o explosivos.']),
-        de=dict(t='Unterwasser-Bauarbeiten', short='Planieren, Verlegen von Fertigteilblöcken, Unterwasserbetonage, Sandsäcke und Abbrucharbeiten.',
+        de=dict(t='Bauarbeiten', short='Planieren, Verlegen von Fertigteilblöcken, Unterwasserbetonage, Sandsäcke und Abbrucharbeiten.',
                 body=['Wir haben die Unterwasserbereiche von drei großen Yachthäfen gebaut. Am Grund planieren wir Schotterbetten auf den vom Kran gesetzten Fundamenten.',
                       'Darauf verlegen wir Stahlbeton-Fertigteilblöcke von 3 x 2 Metern millimetergenau: Vom Grund aus leiten wir den Kranführer per Unterwassertelefon, denn er sieht den Block unter Wasser nicht.',
                       'Wir betonieren unter Wasser, in neuen Häfen ebenso wie an vom Meer ausgewaschenen Molen, setzen Sandsäcke und führen Abbrucharbeiten mit Presslufthämmern oder Sprengstoff aus.'])),
     'metalmeccanica': dict(
-        es=dict(t='Metalmecánica subacuática', short='Cortes y soldaduras bajo el agua, carpintería metálica, tuberías, cierre de vías de agua.',
+        es=dict(t='Metalmecánica', short='Cortes y soldaduras bajo el agua, carpintería metálica, tuberías, cierre de vías de agua.',
                 body=['Realizamos cortes y soldaduras subacuáticas de todo tipo, con la experiencia adquirida en la construcción de rampas de botadura y cunas.',
                       'Estamos especializados en el corte subacuático de metales y en la carpintería metálica. Construimos redes de saneamiento y tuberías con colocación y embridado.',
                       'También nos ocupamos del mantenimiento: fijación de ánodos y zincs, cierre de vías de agua, colocación de manguitos.']),
-        de=dict(t='Unterwasser-Metallbau', short='Schneiden und Schweißen unter Wasser, Stahlbau, Rohrleitungen, Abdichten von Lecks.',
+        de=dict(t='Metallbau', short='Schneiden und Schweißen unter Wasser, Stahlbau, Rohrleitungen, Abdichten von Lecks.',
                 body=['Wir führen Unterwasser-Schneid- und Schweißarbeiten aller Art aus, mit der Erfahrung aus dem Bau von Slipanlagen und Lagerböcken.',
                       'Wir sind auf das Unterwasserschneiden von Metall und den Stahlbau spezialisiert. Wir bauen Abwasser- und Rohrleitungen einschließlich Verlegung und Flanschen.',
                       'Auch die Wartung übernehmen wir: Montage von Anoden und Zinkanoden, Abdichten von Lecks, Setzen von Reparaturmuffen.'])),
@@ -79,10 +79,10 @@ SERVIZI_ES_DE = {
                 body=['Wir holen große Boote mit Travellift oder anderen Mitteln aus dem Wasser und setzen sie wieder ein.',
                       'In der Werft W. Service im Hafen von Savona arbeiten wir regelmäßig: Der Taucher im Wasser kontrolliert die Lage der Gurte unter dem Rumpf.'])),
     'foto-video': dict(
-        es=dict(t='Fotos y vídeos subacuáticos', short='Grabaciones digitales para armadores y peritos, inspección de tuberías con ROV filoguiado.',
+        es=dict(t='Fotos y vídeos', short='Grabaciones digitales para armadores y peritos, inspección de tuberías con ROV filoguiado.',
                 body=['Realizamos fotos y vídeos subacuáticos en digital, en el formato que prefieras, y te los enviamos por email.',
                       'Con un pequeño ROV filoguiado inspeccionamos el interior y el exterior de las tuberías sumergidas, incluso a gran profundidad.']),
-        de=dict(t='Unterwasserfotos und -videos', short='Digitale Aufnahmen für Eigner und Gutachter, Rohrinspektionen mit kabelgeführtem ROV.',
+        de=dict(t='Fotos und Videos', short='Digitale Aufnahmen für Eigner und Gutachter, Rohrinspektionen mit kabelgeführtem ROV.',
                 body=['Wir erstellen digitale Unterwasserfotos und -videos im gewünschten Format und senden sie Ihnen per E-Mail.',
                       'Mit einem kleinen kabelgeführten ROV inspizieren wir Unterwasserleitungen innen und außen, auch in großer Tiefe.'])),
     'reti-anti-medusa': dict(

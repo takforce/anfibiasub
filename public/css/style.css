@@ -794,3 +794,18 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
   .m-srv .card-title{font-size:12px;line-height:1.3;letter-spacing:.3px}
   .m-srv .card-text,.m-srv .card-more{display:none}
 }
+
+/* ---------- HOME DA CELLULARE: meteo sotto i servizi, poi i lavori ---------- */
+.m-meteo{display:none}
+@media (max-width:767px){
+  .m-meteo{display:block;padding:6px 0 26px}
+  .m-lav{padding-top:22px;padding-bottom:30px}
+  .m-lav .sec-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;margin-bottom:18px}
+  .m-lav .g3{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .m-lav .card{border-radius:14px}
+  .m-lav .card img{aspect-ratio:4/3;height:auto}
+  .m-lav .card-body{padding:10px 10px 12px;text-align:center}
+  .m-lav .card-place{font-size:10px;letter-spacing:1px}
+  .m-lav .card-title{font-size:12.5px;line-height:1.3}
+  .m-lav .card-text{display:none}
+}

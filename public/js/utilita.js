@@ -5,7 +5,7 @@
 
   // ---------- METEO ----------
   var box = document.querySelector('[data-meteo]');
-  if (box) {
+  if (box && box.offsetParent !== null) {
     var lang = box.getAttribute('data-lang') || 'it';
     var TT = {
       it: { now: 'Adesso a Loano', next: 'Prossimi giorni', wind: 'Vento', from: 'da', sea: 'Mare', air: 'Aria', water: 'Acqua', gusts: 'raffiche', force: 'Forza', upd: 'Aggiornato alle', na: 'Dati meteo non disponibili in questo momento.',

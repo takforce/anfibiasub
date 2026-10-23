@@ -834,3 +834,5 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
   .dv-ok,.diver img,.dv-scr{transition:none}
   .diver.ok-out .dv-ok,.diver.ok-out img,.diver.ok-out .dv-scr{transition:opacity .4s}
 }
+/* video OK ritagliato più largo a destra: la mano sulla cima resta intera */
+@media (min-width:1700px){.dv-ok{width:140.51%}}

@@ -50,6 +50,10 @@ BEACON = '<span class="beacon" aria-hidden="true"><span class="bc-ray"></span><s
 MENU = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>'
 
 
+# voce di menu del minigioco ABYSS (il gioco è solo in italiano)
+GAME_LABEL = {'it': 'ABYSS · il gioco 3D', 'en': 'ABYSS · 3D game (Italian)', 'es': 'ABYSS · juego 3D (en italiano)', 'de': 'ABYSS · 3D-Spiel (auf Italienisch)'}
+
+
 def url(key, lang, anchor=''):
     f = PAGES[key][lang]
     f = '/' + (f[:-len('index.html')] if f.endswith('index.html') else f)
@@ -83,6 +87,8 @@ def header(cur, lang, overlay):
             continue
         all_key, sub = subs[k]
         items = f'<a class="dd-all" href="{url(k, lang)}">{tx(lang, all_key)}</a>' + ''.join(f'<a href="{url(k, lang, a)}">{e(b)}</a>' for a, b in sub)
+        if k == 'utilita':
+            items += f'<a class="dd-game" href="/abyss.html">{GAME_LABEL[lang]}</a>'
         links += (f'<div class="dd"><button class="dd-btn" type="button" aria-expanded="false" aria-haspopup="true"{cur_attr.replace("page", "true")}>{t}{CHEVRON}</button>'
                   f'<div class="dd-menu">{items}</div></div>')
     cur_l = ' aria-current="true"'
@@ -123,8 +129,8 @@ SHALLOW = {'chi', 'contatti'}  # pagine corte: discesa fino a 30 m, senza relitt
 
 def depth_bg(lang, key=''):
     """Sfondo da PC: dalla superficie al relitto mentre si scorre, con profondimetro digitale 0-50 m."""
-    return f'''<div class="abyss-bg{' is-shallow' if key in SHALLOW else ''}" aria-hidden="true" data-max="{30 if key in SHALLOW else 50}"><i class="ab1"></i><i class="ab2"></i><i class="ab3"></i><span class="ab-veil"></span></div>
-<span class="dv-line" aria-hidden="true"></span><div class="diver" aria-hidden="true"><span class="dv-hose"></span><span class="dv-bub"></span><span class="dv-rope"></span><span class="dv-rope2"></span><img src="/img/sub-ots.webp" alt="" width="602" height="1672"><span class="dv-lamp"></span><span class="dv-scr"><b data-depth>0.0</b><small>m</small></span></div>'''
+    return f'''<div class="abyss-bg{' is-shallow' if key in SHALLOW else ''}" aria-hidden="true" data-max="{30 if key in SHALLOW else 50}"><i class="ab-l"></i><i class="ab-r"></i><span class="ab-veil"></span></div>
+<span class="dv-line" aria-hidden="true"></span><div class="diver" aria-hidden="true"><span class="dv-hose"></span><span class="dv-bub"></span><span class="dv-rope"></span><span class="dv-rope2"></span><img src="/img/sub-ots.webp" alt="" width="602" height="1672"><video class="dv-ok" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><span class="dv-lamp"></span><span class="dv-scr"><b data-depth>0.0</b><small>m</small></span></div>'''
 
 
 def sos_dialog(lang):
@@ -215,7 +221,7 @@ def footer(lang):
 def page(key, lang, title, desc, body, overlay=False, og='porto-loano'):
     extra_head = '<link rel="stylesheet" href="/vendor/leaflet/leaflet.css">\n' if key == 'utilita' else ''
     extra_js = (f'<script src="/vendor/leaflet/leaflet.js"></script>\n<script src="/js/utilita.js?v={VER}"></script>\n' if key == 'utilita'
-                else '')
+                else f'<script src="/js/utilita.js?v={VER}"></script>\n' if key == 'home' else '')
     fname = PAGES[key][lang]
     alternates = ''.join(f'<link rel="alternate" hreflang="{l}" href="{SITE_URL + url(key, l)}">\n' for l in LANGS)
     locale = {'it': 'it_IT', 'en': 'en_GB', 'es': 'es_ES', 'de': 'de_DE'}[lang]
@@ -395,11 +401,12 @@ def build_lang(lang):
 <p class="hero-kicker"><span class="kick-d">{T('hero_kicker')}</span><span class="kick-m">{T('hero_kicker_m')}</span></p>
 <h1>{T('hero_h1')}</h1>
 <p class="hero-lead">{T('hero_lead')}</p>
+<div class="hero-cta"><a class="hc-q" data-quote href="{url('contatti', lang)}">{U['quote']}</a><a class="hc-c" data-call href="tel:{TEL_F}">{U['call_now'].capitalize()}</a></div>
 <div class="badges">{badges}</div>
 </div>
 </section>
 
-<section class="section m-hide" id="servizi" aria-labelledby="srv-t">
+<section class="section m-srv" id="servizi" aria-labelledby="srv-t">
 <div class="wrap">
 <div class="sec-head">
 <div>
@@ -413,6 +420,10 @@ def build_lang(lang):
 </div>
 </section>
 
+<section class="m-meteo" aria-label="{dict(UTIL)['meteo'][lang]}"><div class="wrap">
+<div class="meteo" data-meteo data-lang="{lang}" data-title="{dict(UTIL)['meteo'][lang]}"><div class="mb-frame"><div class="mb-art"></div></div></div>
+</div></section>
+
 <section class="section band m-hide" aria-labelledby="chi-t">
 <div class="wrap">
 <p class="eyebrow">{N['chi']}</p>
@@ -422,7 +433,7 @@ def build_lang(lang):
 </div>
 </section>
 
-<section class="section m-hide" aria-labelledby="lav-t">
+<section class="section m-lav" aria-labelledby="lav-t">
 <div class="wrap">
 <div class="sec-head">
 <div>
@@ -434,6 +445,8 @@ def build_lang(lang):
 <div class="g3">{''.join(job_card(l, lang) for l in LAVORI[:6])}</div>
 </div>
 </section>
+
+<div class="m-ok" aria-hidden="true"><video muted loop playsinline preload="none" poster="/img/sub-ok-mobile-2.webp" width="540" height="720"></video></div>
 
 <section class="section band m-hide" id="area" aria-labelledby="area-t">
 <div class="wrap split">
@@ -627,6 +640,43 @@ def extras_prod():
         f.write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
 
 
+# ---------------- ABYSS (minigioco 3D, solo italiano) ----------------
+def build_abyss():
+    src = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'abyss')
+    files = sorted(f for f in os.listdir(src) if f.endswith(('.js', '.css')))
+    h = hashlib.md5(b''.join(open(os.path.join(src, f), 'rb').read() for f in files)).hexdigest()[:8]
+    # i moduli si importano tra loro: aggiungo ?v= a ogni import, così dopo un aggiornamento il browser non usa copie vecchie
+    for f in files:
+        if f.endswith('.js'):
+            d = os.path.join(OUT, 'abyss', f)
+            t = open(d, encoding='utf-8').read()
+            t = _re.sub(r"from '\./([\w-]+\.js)'", lambda m: f"from './{m.group(1)}?v={h}'", t)
+            open(d, 'w', encoding='utf-8').write(bust(t))
+    body = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'abyss_pagina.html'), encoding='utf-8').read()
+    robots = '' if PROD else '<meta name="robots" content="noindex, nofollow">\n'
+    doc = f'''<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ABYSS · Il relitto dimenticato · Anfibiasub</title>
+<meta name="description" content="ABYSS: esplorazione subacquea in 3D di un relitto sul fondale del Mediterraneo. Un minigioco di Anfibiasub.">
+{robots}<meta name="theme-color" content="#050E1A">
+<meta property="og:title" content="ABYSS · Il relitto dimenticato">
+<meta property="og:image" content="{SITE_URL}/img/abyss/intro.webp">
+<link rel="icon" href="/favicon.png?v=3" type="image/png">
+<link rel="stylesheet" href="/abyss/abyss.css?v={h}">
+</head>
+<body>
+{body}
+<script type="module" src="/abyss/main.js?v={h}"></script>
+</body>
+</html>
+'''
+    with open(os.path.join(OUT, 'abyss.html'), 'w', encoding='utf-8') as f:
+        f.write(bust(doc))
+
+
 if __name__ == '__main__':
     if PROD and os.path.isdir(OUT):
         shutil.rmtree(OUT)
@@ -634,6 +684,7 @@ if __name__ == '__main__':
     copy_assets()
     for lang in LANGS:
         build_lang(lang)
+    build_abyss()
     # l'area clienti mostra la stessa informativa privacy nella finestra "Termini e Privacy" della registrazione
     import json
     # vecchi indirizzi /it/... -> nuove pagine, usati dal server su Railway

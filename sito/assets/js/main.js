@@ -102,7 +102,7 @@
   var bg = document.querySelector('.abyss-bg');
   if (!bg || !window.matchMedia) return;
   var mq = window.matchMedia('(min-width:1024px)');
-  var l2 = bg.querySelector('.ab2'), l3 = bg.querySelector('.ab3');
+  var sl = bg.querySelector('.ab-l'), sr = bg.querySelector('.ab-r'), veil = bg.querySelector('.ab-veil'), RATIO = 4515 / 821;
   var val = document.querySelector('[data-depth]'), bar = document.querySelector('[data-depth-bar]'), diver = document.querySelector('.diver'), line = document.querySelector('.dv-line');
   var MAX = +bg.getAttribute('data-max') || 50, shallow = bg.classList.contains('is-shallow'), ticking = false;
   function update() {
@@ -110,17 +110,22 @@
     if (!mq.matches) return;
     var h = document.documentElement.scrollHeight - window.innerHeight;
     var p = h > 0 ? Math.min(1, Math.max(0, window.scrollY / h)) : 0;
-    // 0-50%: superficie -> acqua profonda; 50-100%: acqua profonda -> relitto
-    if (shallow) { l2.style.opacity = p.toFixed(3); l3.style.opacity = 0; }
-    else {
-      l2.style.opacity = Math.min(1, p * 2).toFixed(3);
-      l3.style.opacity = Math.max(0, p * 2 - 1).toFixed(3);
+    // due immagini verticali ai lati (0-50 m): scorrono dalla superficie al fondale insieme alla pagina
+    if (sl && sr && veil) {
+      var vw = window.innerWidth, vh = window.innerHeight, side = Math.max(0, (vw - veil.offsetWidth) / 2) + 48;
+      var ih = Math.max(side * RATIO, vh * 2), iw = ih / RATIO;
+      var y = -Math.round((ih - vh) * p * (shallow ? 0.6 : 1));
+      sl.style.width = sr.style.width = Math.round(iw) + 'px';
+      sl.style.height = sr.style.height = Math.round(ih) + 'px';
+      sl.style.left = Math.round(side - iw) + 'px';
+      sl.style.transform = sr.style.transform = 'translate3d(0,' + y + 'px,0)';
     }
     // profondità da 1 m (appena sotto la superficie) al massimo della pagina
     var depth = 1 + p * (MAX - 1);
     if (val) val.textContent = depth.toFixed(1);
     // dai 40 m in giù si accende la torcia sul casco
     if (diver) diver.style.setProperty('--lamp', Math.min(1, Math.max(0, (depth - 40) / 3)).toFixed(2));
+    if (diver && diver.okAt) diver.okAt(depth);
     if (bar) bar.style.height = (p * 100).toFixed(1) + '%';
     // il sub scende dall'alto (sotto l'header) fino in fondo allo schermo
     if (diver && diver.offsetHeight) {
@@ -156,7 +161,7 @@
   if (!cx) return;
   // valvola di scarico sotto il mento, in % dell'immagine del sub
   var VX = 0.495, VY = 0.262;
-  var BREATH = 4.6, EXHALE = 1.5; // secondi: un ciclo di respiro e la durata dell'espirazione
+  var BREATH = 10, EXHALE = 1.5; // secondi: un ciclo di respiro e la durata dell'espirazione
   var bubbles = [], last = 0, t0 = 0, running = false, dpr = 1, W = 0, H = 0;
 
   function size() {
@@ -291,4 +296,56 @@
   function close() { dlg.close(); }
   dlg.querySelector('[data-c-close]').addEventListener('click', close);
   dlg.addEventListener('click', function (e) { if (e.target === dlg) close(); });
+})();
+
+// ---------- Arrivato sul fondo (50 m): il sub fa il segno OK, ogni volta che tocca il fondo ----------
+(function () {
+  var diver = document.querySelector('.diver'), v = diver && diver.querySelector('.dv-ok');
+  if (!v || !v.canPlayType) return;
+  // Safari non mostra la trasparenza dei video webm: lì resta la foto ferma
+  var safari = /^((?!chrome|chromium|android|edg).)*safari/i.test(navigator.userAgent);
+  if (safari || !v.canPlayType('video/webm; codecs="vp9"')) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var loaded = false, armed = true, playing = false;
+  function show() { diver.classList.remove('ok-out'); diver.classList.add('is-ok'); }
+  function hide() { diver.classList.add('ok-out'); diver.classList.remove('is-ok'); }
+  // il video compare di colpo solo quando il primo fotogramma è già disegnato
+  function whenFrame(cb) {
+    if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(function () { cb(); });
+    else v.addEventListener('playing', function h() { v.removeEventListener('playing', h); setTimeout(cb, 60); });
+  }
+  diver.okAt = function (depth) {
+    if (!diver.offsetWidth) return;
+    if (!loaded && depth > 38) { loaded = true; v.preload = 'auto'; v.src = '/img/sub-ok-5.webm'; }
+    if (depth < 45 && !playing) armed = true;           // risalito: al prossimo arrivo sul fondo lo rifà
+    if (depth >= 49.9 && armed && loaded && !playing) {
+      armed = false; playing = true;
+      try { v.currentTime = 0; } catch (e) {}
+      whenFrame(show);
+      var p = v.play();
+      if (p && p.catch) p.catch(function () { playing = false; armed = true; hide(); });
+    }
+  };
+  // negli ultimi istanti il video sfuma sulla foto ferma
+  v.addEventListener('timeupdate', function () {
+    if (playing && v.duration && v.currentTime > v.duration - 0.45 && diver.classList.contains('is-ok')) hide();
+  });
+  v.addEventListener('ended', function () { hide(); playing = false; });
+})();
+
+// ---------- Cellulare: in fondo alla home il sub fa OK in continuo (parte solo quando è visibile) ----------
+(function () {
+  var box = document.querySelector('.m-ok'), v = box && box.querySelector('video');
+  if (!v || !('IntersectionObserver' in window)) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (!box.offsetWidth) return;
+      if (e.isIntersecting) {
+        if (!v.src) v.src = v.canPlayType('video/mp4; codecs="avc1.42E01E"') ? '/img/sub-ok-mobile-2.mp4' : '/img/sub-ok-mobile-2.webm';
+        var p = v.play(); if (p && p.catch) p.catch(function () {});
+      } else if (v.src) v.pause();
+    });
+  }, { rootMargin: '200px 0px' });
+  io.observe(box);
 })();

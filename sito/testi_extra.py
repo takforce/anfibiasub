@@ -1,36 +1,32 @@
-# Testi del pulsante SOS (header + finestra di conferma), 4 lingue.
+# Testi del pulsante "Dove sono" (ex SOS): invia la posizione GPS su WhatsApp, non è un'emergenza. 4 lingue.
 SOS = {
     'it': {
-        'btn': 'SOS', 'title': 'SOS – Barca in difficoltà',
-        'text': 'Mandiamo la tua posizione GPS su WhatsApp a Francesco o a Simone. Usalo solo se hai davvero bisogno di aiuto.',
+        'btn': 'Dove sono', 'title': 'Invia la tua posizione',
+        'text': 'Mandiamo la tua posizione GPS su WhatsApp a Francesco o a Simone, così sanno esattamente dove intervenire.',
         'pos': 'La tua posizione', 'searching': 'Sto cercando la posizione…',
         'nopos': 'Posizione non disponibile: il messaggio partirà senza coordinate. Scrivi tu dove sei.',
-        'acc': 'precisione', 'to_f': 'Invia SOS a Francesco', 'to_s': 'Invia SOS a Simone', 'cancel': 'Annulla',
-        'emerg': 'Persone in pericolo? Chiama subito la Guardia Costiera',
+        'acc': 'precisione', 'to_f': 'Invia a Francesco', 'to_s': 'Invia a Simone', 'cancel': 'Annulla',
     },
     'en': {
-        'btn': 'SOS', 'title': 'SOS – Boat in trouble',
-        'text': 'We send your GPS position on WhatsApp to Francesco or Simone. Use it only if you really need help.',
+        'btn': 'My location', 'title': 'Send your location',
+        'text': 'We send your GPS position on WhatsApp to Francesco or Simone, so they know exactly where to come.',
         'pos': 'Your position', 'searching': 'Finding your position…',
         'nopos': 'Position not available: the message will be sent without coordinates. Please write where you are.',
-        'acc': 'accuracy', 'to_f': 'Send SOS to Francesco', 'to_s': 'Send SOS to Simone', 'cancel': 'Cancel',
-        'emerg': 'People in danger? Call the Italian Coast Guard now',
+        'acc': 'accuracy', 'to_f': 'Send to Francesco', 'to_s': 'Send to Simone', 'cancel': 'Cancel',
     },
     'es': {
-        'btn': 'SOS', 'title': 'SOS – Barco en apuros',
-        'text': 'Enviamos tu posición GPS por WhatsApp a Francesco o a Simone. Úsalo solo si de verdad necesitas ayuda.',
+        'btn': 'Dónde estoy', 'title': 'Envía tu posición',
+        'text': 'Enviamos tu posición GPS por WhatsApp a Francesco o a Simone, así saben exactamente dónde intervenir.',
         'pos': 'Tu posición', 'searching': 'Buscando tu posición…',
         'nopos': 'Posición no disponible: el mensaje saldrá sin coordenadas. Escribe tú dónde estás.',
-        'acc': 'precisión', 'to_f': 'Enviar SOS a Francesco', 'to_s': 'Enviar SOS a Simone', 'cancel': 'Cancelar',
-        'emerg': '¿Personas en peligro? Llama ya a la Guardia Costera italiana',
+        'acc': 'precisión', 'to_f': 'Enviar a Francesco', 'to_s': 'Enviar a Simone', 'cancel': 'Cancelar',
     },
     'de': {
-        'btn': 'SOS', 'title': 'SOS – Boot in Not',
-        'text': 'Wir senden Ihre GPS-Position per WhatsApp an Francesco oder Simone. Nur verwenden, wenn Sie wirklich Hilfe brauchen.',
+        'btn': 'Mein Standort', 'title': 'Standort senden',
+        'text': 'Wir senden Ihre GPS-Position per WhatsApp an Francesco oder Simone, damit sie genau wissen, wohin sie kommen sollen.',
         'pos': 'Ihre Position', 'searching': 'Position wird gesucht…',
         'nopos': 'Position nicht verfügbar: Die Nachricht wird ohne Koordinaten gesendet. Schreiben Sie, wo Sie sind.',
-        'acc': 'Genauigkeit', 'to_f': 'SOS an Francesco senden', 'to_s': 'SOS an Simone senden', 'cancel': 'Abbrechen',
-        'emerg': 'Menschen in Gefahr? Sofort die italienische Küstenwache anrufen',
+        'acc': 'Genauigkeit', 'to_f': 'An Francesco senden', 'to_s': 'An Simone senden', 'cancel': 'Abbrechen',
     },
 }
 

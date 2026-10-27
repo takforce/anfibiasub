@@ -406,22 +406,20 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 @keyframes bcSpin{to{transform:rotate(360deg)}}
 @keyframes bcBlink{50%{filter:brightness(1.6)}}
 @keyframes sosGlow{50%{box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -2px 0 rgba(0,0,0,.35),0 3px 0 #2a0505,0 0 16px 3px rgba(255,60,60,.6)}}
-.nav-sos{display:inline-flex;align-items:center;gap:8px;margin-left:14px;padding:8px 16px;border-radius:999px;border:1px solid rgba(255,120,120,.5);cursor:pointer;
-  font:inherit;font-weight:800;font-size:14px;letter-spacing:1px;color:#fff;background:linear-gradient(180deg,#9A1E1E,#5E0F0F);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 3px 0 #2a0505,0 6px 12px rgba(0,0,0,.4);animation:sosGlow 1.2s ease-in-out infinite}
+.nav-sos{display:inline-flex;align-items:center;gap:8px;margin-left:14px;padding:8px 16px;border-radius:999px;border:1px solid rgba(60,198,245,.5);cursor:pointer;
+  font:inherit;font-weight:700;font-size:14px;color:#fff;background:linear-gradient(180deg,#14507E,#0B2F4E);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 3px 0 #061a2c,0 6px 12px rgba(0,0,0,.4)}
+.nav-sos svg{color:#3CC6F5}
 .nav-sos:hover{filter:brightness(1.15)}
 @media (max-width:767px){
   .nav-sos{display:none}
-  .q-tile.q-sos{border:1px solid rgba(255,120,120,.45);cursor:pointer;font:inherit;flex:0 0 auto;padding:0 12px;
-    background:linear-gradient(180deg,#8E1B1B 0%,#5E0F0F 55%,#430A0A 100%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -2px 0 rgba(0,0,0,.35),0 3px 0 #2a0505,0 6px 12px rgba(0,0,0,.45);animation:sosGlow 1.2s ease-in-out infinite}
-  .q-sos strong{font-size:11px;letter-spacing:.5px}
+  .q-tile.q-sos{cursor:pointer;font:inherit;color:inherit}
 }
-.sos-dlg{max-width:440px;width:calc(100% - 32px);border:1px solid rgba(255,120,120,.45);border-radius:18px;padding:0;color:#fff;background:#0B1F33;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.sos-dlg{max-width:440px;width:calc(100% - 32px);border:1px solid rgba(60,198,245,.45);border-radius:18px;padding:0;color:#fff;background:#0B1F33;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 .sos-dlg::backdrop{background:rgba(2,8,16,.75);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 .sos-dlg>*{margin-left:20px;margin-right:20px}
-.sos-head{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:16px 20px;background:linear-gradient(180deg,#8E1B1B,#5E0F0F);border-radius:17px 17px 0 0;margin-left:0!important;margin-right:0!important}
-.sos-head .beacon{transform:scale(1.5)}
+.sos-head{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:16px 20px;background:linear-gradient(180deg,#14507E,#0B2F4E);border-radius:17px 17px 0 0;margin-left:0!important;margin-right:0!important}
+.sos-head svg{width:26px;height:26px;color:#3CC6F5;flex:none}
 .sos-head h2{font-size:19px;line-height:1.25;margin:0}
 .sos-dlg p{font-size:15px;line-height:1.55;color:#cfe0ee;margin-bottom:12px}
 .sos-pos{background:#0F2B47;border-radius:12px;padding:10px 12px;margin-bottom:14px;font-size:13px}
@@ -521,6 +519,9 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
   body{background:#050E1A}
   .abyss-bg{display:block;position:fixed;inset:0;z-index:-1;pointer-events:none;background:#050E1A}
   .abyss-bg i{position:absolute;inset:0;background-size:cover;background-position:center;will-change:opacity}
+  .ab1{background-image:url(/img/fondo-1.webp)}
+  .ab2{background-image:url(/img/fondo-2.webp);opacity:0}
+  .ab3{background-image:url(/img/fondo-3.webp);opacity:0}
   /* velo scuro dietro ai riquadri: le immagini si vedono solo ai lati */
   .ab-veil{position:absolute;top:0;bottom:0;left:50%;width:min(100%,calc(var(--wrap) + 40px));transform:translateX(-50%);background:rgba(5,14,26,.9);
     -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 48px,#000 calc(100% - 48px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 48px,#000 calc(100% - 48px),transparent 100%)}
@@ -584,6 +585,7 @@ table.data tbody tr:nth-child(even) td{background:#0B1F33}
 /* PC: nessuno stacco orizzontale, il piè di pagina sfuma nello sfondo */
 @media (min-width:1024px){
   .site-footer{background:linear-gradient(180deg,rgba(2,8,13,0) 0,rgba(2,8,13,.55) 140px)}
+  .abyss-bg.is-shallow .ab3{display:none}
 }
 /* bolle di scarico realistiche (canvas): sostituiscono la colonna continua */
 .dv-bub{display:none!important}
@@ -735,104 +737,3 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
 .c-wa{display:grid;place-items:center;width:48px;height:48px;border-radius:12px;background:#25D366;color:#05210f;flex:none}
 .c-wa svg{width:24px;height:24px}
 .c-dlg .sos-btns{margin-top:4px}
-
-/* sfondo "discesa" con due immagini verticali ai lati (0-50 m) che scorrono con la pagina */
-@media (min-width:1024px){
-  .abyss-bg .ab-l,.abyss-bg .ab-r{inset:auto;top:0;background-size:100% 100%;background-repeat:no-repeat;will-change:transform}
-  .abyss-bg .ab-l{left:0;background-image:url(/img/discesa-sx.webp)}
-  .abyss-bg .ab-r{right:0;background-image:url(/img/discesa-dx.webp)}
-}
-
-/* ---------- PRIMA SCHERMATA DA PC: un solo mare da bordo a bordo, testo centrato, pulsanti ---------- */
-.hero-cta{display:none}
-@media (min-width:1024px){
-  html{overflow-x:clip}
-  .hero{overflow:visible}
-  .hero .hero-img,.hero::after{display:none}
-  .hero::before{display:block;left:50%;right:auto;width:100vw;transform:translateX(-50%);top:-160px;
-    background:linear-gradient(180deg,rgba(5,14,26,.2) 0,rgba(5,14,26,.45) 45%,rgba(5,14,26,0) 100%),url(/img/hero-luce.webp) center top/cover no-repeat;
-    -webkit-mask-image:linear-gradient(180deg,#000 0,#000 60%,transparent 100%);mask-image:linear-gradient(180deg,#000 0,#000 60%,transparent 100%)}
-  .hero-body{text-align:center;padding-top:80px;padding-bottom:40px}
-  .hero-kicker{justify-content:center;color:#fff;font-weight:700;text-shadow:0 1px 3px #000,0 0 14px rgba(0,0,0,.9)}
-  .hero h1{margin-left:auto;margin-right:auto;text-shadow:0 4px 30px rgba(0,0,0,.5)}
-  .hero h1 .fit{margin:0 auto}
-  .hero-lead{text-align:center;max-width:760px;margin-left:auto;margin-right:auto;hyphens:manual;-webkit-hyphens:manual}
-  .hero-cta{display:flex;gap:14px;justify-content:center;margin-bottom:40px}
-  .hero-cta a{padding:14px 26px;border-radius:999px;font-weight:700;font-size:15px;text-decoration:none;transition:transform .15s,box-shadow .15s}
-  .hero-cta a:hover{transform:translateY(-1px)}
-  .hc-q{background:#3CC6F5;color:#04121e;box-shadow:0 0 30px rgba(60,198,245,.45)}
-  .hc-q:hover{box-shadow:0 0 40px rgba(60,198,245,.65)}
-  .hc-c{border:1px solid rgba(220,239,245,.5);color:#DCEFF5;background:rgba(5,14,26,.35)}
-  /* punti forti: riquadri in vetro con cornice leggera tutta intorno */
-  .hero .badges{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));grid-auto-flow:column;gap:12px;justify-content:stretch}
-  .hero .badge{flex-direction:column;align-items:center;text-align:center;gap:8px;padding:16px 10px;border-radius:16px;
-    background:rgba(5,14,26,.32);border:1px solid rgba(160,225,250,.28);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-  .hero .badge span span{white-space:normal}
-}
-/* home da PC: il pulsante preventivo è nella prima schermata, niente doppione nell'intestazione */
-@media (min-width:1024px){body:has(.hero-cta) .nav-cta{display:none}}
-
-/* ---------- HOME DA CELLULARE: prima schermata sul mare, centrata, e i servizi ---------- */
-@media (max-width:767px){
-  .hero .hero-img{display:none}
-  .hero{background:url(/img/hero-luce.webp) center top/cover no-repeat}
-  .hero::before{background:linear-gradient(180deg,rgba(5,14,26,.25) 0,rgba(5,14,26,.55) 55%,var(--bg) 100%)}
-  .hero::after{display:none}
-  .hero-body{text-align:center;padding-top:34px;padding-bottom:18px}
-  .hero-kicker{justify-content:center;color:#fff;font-weight:700;text-shadow:0 1px 3px #000,0 0 12px rgba(0,0,0,.9)}
-  .hero h1{text-shadow:0 3px 20px rgba(0,0,0,.55)}
-  .hero h1 .fit{margin:0 auto}
-  .hero-lead{text-align:center;hyphens:manual;-webkit-hyphens:manual;margin-bottom:6px}
-  /* servizi: 6 riquadri in 2 colonne, solo foto e nome */
-  .m-srv{padding-top:22px;padding-bottom:30px;background:linear-gradient(180deg,var(--bg) 0,rgba(11,48,71,.35) 60%,var(--bg) 100%)}
-  .m-srv .sec-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;margin-bottom:18px}
-  .m-srv .lead{margin:0 auto}
-  .m-srv .g3{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .m-srv .card{border-radius:14px}
-  .m-srv .card img{aspect-ratio:4/3;height:auto}
-  .m-srv .card-body{padding:10px 10px 12px;text-align:center}
-  .m-srv .card-title{font-size:12px;line-height:1.3;letter-spacing:.3px}
-  .m-srv .card-text,.m-srv .card-more{display:none}
-}
-
-/* ---------- HOME DA CELLULARE: meteo sotto i servizi, poi i lavori ---------- */
-.m-meteo{display:none}
-@media (max-width:767px){
-  .m-meteo{display:block;padding:6px 0 26px}
-  .m-lav{padding-top:22px;padding-bottom:30px}
-  .m-lav .sec-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;margin-bottom:18px}
-  .m-lav .g3{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .m-lav .card{border-radius:14px}
-  .m-lav .card img{aspect-ratio:4/3;height:auto}
-  .m-lav .card-body{padding:10px 10px 12px;text-align:center}
-  .m-lav .card-place{font-size:10px;letter-spacing:1px}
-  .m-lav .card-title{font-size:12.5px;line-height:1.3}
-  .m-lav .card-text{display:none}
-}
-
-/* segno OK a 50 m: video trasparente sopra la foto del sub (solo PC largo) */
-.dv-ok{display:none}
-@media (min-width:1700px){
-  .dv-ok{display:block;position:absolute;left:-26.54%;top:0;width:126.77%;height:auto;opacity:0;pointer-events:none;
-    filter:drop-shadow(0 10px 24px rgba(0,0,0,.6));transition:opacity .4s}
-  .diver img{transition:opacity .4s}
-  .dv-scr{transition:opacity .25s}
-  .diver.is-ok .dv-ok{opacity:1}
-  .diver.is-ok img,.diver.is-ok .dv-scr{opacity:0}
-}
-
-/* cellulare: sub sul fondale in fondo alla home */
-.m-ok{display:none}
-@media (max-width:767px){
-  .m-ok{display:block;margin:0 auto -10px;max-width:420px}
-  .m-ok video{display:block;width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;
-    -webkit-mask-image:linear-gradient(180deg,transparent 0,#000 18%,#000 82%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 18%,#000 82%,transparent 100%)}
-}
-
-/* segno OK: compare di colpo (primo fotogramma già pronto), sfuma solo alla fine */
-@media (min-width:1700px){
-  .dv-ok,.diver img,.dv-scr{transition:none}
-  .diver.ok-out .dv-ok,.diver.ok-out img,.diver.ok-out .dv-scr{transition:opacity .4s}
-}
-/* video OK ritagliato più largo a destra: la mano sulla cima resta intera */
-@media (min-width:1700px){.dv-ok{width:140.51%}}

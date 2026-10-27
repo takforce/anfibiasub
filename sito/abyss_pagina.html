@@ -1,0 +1,100 @@
+<div id="abyss" class="ab" data-state="INTRO">
+<canvas id="ab-c" aria-label="Scena subacquea 3D"></canvas>
+
+<section id="ab-intro" class="ab-intro" aria-labelledby="ab-title">
+  <div class="ab-intro-bg" aria-hidden="true"></div>
+  <div class="ab-motes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <a class="ab-back" href="/">← Torna al sito</a>
+  <div class="ab-intro-txt">
+    <h1 id="ab-title" class="ab-logo">ABYSS</h1>
+    <p class="ab-sub">IL RELITTO DIMENTICATO</p>
+    <p class="ab-lead">«Il fondale custodisce un segreto. Solo chi saprà cercarlo potrà scoprirlo.»</p>
+    <button id="ab-start" class="ab-btn ab-btn-main" type="button" disabled>PREPARAZIONE DELL'IMMERSIONE…</button>
+    <p class="ab-sec">Un relitto dimenticato, tre reperti da ritrovare e un segreto nascosto negli abissi.</p>
+    <p class="ab-how ab-how-pc">Usa il mouse per orientare la torcia e la visuale, W A S D per nuotare.</p>
+    <p class="ab-how ab-how-touch">Trascina il dito a destra per guardarti intorno, usa il joystick a sinistra per nuotare.</p>
+    <p id="ab-nowebgl" class="ab-sec" hidden>Il tuo browser non supporta la grafica 3D (WebGL): prova con una versione recente di Chrome, Safari, Firefox o Edge.</p>
+  </div>
+</section>
+
+<div class="ab-hud" aria-live="polite">
+  <div class="ab-tl"><span class="ab-mark">ABYSS</span><span id="ab-depth" class="ab-depth"><b>0,0</b> m</span></div>
+  <div class="ab-tr">
+    <button class="ab-ico ab-inv-btn" type="button" data-act="inv" aria-label="Inventario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h16v12H4z"/><path d="M9 8V5h6v3"/></svg><span id="ab-count">0/3</span></button>
+    <button class="ab-ico" type="button" data-act="audio" aria-label="Audio on/off"><svg class="snd-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg><svg class="snd-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg></button>
+    <button class="ab-ico" type="button" data-act="pause" aria-label="Pausa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+  </div>
+  <div class="ab-cross" aria-hidden="true"></div>
+  <p id="ab-prompt" class="ab-prompt"></p>
+  <p id="ab-msg" class="ab-msg" role="status"></p>
+  <div id="ab-hint" class="ab-hint">
+    <p class="ab-how-pc"><b>Clic</b> sullo schermo per guidare la visuale col mouse · <b>W A S D</b> nuoto · <b>Spazio</b> sali · <b>C</b> scendi · <b>Shift</b> veloce · <b>F</b> torcia · <b>E</b> interagisci · <b>I</b> inventario</p>
+    <p class="ab-how-touch">Joystick a sinistra per nuotare · trascina a destra per guardare · ▲▼ per salire e scendere</p>
+    <p>Segui la cima d'ormeggio verso il fondale.</p>
+  </div>
+</div>
+
+<div class="ab-touch" aria-hidden="true">
+  <div class="ab-joy"><i></i></div>
+  <div class="ab-tbtns">
+    <button type="button" data-up aria-label="Sali">▲</button>
+    <button type="button" data-down aria-label="Scendi">▼</button>
+  </div>
+  <div class="ab-tbtns ab-tbtns-r">
+    <button type="button" class="ab-act" data-act="interact" aria-label="Interagisci">✋</button>
+    <button type="button" class="ab-torch" data-act="torch" aria-label="Torcia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6l-1 6h-4z"/><path d="M10 9h4v11a2 2 0 0 1-4 0z"/></svg></button>
+  </div>
+</div>
+
+<div class="ab-panel" data-panel="inv" hidden role="dialog" aria-modal="true" aria-label="Inventario">
+  <div class="ab-box">
+    <h2>Reperti recuperati <span class="ab-count2"></span></h2>
+    <div class="ab-slots"><div class="ab-slot"></div><div class="ab-slot"></div><div class="ab-slot"></div></div>
+    <button class="ab-btn" type="button" data-act="close">Chiudi</button>
+  </div>
+</div>
+
+<div class="ab-panel" data-panel="lock" hidden role="dialog" aria-modal="true" aria-label="Meccanismo della botola">
+  <div class="ab-box ab-lockbox">
+    <h2>Il meccanismo della botola</h2>
+    <p class="ab-small">Tre ghiere in ottone, ognuna con un simbolo inciso. Imposta la combinazione.</p>
+    <div class="ab-dials">
+      <div class="ab-dial"><svg viewBox="0 0 64 64" aria-label="Rosa dei venti"><g fill="#d4ac63"><path d="M32 4l4 24-4 4-4-4zM32 60l-4-24 4-4 4 4zM4 32l24-4 4 4-4 4zM60 32l-24 4-4-4 4-4z"/></g><circle cx="32" cy="32" r="19" fill="none" stroke="#d4ac63" stroke-width="2"/></svg><button type="button" data-act="dial-up" data-i="0" aria-label="Aumenta">▲</button><b>0</b><button type="button" data-act="dial-dn" data-i="0" aria-label="Diminuisci">▼</button></div>
+      <div class="ab-dial"><svg viewBox="0 0 64 64" aria-label="Ancora"><g fill="none" stroke="#d4ac63" stroke-width="4" stroke-linecap="round"><circle cx="32" cy="10" r="5"/><path d="M32 15v40M20 24h24M10 38a22 22 0 0 0 44 0"/></g></svg><button type="button" data-act="dial-up" data-i="1" aria-label="Aumenta">▲</button><b>0</b><button type="button" data-act="dial-dn" data-i="1" aria-label="Diminuisci">▼</button></div>
+      <div class="ab-dial"><svg viewBox="0 0 64 64" aria-label="Chiave"><g fill="none" stroke="#d4ac63" stroke-width="4" stroke-linecap="round" transform="rotate(-45 32 32)"><circle cx="16" cy="32" r="9"/><path d="M25 32h32M48 32v9M55 32v7"/></g></svg><button type="button" data-act="dial-up" data-i="2" aria-label="Aumenta">▲</button><b>0</b><button type="button" data-act="dial-dn" data-i="2" aria-label="Diminuisci">▼</button></div>
+    </div>
+    <div class="ab-clues"><p>Indizi raccolti</p><ul data-clues></ul></div>
+    <p id="ab-lockfb" class="ab-fb" role="alert"></p>
+    <div class="ab-row"><button class="ab-btn" type="button" data-act="close">Indietro</button><button class="ab-btn ab-btn-main" type="button" data-act="confirm">CONFERMA</button></div>
+  </div>
+</div>
+
+<div class="ab-panel" data-panel="pause" hidden role="dialog" aria-modal="true" aria-label="Pausa">
+  <div class="ab-box">
+    <h2>Immersione in pausa</h2>
+    <p class="ab-small ab-how-pc">W A S D nuoto · Spazio sali · C scendi · Shift veloce · F torcia · E interagisci · I inventario · Esc pausa</p>
+    <p class="ab-small ab-how-touch">Joystick a sinistra per nuotare · trascina a destra per guardare · ▲▼ sali e scendi · ✋ interagisci</p>
+    <div class="ab-col">
+      <button class="ab-btn ab-btn-main" type="button" data-act="resume">RIPRENDI</button>
+      <button class="ab-btn" type="button" data-act="restart">Ricomincia l'immersione</button>
+      <a class="ab-btn" href="/">Torna al sito</a>
+    </div>
+  </div>
+</div>
+
+<div class="ab-panel ab-end" data-panel="end" hidden role="dialog" aria-modal="true" aria-label="Missione completata">
+  <div class="ab-box">
+    <p class="ab-sub">MISSIONE COMPLETATA</p>
+    <h2>«Il segreto del relitto è stato finalmente svelato.»</h2>
+    <p class="ab-small">Nella camera nascosta riposava un antico scafandro da palombaro in ottone.</p>
+    <ul class="ab-sum"><li>Reperti recuperati: 3/3</li><li>Enigma risolto</li><li>Missione completata</li></ul>
+    <div class="ab-col">
+      <button class="ab-btn ab-btn-main" type="button" data-act="restart">RIPETI IMMERSIONE</button>
+      <button class="ab-btn" type="button" data-act="continue">Continua a esplorare</button>
+      <a class="ab-btn" href="/">TORNA AL SITO</a>
+    </div>
+  </div>
+</div>
+
+<div id="ab-veil" class="ab-veil" aria-hidden="true"></div>
+</div>

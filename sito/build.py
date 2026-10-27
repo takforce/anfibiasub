@@ -634,6 +634,43 @@ def extras_prod():
         f.write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
 
 
+# ---------------- ABYSS (minigioco 3D, solo italiano) ----------------
+def build_abyss():
+    src = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'abyss')
+    files = sorted(f for f in os.listdir(src) if f.endswith(('.js', '.css')))
+    h = hashlib.md5(b''.join(open(os.path.join(src, f), 'rb').read() for f in files)).hexdigest()[:8]
+    # i moduli si importano tra loro: aggiungo ?v= a ogni import, così dopo un aggiornamento il browser non usa copie vecchie
+    for f in files:
+        if f.endswith('.js'):
+            d = os.path.join(OUT, 'abyss', f)
+            t = open(d, encoding='utf-8').read()
+            t = _re.sub(r"from '\./([\w-]+\.js)'", lambda m: f"from './{m.group(1)}?v={h}'", t)
+            open(d, 'w', encoding='utf-8').write(bust(t))
+    body = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'abyss_pagina.html'), encoding='utf-8').read()
+    robots = '' if PROD else '<meta name="robots" content="noindex, nofollow">\n'
+    doc = f'''<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ABYSS · Il relitto dimenticato · Anfibiasub</title>
+<meta name="description" content="ABYSS: esplorazione subacquea in 3D di un relitto sul fondale del Mediterraneo. Un minigioco di Anfibiasub.">
+{robots}<meta name="theme-color" content="#050E1A">
+<meta property="og:title" content="ABYSS · Il relitto dimenticato">
+<meta property="og:image" content="{SITE_URL}/img/abyss/intro.webp">
+<link rel="icon" href="/favicon.png?v=3" type="image/png">
+<link rel="stylesheet" href="/abyss/abyss.css?v={h}">
+</head>
+<body>
+{body}
+<script type="module" src="/abyss/main.js?v={h}"></script>
+</body>
+</html>
+'''
+    with open(os.path.join(OUT, 'abyss.html'), 'w', encoding='utf-8') as f:
+        f.write(bust(doc))
+
+
 if __name__ == '__main__':
     if PROD and os.path.isdir(OUT):
         shutil.rmtree(OUT)
@@ -641,6 +678,7 @@ if __name__ == '__main__':
     copy_assets()
     for lang in LANGS:
         build_lang(lang)
+    build_abyss()
     # l'area clienti mostra la stessa informativa privacy nella finestra "Termini e Privacy" della registrazione
     import json
     # vecchi indirizzi /it/... -> nuove pagine, usati dal server su Railway

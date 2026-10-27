@@ -1,0 +1,551 @@
+// ABYSS — Il relitto dimenticato. Motore principale e macchina a stati.
+import * as THREE from '../vendor/three/three.module.min.js';
+import { CFG, CODE } from './config.js?v=beda70ae';
+import { makeTextures } from './textures.js?v=beda70ae';
+import { buildWorld, collideWorld, heightAt } from './world.js?v=beda70ae';
+import { buildWreck } from './wreck.js?v=beda70ae';
+import { buildArtifacts } from './artifacts.js?v=beda70ae';
+import { createControls } from './controls.js?v=beda70ae';
+import { createAudio } from './audio.js?v=beda70ae';
+
+const $ = (s) => document.querySelector(s);
+const root = $('#abyss');
+const canvas = $('#ab-c');
+const mobile = matchMedia('(pointer: coarse)').matches;
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const Q = { mobile, particles: mobile ? 1600 : 4200, tex: mobile ? 256 : 512, shadows: !mobile };
+
+// ---------------- stato ----------------
+const S = { state: 'INTRO', prev: null, t: 0, found: [], hatchSeen: false, reached: false, torch: false, torchTouched: false, panel: null, inspect: null, seq: null, fpsN: 0, fpsT: 0, hintT: 0 };
+const setState = (s) => { S.prev = S.state; S.state = s; root.dataset.state = s; };
+
+// ---------------- renderer ----------------
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: !mobile, powerPreference: 'high-performance' });
+} catch (e) {
+  $('#ab-start').textContent = 'WebGL non disponibile';
+  $('#ab-nowebgl').hidden = false;
+  throw e;
+}
+renderer.setPixelRatio(Math.min(devicePixelRatio, mobile ? 1.5 : 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = Q.shadows;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x1f6f8c, 0.03);
+scene.background = new THREE.Color(0x1f6f8c);
+const camera = new THREE.PerspectiveCamera(72, innerWidth / innerHeight, 0.05, 240);
+scene.add(camera);
+
+// riflessi ambientali per i metalli (gradiente acqua, niente immagini esterne)
+{
+  const envScene = new THREE.Scene();
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(10, 32, 16), new THREE.ShaderMaterial({
+    side: THREE.BackSide,
+    vertexShader: 'varying vec3 v; void main(){ v = position; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+    fragmentShader: 'varying vec3 v; void main(){ float h = normalize(v).y; vec3 c = mix(vec3(.01,.03,.05), vec3(.25,.6,.75), smoothstep(-.2,.9,h)); c += vec3(.9,1.,1.)*smoothstep(.93,1.,h)*2.; gl_FragColor = vec4(c,1.); }',
+  }));
+  envScene.add(sky);
+  const pm = new THREE.PMREMGenerator(renderer);
+  scene.environment = pm.fromScene(envScene, 0.02).texture;
+  pm.dispose();
+}
+
+const hemi = new THREE.HemisphereLight(0x6fc8e8, 0x0b1a22, 1.2);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xbfefff, 1.5);
+sun.position.set(10, 40, 6); scene.add(sun);
+
+// torcia: vera luce che illumina le geometrie
+const torch = new THREE.SpotLight(0xeaf4ff, 0, CFG.torch.range, CFG.torch.angle, 0.6, 1.8);
+torch.castShadow = Q.shadows;
+torch.shadow.mapSize.set(1024, 1024);
+torch.shadow.camera.near = 0.3; torch.shadow.camera.far = CFG.torch.range;
+torch.shadow.bias = -0.0008; torch.shadow.normalBias = 0.03;
+scene.add(torch, torch.target);
+const TORCH_I = 22;
+
+// ---------------- costruzione del mondo ----------------
+const tex = makeTextures(Q.tex, renderer.capabilities.getMaxAnisotropy());
+const wreck = buildWreck(scene, tex);
+const shipInv = new THREE.Matrix4().copy(wreck.ship.matrixWorld).invert();
+const arts = buildArtifacts(scene, wreck, tex);
+const avoid = (x, z, r) => {
+  for (const a of arts.list) if (Math.hypot(x - a.home.pos.x, z - a.home.pos.z) < 1.4 + r) return true;   // reperti liberi dalle rocce
+  const l = new THREE.Vector3(x, CFG.seabed, z).applyMatrix4(shipInv);
+  if (l.x > -14 - r && l.x < 16 + r && Math.abs(l.z) < 5.5 + r) return true;            // impronta del relitto
+  if (Math.hypot(x - CFG.line.bx, z - CFG.line.bz) < 2 + r) return true;                 // corpo morto
+  if (wreck.anchorPos.distanceTo(new THREE.Vector3(x, wreck.anchorPos.y, z)) < 2.2 + r) return true;
+  return false;
+};
+const world = buildWorld(scene, tex, Q, avoid);
+
+// ---------------- giocatore ----------------
+const P = { pos: new THREE.Vector3(), vel: new THREE.Vector3(), yaw: 0, pitch: 0, tyaw: 0, tpitch: 0 };
+function resetPlayer() {
+  P.pos.set(CFG.start.x, CFG.start.y, CFG.start.z); P.vel.set(0, 0, 0);
+  P.yaw = P.tyaw = CFG.start.yaw; P.pitch = P.tpitch = CFG.start.pitch;
+}
+resetPlayer();
+
+const audio = createAudio();
+const controls = createControls(canvas, root, {
+  escape() {
+    if (S.panel) { closePanel(); return; }
+    if (S.state === 'PAUSED') resume(); else if (canPause()) pause();
+  },
+  interact() { if (S.state === 'EXPLORATION' || S.state === 'DESCENT') interact(); },
+  torch() { toggleTorch(); },
+  inventory() { if (S.panel === 'inv') closePanel(); else if (canPause()) { openPanel('inv'); controls.enabled = false; } },
+  unlocked() { if (!S.panel && canPause() && !S.seq) pause(); },
+  lockChange(l) { root.classList.toggle('is-locked', l); },
+});
+const canPause = () => ['DESCENT', 'EXPLORATION'].includes(S.state);
+
+// ---------------- interfaccia ----------------
+const ui = {
+  depth: $('#ab-depth b'), count: $('#ab-count'), prompt: $('#ab-prompt'), msg: $('#ab-msg'), hint: $('#ab-hint'),
+  veil: $('#ab-veil'), start: $('#ab-start'),
+};
+let msgTimer = 0;
+function toast(text, ms = 3600, cls = '') {
+  ui.msg.textContent = text; ui.msg.className = 'ab-msg on ' + cls;
+  clearTimeout(msgTimer); msgTimer = setTimeout(() => { ui.msg.className = 'ab-msg ' + cls; }, ms);
+}
+function updCount() {
+  ui.count.textContent = `${S.found.length}/3`;
+  root.querySelectorAll('.ab-count2').forEach((el) => { el.textContent = `${S.found.length}/3`; });
+  root.querySelectorAll('.ab-slot').forEach((el, i) => {
+    const a = CFG.artifacts[i], f = S.found.includes(a.id);
+    el.classList.toggle('full', f);
+    el.innerHTML = f ? `<img src="${a.img}" alt=""><b>${a.name}</b><span>${a.clue}</span>` : `<i></i><b>Reperto ${i + 1}</b><span>Non ancora trovato</span>`;
+  });
+  root.querySelectorAll('[data-clues]').forEach((el) => {
+    el.innerHTML = S.found.length ? CFG.artifacts.filter((a) => S.found.includes(a.id)).map((a) => `<li>${a.clue}</li>`).join('') : '<li>Nessun indizio raccolto</li>';
+  });
+}
+
+function openPanel(name) {
+  S.panel = name; controls.reset(); controls.release();
+  root.querySelectorAll('.ab-panel').forEach((p) => { p.hidden = p.dataset.panel !== name; });
+  const p = root.querySelector(`[data-panel="${name}"]`);
+  const f = p && p.querySelector('button, [tabindex]'); if (f) setTimeout(() => f.focus(), 30);
+}
+function closePanel() {
+  root.querySelectorAll('.ab-panel').forEach((p) => { p.hidden = true; });
+  const was = S.panel; S.panel = null;
+  if (was === 'pause') resume();
+  else if (was === 'inv') { controls.enabled = true; relock(); }
+}
+function relock() {
+  if (controls.touch || !canvas.requestPointerLock) return;
+  try { const p = canvas.requestPointerLock(); if (p && p.catch) p.catch(() => {}); } catch (_) { /* il browser può rifiutare */ }
+}
+function pause() { if (!canPause()) return; setState('PAUSED'); controls.enabled = false; controls.reset(); controls.release(); openPanel('pause'); S.panel = 'pause'; }
+function resume() {
+  root.querySelectorAll('.ab-panel').forEach((p) => { p.hidden = true; });
+  S.panel = null;
+  if (S.state === 'PAUSED') { setState(S.prev === 'PAUSED' ? 'EXPLORATION' : S.prev); }
+  controls.enabled = true; relock();
+}
+
+root.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const act = b.dataset.act;
+  if (act === 'resume') resume();
+  else if (act === 'close') closePanel();
+  else if (act === 'pause') { if (S.state === 'PAUSED') resume(); else pause(); }
+  else if (act === 'inv') { if (S.panel === 'inv') closePanel(); else if (canPause()) { openPanel('inv'); controls.enabled = false; } }
+  else if (act === 'audio') { audio.setOn(!audio.on); root.classList.toggle('muted', !audio.on); }
+  else if (act === 'torch') toggleTorch();
+  else if (act === 'interact') interact();
+  else if (act === 'restart') restart();
+  else if (act === 'continue') continueExploring();
+  else if (act === 'dial-up' || act === 'dial-dn') {
+    const i = +b.dataset.i; dial[i] = (dial[i] + (act === 'dial-up' ? 1 : 9)) % 10; drawDials(); audio.click(); $('#ab-lockfb').textContent = '';
+  } else if (act === 'confirm') confirmCode();
+});
+
+// ---------------- torcia ----------------
+function toggleTorch(force) {
+  const v = typeof force === 'boolean' ? force : !S.torch;
+  if (v === S.torch) return;
+  S.torch = v; if (typeof force !== 'boolean') S.torchTouched = true;
+  root.classList.toggle('torch-on', v);
+  audio.torch();
+}
+
+// ---------------- avvio ----------------
+function ready() {
+  ui.start.disabled = false;
+  ui.start.textContent = 'INIZIA L\'IMMERSIONE';
+  root.classList.add('is-ready');
+}
+ui.start.addEventListener('click', () => {
+  if (S.state !== 'INTRO') return;
+  audio.init();
+  setState('DIVE');
+  root.classList.add('is-diving');
+  // transizione: l'immagine si scurisce e "scende", poi si è in acqua
+  setTimeout(() => {
+    $('#ab-intro').hidden = true;
+    startDescent();
+    ui.veil.classList.remove('on');
+  }, reduced ? 200 : 1600);
+  ui.veil.classList.add('on');
+});
+
+function startDescent() {
+  setState('DESCENT');
+  controls.enabled = true;
+  root.classList.add('is-playing');
+  toast('DISCESA IN CORSO…', 3200, 'big');
+  S.hintT = 0;
+  ui.hint.classList.add('on');
+  setTimeout(() => ui.hint.classList.remove('on'), 16000);
+}
+
+// ---------------- interazione ----------------
+const _v = new THREE.Vector3(), _d = new THREE.Vector3();
+function target() {
+  camera.getWorldDirection(_d);
+  let best = null, bd = 1e9;
+  const cands = arts.list.filter((a) => !a.taken).map((a) => ({ kind: 'art', a, c: a.center, r: a.hitR }));
+  if (S.state === 'EXPLORATION' || S.state === 'DESCENT') cands.push({ kind: 'hatch', c: wreck.hatchWorld(), r: 1.1 });
+  for (const k of cands) {
+    _v.subVectors(k.c, camera.position); const dist = _v.length();
+    if (dist > CFG.interactDist + k.r) continue;
+    const ang = _v.normalize().angleTo(_d);
+    if (ang < Math.atan(k.r / dist) + 0.12 && dist < bd) { best = k; bd = dist; }
+  }
+  return best;
+}
+function interact() {
+  const k = target(); if (!k) return;
+  if (k.kind === 'art') pickup(k.a);
+  else if (k.kind === 'hatch') {
+    if (wreck.hatch.userData.open) return;
+    if (S.found.length < 3) { toast('Non hai ancora raccolto tutti gli indizi.'); audio.clunk(); return; }
+    setState('LOCK_PUZZLE'); controls.enabled = false; drawDials(); openPanel('lock');
+  }
+}
+
+function pickup(a) {
+  if (a.taken) return;
+  a.taken = true; S.found.push(a.id);
+  a.glint.material.opacity = 0;
+  (a.extra || []).forEach((m) => { m.visible = false; });
+  audio.pickup();
+  // breve animazione: il reperto si solleva davanti alla maschera e ruota
+  camera.attach(a.obj);
+  S.inspect = { a, t: 0, lp: a.obj.position.clone() };
+  setState('INSPECT'); controls.enabled = false; controls.reset();
+  setTimeout(() => {
+    toast(a.found, 6500, 'card');
+  }, 400);
+  updCount();
+}
+
+// ---------------- enigma della botola ----------------
+const dial = [0, 0, 0];
+function drawDials() {
+  root.querySelectorAll('.ab-dial b').forEach((el, i) => { el.textContent = dial[i]; });
+}
+function confirmCode() {
+  if (dial.every((d, i) => d === CODE[i])) {
+    closePanelSilently();
+    audio.click();
+    openHatch();
+  } else {
+    audio.clunk();
+    const p = $('.ab-lockbox'); p.classList.remove('shake'); void p.offsetWidth; p.classList.add('shake');
+    $('#ab-lockfb').textContent = 'Il meccanismo resta bloccato. Ricontrolla gli indizi.';
+  }
+}
+function closePanelSilently() { root.querySelectorAll('.ab-panel').forEach((p) => { p.hidden = true; }); S.panel = null; }
+// pannello chiuso senza risolvere -> si torna a esplorare
+root.querySelector('[data-panel="lock"] [data-act="close"]').addEventListener('click', () => { setState('EXPLORATION'); controls.enabled = true; });
+
+// ---------------- sequenze animate ----------------
+const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+function openHatch() {
+  setState('OPENING');
+  controls.enabled = false; controls.reset(); controls.release();
+  wreck.hatch.userData.open = true;
+  const hw = wreck.hatchWorld();
+  const view = hw.clone().addScaledVector(wreck.side, 2.2).addScaledVector(wreck.fwd, 1.8); view.y += 1.6;
+  const top = hw.clone().addScaledVector(wreck.fwd, 0.45).addScaledVector(wreck.side, 0.25); top.y += 1.3;
+  const helm = wreck.helmetWorld();
+  const camFrom = camera.position.clone();
+  const lookFrom = camera.position.clone().add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(3));
+  const { dials, latches, lid } = wreck.hatch.userData;
+  const dial0 = dials.map((d) => d.rotation.x);
+  S.seq = {
+    t: 0,
+    run(t) {
+      // 0-1.6 s: la visuale si avvicina alla botola
+      const a = ease(Math.min(1, t / 1.6));
+      if (t < 5.2) { camera.position.lerpVectors(camFrom, view, a); camera.lookAt(new THREE.Vector3().lerpVectors(lookFrom, hw, a)); }
+      // 1.4-2.4 s: le ghiere ruotano fino al codice
+      const b = Math.min(1, Math.max(0, (t - 1.4) / 1.0));
+      dials.forEach((d, i) => { d.rotation.x = dial0[i] + ease(b) * (Math.PI * 2 * (1 + CODE[i] / 10)); });
+      // 2.4-3.0 s: i fermi scorrono verso l'esterno
+      const c = Math.min(1, Math.max(0, (t - 2.4) / 0.6));
+      latches.forEach((l) => { l.m.position.set(Math.cos(l.a) * (0.73 + 0.22 * c), 0.04, Math.sin(l.a) * (0.73 + 0.22 * c)); });
+      if (t > 2.4 && !S.seq.k1) { S.seq.k1 = 1; audio.clunk(); }
+      // 3.0-6.0 s: la botola si solleva e si apre
+      const d = Math.min(1, Math.max(0, (t - 3.0) / 3.0));
+      wreck.hatch.rotation.z = ease(d) * 2.95;   // si ribalta e si appoggia aperta sulla mastra
+      wreck.hatch.position.y = wreck.HY + 0.46 + Math.sin(Math.min(1, d * 3) * Math.PI) * 0.04;
+      if (t > 3.0 && !S.seq.k2) {
+        S.seq.k2 = 1; audio.creak(); wreck.chamber.visible = true;
+        world.bubbles.burst(hw, 70, 0.6); sediment.start(hw);
+      }
+      // la camera nascosta si illumina
+      wreck.chamber.userData.light.intensity = Math.min(1, Math.max(0, (t - 3.6) / 3)) * 10;
+      // 5.2-9 s: la visuale scende sopra l'apertura e guarda lo scafandro
+      if (t >= 5.2) {
+        const e2 = ease(Math.min(1, (t - 5.2) / 3.4));
+        camera.position.lerpVectors(view, top, e2);
+        camera.lookAt(new THREE.Vector3().lerpVectors(hw, helm, e2));
+      }
+      if (t > 6.2 && !S.seq.k3) { S.seq.k3 = 1; audio.finale(); toast('Il segreto del relitto…', 3500, 'big'); }
+      if (t > 11) { S.seq = null; finish(); }
+    },
+  };
+}
+
+function finish() {
+  setState('COMPLETED');
+  controls.release();
+  root.classList.add('is-done');
+  openPanel('end');
+}
+
+function continueExploring() {
+  closePanelSilently();
+  root.classList.remove('is-done');
+  // il sub riparte da sopra la botola, guardando dentro
+  P.pos.copy(camera.position); P.vel.set(0, 0, 0);
+  const d = camera.getWorldDirection(new THREE.Vector3());
+  P.yaw = P.tyaw = Math.atan2(-d.x, -d.z); P.pitch = P.tpitch = Math.asin(Math.max(-1, Math.min(1, d.y)));
+  setState('EXPLORATION'); controls.enabled = true;
+}
+
+function restart() {
+  closePanelSilently();
+  root.classList.remove('is-done');
+  S.found = []; S.hatchSeen = false; S.reached = false; S.seq = null; S.inspect = null;
+  arts.reset();
+  const { dials, latches } = wreck.hatch.userData;
+  wreck.hatch.userData.open = false; wreck.hatch.rotation.z = 0; wreck.hatch.position.y = wreck.HY + 0.46;
+  dials.forEach((d) => { d.rotation.x = 0; });
+  latches.forEach((l) => l.m.position.set(Math.cos(l.a) * 0.73, 0.04, Math.sin(l.a) * 0.73));
+  wreck.chamber.visible = false; wreck.chamber.userData.light.intensity = 0;
+  dial.fill(0); $('#ab-lockfb').textContent = '';
+  world.bubbles.clear(); sediment.stop();
+  resetPlayer(); toggleTorch(false); S.torchTouched = false;
+  updCount();
+  ui.veil.classList.add('on');
+  setTimeout(() => { ui.veil.classList.remove('on'); startDescent(); }, 700);
+}
+
+// ---------------- nube di sedimento all'apertura ----------------
+const sediment = (() => {
+  const N = 260, pos = new Float32Array(N * 3), vel = [];
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const dot = document.createElement('canvas'); dot.width = dot.height = 64;
+  { const g2 = dot.getContext('2d'), r = g2.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g2.fillStyle = r; g2.fillRect(0, 0, 64, 64); }
+  const m = new THREE.PointsMaterial({ color: 0xb9a98a, size: 0.16, map: new THREE.CanvasTexture(dot), transparent: true, opacity: 0, depthWrite: false });
+  const pts = new THREE.Points(g, m); pts.frustumCulled = false; scene.add(pts);
+  let t = -1;
+  return {
+    start(c) { t = 0; for (let i = 0; i < N; i++) { pos.set([c.x, c.y - 0.2, c.z], i * 3); const a = Math.random() * 7, s = Math.random(); vel[i] = new THREE.Vector3(Math.cos(a) * s * 1.2, Math.random() * 1.4 + 0.2, Math.sin(a) * s * 1.2); } },
+    stop() { t = -1; m.opacity = 0; },
+    update(dt) {
+      if (t < 0) return; t += dt;
+      for (let i = 0; i < N; i++) { const v = vel[i]; v.multiplyScalar(Math.exp(-dt * 1.2)); v.y -= dt * 0.12; pos[i * 3] += v.x * dt; pos[i * 3 + 1] += v.y * dt; pos[i * 3 + 2] += v.z * dt; }
+      g.attributes.position.needsUpdate = true;
+      m.opacity = Math.min(0.32, t * 2) * Math.max(0, 1 - t / 14);
+      if (t > 14) t = -1;
+    },
+  };
+})();
+
+// ---------------- ciclo principale ----------------
+const clock = new THREE.Clock();
+const fogShallow = new THREE.Color(0x2a7d98), fogDeep = new THREE.Color(0x03101b), tmpC = new THREE.Color();
+const fwd = new THREE.Vector3(), right = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0), acc = new THREE.Vector3(), before = new THREE.Vector3();
+let breath = 0, lastBreathPhase = -1;
+
+function tick() {
+  const raw = Math.min(clock.getDelta(), S.dtMax || 0.05);
+  const paused = S.state === 'PAUSED' || document.hidden;
+  const dt = paused ? 0 : raw;
+  S.t += dt;
+  const t = S.t;
+  const playing = ['DESCENT', 'EXPLORATION'].includes(S.state);
+
+  // --- movimento del sub ---
+  if (!S.seq && S.state !== 'COMPLETED') {
+    const l = controls.consumeLook();
+    const sens = controls.touch ? 0.0042 : 0.0022;
+    if (playing) { P.tyaw -= l.dx * sens; P.tpitch = Math.max(-1.45, Math.min(1.45, P.tpitch - l.dy * sens)); }
+    const k = 1 - Math.exp(-dt * 16);
+    P.yaw += (P.tyaw - P.yaw) * k; P.pitch += (P.tpitch - P.pitch) * k;
+    camera.rotation.set(P.pitch, P.yaw, 0, 'YXZ');
+
+    camera.getWorldDirection(fwd);
+    right.crossVectors(fwd, UP).normalize();
+    acc.set(0, 0, 0);
+    if (playing) {
+      const m = controls.move;
+      acc.addScaledVector(fwd, m.f).addScaledVector(right, m.r).addScaledVector(UP, m.u);
+      if (acc.lengthSq() > 1) acc.normalize();
+      acc.multiplyScalar(CFG.swim.accel * (controls.fast ? CFG.swim.fast : 1));
+      if (m.u === 0 && m.f === 0 && -P.pos.y < 22 && S.state === 'DESCENT') acc.y -= 0.25;   // leggermente negativo in discesa
+      if (!S.hintDone && (m.f || m.r || m.u)) { S.hintDone = true; setTimeout(() => ui.hint.classList.remove('on'), 4000); }
+    }
+    P.vel.addScaledVector(acc, dt);
+    P.vel.multiplyScalar(Math.exp(-CFG.swim.drag * dt));
+    before.copy(P.pos).addScaledVector(P.vel, dt);
+    P.pos.copy(before);
+    collideWorld(world, P.pos, CFG.swim.radius);
+    wreck.collide(P.pos, CFG.swim.radius);
+    const corr = before.sub(P.pos);                  // vettore della correzione (invertito)
+    if (corr.lengthSq() > 1e-8) { corr.normalize(); const vn = P.vel.dot(corr); if (vn > 0) P.vel.addScaledVector(corr, -vn); }
+
+    // galleggiamento e respiro
+    breath = (t % 5.2) / 5.2;
+    const bob = reduced ? 0 : Math.sin(t * 0.55) * 0.035 + Math.sin(breath * Math.PI * 2) * 0.025;
+    camera.position.copy(P.pos); camera.position.y += bob;
+    if (!reduced) camera.rotation.z = Math.sin(t * 0.37) * 0.012;
+  }
+
+  // --- inspection del reperto raccolto ---
+  if (S.inspect) {
+    const it = S.inspect; it.t += dt;
+    const o = it.a.obj;
+    const target = new THREE.Vector3(0, -0.06, -0.55);
+    const k = ease(Math.min(1, it.t / 0.9));
+    o.position.lerpVectors(it.lp, target, k);
+    o.rotation.y += dt * 1.6; o.rotation.x = 0.6 * k;
+    if (it.t > 2.6) {
+      const s = Math.max(0, 1 - (it.t - 2.6) / 0.4); o.scale.setScalar(s * (it.a.id === 'chiave' ? 1.25 : 1));
+    }
+    if (it.t > 3.0) {
+      o.visible = false; scene.attach(o); S.inspect = null;
+      setState(S.reached ? 'EXPLORATION' : 'DESCENT'); controls.enabled = true;
+      if (S.found.length === 3) setTimeout(() => toast('Hai recuperato tutti i reperti. Cerca la botola sul ponte del relitto.', 5200), 6800);
+      else setTimeout(() => toast(`REPERTI RECUPERATI: ${S.found.length}/3`, 2600), 6800);
+    }
+  }
+
+  if (S.seq) { S.seq.t += dt; S.seq.run(S.seq.t); }
+
+  // --- profondità: colore, nebbia, luce ---
+  const depth = Math.max(0, -camera.position.y);
+  const dn = Math.min(1, depth / 30);
+  tmpC.copy(fogShallow).lerp(fogDeep, Math.pow(dn, 0.65));
+  scene.fog.color.copy(tmpC); scene.background.copy(tmpC);
+  const lit = Math.pow(1 - dn, 1.6);
+  scene.fog.density = 0.042 + dn * 0.024;
+  hemi.intensity = 1.1 * lit + 0.06;
+  sun.intensity = 1.6 * lit * lit + 0.02;
+  scene.environmentIntensity = 0.4 * lit + 0.05;
+  world.surface.uniforms.uTime.value = t; world.surface.uniforms.uCam.value.copy(camera.position);
+  world.surface.uniforms.uFog.value.copy(tmpC); world.surface.uniforms.uDensity.value = scene.fog.density * 0.9;
+  ui.depth.textContent = depth.toFixed(1).replace('.', ',');
+  audio.depth(depth);
+
+  if (playing && !S.reached && depth > 23) {
+    S.reached = true; setState('EXPLORATION'); toast('IMMERSIONE INIZIATA', 3200, 'big');
+  }
+  if (!S.torchTouched && !S.torch && depth > CFG.torch.autoOnDepth && playing) toggleTorch(true);
+
+  // --- torcia ---
+  camera.getWorldDirection(fwd);
+  const flick = reduced ? 1 : 1 + Math.sin(t * 23) * 0.012 + Math.sin(t * 7.3) * 0.015;
+  torch.intensity = S.torch ? TORCH_I * flick : 0;
+  torch.position.copy(camera.position).addScaledVector(right, 0.18).addScaledVector(UP, -0.15);
+  torch.target.position.copy(camera.position).addScaledVector(fwd, 10);
+  world.particles.uniforms.uTime.value = t; world.particles.uniforms.uCam.value.copy(camera.position);
+  world.particles.uniforms.uDir.value.copy(fwd); world.particles.uniforms.uTorch.value = S.torch ? 1 : 0;
+  world.particles.uniforms.uAmb.value = 0.7 * (1 - dn) + 0.12;
+  world.bubbles.mat.uniforms.uAmb.value = 0.9 * (1 - dn) + 0.35 + (S.torch ? 0.3 : 0);
+
+  // --- bolle del respiro ---
+  if (playing || S.state === 'INSPECT') {
+    const ph = breath < 0.4 ? 0 : breath < 0.75 ? 1 : 2;
+    if (ph !== lastBreathPhase) { lastBreathPhase = ph; if (ph === 0) audio.inhale(); if (ph === 1) audio.exhale(); }
+    if (ph === 1 && Math.random() < 0.55) world.bubbles.emit(camera.position.clone().addScaledVector(fwd, 0.12).add(new THREE.Vector3(0, -0.12, 0)), 1);
+  }
+
+  // --- riflessi sui reperti e scoperta della botola ---
+  for (const a of arts.list) {
+    if (a.taken) continue;
+    _v.subVectors(a.center, camera.position); const dist = _v.length();
+    const cone = _v.normalize().dot(fwd);
+    const lit = S.torch && dist < 11 && cone > Math.cos(CFG.torch.angle * 0.9) ? 1 : 0;
+    const tw = 0.5 + 0.5 * Math.sin(t * 3 + a.digit);
+    const want = lit * (0.35 + 0.65 * tw) * Math.min(1, (11 - dist) / 4);
+    a.glint.material.opacity += (want - a.glint.material.opacity) * Math.min(1, dt * 6);
+  }
+  if (playing && !S.hatchSeen) {
+    const hw = wreck.hatchWorld(); _v.subVectors(hw, camera.position); const dist = _v.length();
+    if (S.torch && dist < 8 && _v.normalize().dot(fwd) > 0.9) { S.hatchSeen = true; toast('Un antico meccanismo blocca l\'accesso. Gli indizi raccolti potrebbero rivelare la combinazione.', 6000); }
+  }
+
+  // --- suggerimento di interazione ---
+  if (playing) {
+    const k = target();
+    if (k) {
+      const what = k.kind === 'art' ? `Raccogli: ${k.a.name}` : (wreck.hatch.userData.open ? '' : 'Esamina la botola');
+      ui.prompt.innerHTML = what ? `<kbd>${controls.touch ? '✋' : 'E'}</kbd> ${what}` : '';
+      root.classList.toggle('can-act', !!what);
+    } else { ui.prompt.innerHTML = ''; root.classList.remove('can-act'); }
+  } else { root.classList.remove('can-act'); ui.prompt.innerHTML = ''; }
+
+  for (const u of world.updaters) u(dt, t, camera);
+  sediment.update(dt);
+
+  if (S.state !== 'INTRO' && S.state !== 'DIVE') renderer.render(scene, camera);
+
+  // --- qualità automatica: se gli fps sono bassi riduco risoluzione e ombre ---
+  if (playing && S.fpsN >= 0) {
+    S.fpsN++; S.fpsT += raw;
+    if (S.fpsT > 4) {
+      const fps = S.fpsN / S.fpsT;
+      if (fps < 32) { renderer.setPixelRatio(1); torch.castShadow = false; renderer.shadowMap.enabled = false; }
+      S.fpsN = -1;
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+function resize() {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight, false);
+  world.particles.uniforms.uPR.value = renderer.getPixelRatio() * innerHeight / 900;
+  world.bubbles.mat.uniforms.uPR.value = renderer.getPixelRatio() * innerHeight / 900;
+}
+addEventListener('resize', resize);
+resize();
+updCount();
+
+// compilo shader e carico le texture prima dell'avvio, così la discesa non scatta
+camera.position.copy(P.pos); camera.rotation.set(P.pitch, P.yaw, 0, 'YXZ');
+torch.intensity = 1;
+renderer.compile(scene, camera);
+renderer.render(scene, camera);
+torch.intensity = 0;
+document.addEventListener('visibilitychange', () => { if (document.hidden && canPause()) pause(); });
+requestAnimationFrame(tick);
+ready();
+
+// per i test automatici (nessun effetto sul gioco)
+window.__abyss = { THREE, scene, S, P, CODE, wreck, arts, camera, pickup, toast, openHatch, setPos: (x, y, z, yaw, pitch) => { P.pos.set(x, y, z); P.vel.set(0, 0, 0); if (yaw !== undefined) { P.yaw = P.tyaw = yaw; P.pitch = P.tpitch = pitch; } } };

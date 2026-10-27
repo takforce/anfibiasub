@@ -1,4 +1,4 @@
-<div id="abyss" class="ab" data-state="INTRO">
+<div id="abyss" class="ab" data-state="INTRO" data-api="{{API}}">
 <canvas id="ab-c" aria-label="Scena subacquea 3D"></canvas>
 
 <section id="ab-intro" class="ab-intro" aria-labelledby="ab-title">
@@ -13,6 +13,7 @@
     <p class="ab-sec">Un relitto dimenticato, tre reperti da ritrovare e un segreto nascosto negli abissi.</p>
     <p class="ab-how ab-how-pc">Usa il mouse per orientare la torcia e la visuale, W A S D per nuotare.</p>
     <p class="ab-how ab-how-touch">Trascina il dito a destra per guardarti intorno, usa il joystick a sinistra per nuotare.</p>
+    <p class="ab-how ab-ios" hidden>Su iPhone, per giocare a schermo intero: <b>Condividi → Aggiungi alla schermata Home</b> e apri ABYSS dall'icona.</p>
     <p id="ab-nowebgl" class="ab-sec" hidden>Il tuo browser non supporta la grafica 3D (WebGL): prova con una versione recente di Chrome, Safari, Firefox o Edge.</p>
   </div>
 </section>
@@ -23,8 +24,10 @@
   <div class="ab-tr">
     <button class="ab-ico ab-inv-btn" type="button" data-act="inv" aria-label="Inventario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h16v12H4z"/><path d="M9 8V5h6v3"/></svg><span id="ab-count">0/3</span></button>
     <button class="ab-ico" type="button" data-act="audio" aria-label="Audio on/off"><svg class="snd-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg><svg class="snd-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg></button>
+    <button class="ab-ico ab-exit" type="button" data-act="exit" aria-label="Termina e torna al sito"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Termina</span></button>
     <button class="ab-ico" type="button" data-act="pause" aria-label="Pausa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
   </div>
+  <div class="ab-gauge" aria-hidden="true"><span class="ab-g-fill"></span><span class="ab-g-mark"></span><i style="top:0">0</i><i style="top:20%">10</i><i style="top:40%">20</i><i style="top:60%">30</i><i style="top:80%">40</i><i style="top:100%">50 m</i></div>
   <div class="ab-cross" aria-hidden="true"></div>
   <p id="ab-prompt" class="ab-prompt"></p>
   <p id="ab-msg" class="ab-msg" role="status"></p>
@@ -96,12 +99,27 @@
   <div class="ab-box">
     <p class="ab-sub">MISSIONE COMPLETATA</p>
     <h2>«Il segreto del relitto è stato finalmente svelato.»</h2>
+    <div class="ab-poll" id="ab-poll">
+      <p class="ab-ad-lab">TI È PIACIUTO?</p>
+      <div class="ab-row ab-poll-q"><button class="ab-btn ab-btn-main" type="button" data-poll="si">VOGLIO UN'ALTRA MISSIONE</button><button class="ab-btn" type="button" data-poll="no">Mi basta così</button></div>
+      <div class="ab-stars" role="radiogroup" aria-label="Voto da 1 a 5"><button type="button" data-star="1" aria-label="1 stella">★</button><button type="button" data-star="2" aria-label="2 stelle">★</button><button type="button" data-star="3" aria-label="3 stelle">★</button><button type="button" data-star="4" aria-label="4 stelle">★</button><button type="button" data-star="5" aria-label="5 stelle">★</button></div>
+      <textarea id="ab-poll-txt" maxlength="500" rows="2" placeholder="Un suggerimento per la prossima missione? (facoltativo)"></textarea>
+      <button class="ab-btn" type="button" data-poll="send" disabled>Invia</button>
+      <p class="ab-small ab-poll-msg" role="status"></p>
+    </div>
     <p class="ab-small">Lo scafandro del palombaro era nella camera nascosta; il cofanetto del capitano, sotto l'arco di roccia sul bordo dell'abisso.</p>
     <ul class="ab-sum"><li>Reperti recuperati: 3/3</li><li>Enigma della botola risolto</li><li>Giornale di bordo decifrato</li><li>Cofanetto del capitano ritrovato</li></ul>
-    <div class="ab-col">
-      <button class="ab-btn ab-btn-main" type="button" data-act="restart">RIPETI IMMERSIONE</button>
+    <div class="ab-ad">
+      <p class="ab-ad-lab">QUESTO ERA UN GIOCO. IL NOSTRO LAVORO È VERO.</p>
+      <div class="ab-ad-logo"><img src="/img/logo-casco-96.png" alt="" width="64" height="64"><b>ANFIBIA<span>SUB</span></b></div>
+      <p class="ab-small">Dal Porto di Loano interveniamo dove il lavoro si fa sott'acqua, con operatori qualificati e ogni intervento documentato.</p>
+      <ul class="ab-svc"><li>Pulizia eliche e carene</li><li>Sostituzione anodi</li><li>Recuperi in mare</li><li>Lavori edili subacquei</li><li>Saldature e metalmeccanica</li><li>Foto e videoriprese</li></ul>
+      <div class="ab-row"><a class="ab-btn ab-btn-main" href="/contatti.html">RICHIEDI UN PREVENTIVO</a><a class="ab-btn" href="/servizi.html">I nostri servizi</a></div>
+    </div>
+    <div class="ab-row">
+      <button class="ab-btn" type="button" data-act="restart">Ripeti immersione</button>
       <button class="ab-btn" type="button" data-act="continue">Continua a esplorare</button>
-      <a class="ab-btn" href="/">TORNA AL SITO</a>
+      <a class="ab-btn" href="/">Torna al sito</a>
     </div>
   </div>
 </div>

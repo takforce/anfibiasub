@@ -16,7 +16,7 @@ export function heightAt(x, z) {
     h = h * (1 - f * 0.7) + (CFG.seabed - 0.6) * f * 0.7;
   }
   const r = Math.hypot(x, z);
-  if (r > CFG.cliff) h -= (r - CFG.cliff) * 0.6 + Math.pow(Math.max(0, r - CFG.cliff), 2) * 0.02;   // la scarpata verso il blu
+  if (r > CFG.cliff) h -= (r - CFG.cliff) * 1.2 + Math.pow(r - CFG.cliff, 2) * 0.03;   // fino a circa 50 m sul bordo dell'area   // la scarpata verso il blu
   return h;
 }
 

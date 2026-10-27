@@ -3,10 +3,11 @@ import * as THREE from '../vendor/three/three.module.min.js';
 import { CFG, CODE, bearing } from './config.js';
 import { makeTextures, logbookPage } from './textures.js';
 import { buildWorld, collideWorld } from './world.js';
-import { buildWreck } from './wreck.js';
+import { buildWreck, makeHelmet } from './wreck.js';
 import { buildArtifacts } from './artifacts.js';
 import { buildLandmarks } from './landmarks.js';
 import { buildFish } from './fish.js';
+import { buildAds, buildStatues } from './ads.js';
 import { createControls } from './controls.js';
 import { createAudio } from './audio.js';
 
@@ -88,6 +89,8 @@ const wreck = buildWreck(scene, tex);
 const shipInv = new THREE.Matrix4().copy(wreck.ship.matrixWorld).invert();
 const avoid = (x, z, r) => {
   for (const k in CFG.places) { const p = CFG.places[k]; if (Math.hypot(x - p.x, z - p.z) < 13 + r) return true; }   // i luoghi hanno rocce proprie
+  for (const st of CFG.statues) if (Math.hypot(x - st.x, z - st.z) < 3 + r) return true;
+  if (Math.hypot(x - CFG.ads.x, z - CFG.ads.z) < 3 + r || Math.hypot(x - CFG.ads.bx, z - CFG.ads.bz) < 2.5 + r) return true;
   const l = new THREE.Vector3(x, CFG.seabed, z).applyMatrix4(shipInv);
   if (l.x > -14 - r && l.x < 16 + r && Math.abs(l.z) < 5.5 + r) return true;            // impronta del relitto
   if (Math.hypot(x - CFG.line.bx, z - CFG.line.bz) < 2 + r) return true;                 // corpo morto
@@ -98,6 +101,8 @@ const world = buildWorld(scene, tex, Q, avoid);
 const spots = buildLandmarks(scene, world, tex);
 const arts = buildArtifacts(scene, wreck, tex, spots);
 const fish = buildFish(scene, Q); world.updaters.push(fish);
+buildStatues(scene, world, tex, CFG.statues, makeHelmet);
+const adsReady = buildAds(scene, wreck, tex, CFG.ads);
 // rotta e distanza scritte nel giornale di bordo: calcolate dalla posizione vera di poppa e arco
 const LOG = (() => { const a = wreck.sternWorld(), b = arts.casket.home.pos; return { deg: bearing(a, b), m: Math.hypot(b.x - a.x, b.z - a.z) }; })();
 
@@ -126,7 +131,7 @@ const canPause = () => ['DESCENT', 'EXPLORATION'].includes(S.state);
 // ---------------- interfaccia ----------------
 const ui = {
   depth: $('#ab-depth b'), count: $('#ab-count'), prompt: $('#ab-prompt'), msg: $('#ab-msg'), hint: $('#ab-hint'),
-  veil: $('#ab-veil'), start: $('#ab-start'), obj: $('#ab-obj'), strip: $('.ab-comp-strip'), hdg: $('#ab-hdg'),
+  veil: $('#ab-veil'), start: $('#ab-start'), obj: $('#ab-obj'), gauge: $('.ab-gauge'), strip: $('.ab-comp-strip'), hdg: $('#ab-hdg'),
 };
 // bussola da polso: striscia con i punti cardinali (2 px per grado, ripetuta)
 {
@@ -202,6 +207,7 @@ root.addEventListener('click', (e) => {
   else if (act === 'restart') restart();
   else if (act === 'continue') continueExploring();
   else if (act === 'log') openLog();
+  else if (act === 'exit') { try { if (document.fullscreenElement) document.exitFullscreen(); } catch (_) { /* niente */ } location.href = '/'; }
   else if (act === 'dial-up' || act === 'dial-dn') {
     const i = +b.dataset.i; dial[i] = (dial[i] + (act === 'dial-up' ? 1 : 9)) % 10; drawDials(); audio.click(); $('#ab-lockfb').textContent = '';
   } else if (act === 'confirm') confirmCode();
@@ -222,8 +228,16 @@ function ready() {
   ui.start.textContent = 'INIZIA L\'IMMERSIONE';
   root.classList.add('is-ready');
 }
+// iPhone: Safari non permette di nascondere la barra degli indirizzi; da icona sulla Home il gioco va a schermo intero
+if (/iPhone|iPod/.test(navigator.userAgent) && !navigator.standalone) { const t = $('.ab-ios'); if (t) t.hidden = false; }
+function goFullscreen() {
+  const el = document.documentElement, f = el.requestFullscreen || el.webkitRequestFullscreen;
+  if (!f || document.fullscreenElement) return;
+  try { const pr = f.call(el, { navigationUI: 'hide' }); if (pr && pr.then) pr.then(() => { try { screen.orientation.lock('landscape').catch(() => {}); } catch (_) { /* niente */ } }).catch(() => {}); } catch (_) { /* il browser può rifiutare */ }
+}
 ui.start.addEventListener('click', () => {
   if (S.state !== 'INTRO') return;
+  if (controls.touch) goFullscreen();
   audio.init();
   setState('DIVE');
   root.classList.add('is-diving');
@@ -407,6 +421,31 @@ function restart() {
   setTimeout(() => { ui.veil.classList.remove('on'); startDescent(); }, 700);
 }
 
+// ---------------- sondaggio di fine partita ----------------
+{
+  const poll = { altra: null, voto: 0 }, box = $('#ab-poll'), msg = box.querySelector('.ab-poll-msg'), send = box.querySelector('[data-poll="send"]');
+  box.addEventListener('click', async (e) => {
+    const st = e.target.closest('[data-star]');
+    if (st) { poll.voto = +st.dataset.star; box.querySelectorAll('[data-star]').forEach((b) => b.classList.toggle('on', +b.dataset.star <= poll.voto)); return; }
+    const b = e.target.closest('[data-poll]'); if (!b) return;
+    if (b.dataset.poll === 'si' || b.dataset.poll === 'no') {
+      poll.altra = b.dataset.poll === 'si';
+      box.querySelectorAll('.ab-poll-q button').forEach((x) => x.classList.toggle('picked', x === b));
+      send.disabled = false; send.classList.add('ab-btn-main');
+      return;
+    }
+    if (b.dataset.poll === 'send' && poll.altra !== null) {
+      send.disabled = true; msg.textContent = 'Invio in corso…';
+      try {
+        const r = await fetch(root.dataset.api, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...poll, commento: $('#ab-poll-txt').value }) });
+        if (!r.ok) throw new Error(r.status);
+        box.classList.add('sent');
+        msg.textContent = poll.altra ? 'Grazie! Lo diciamo subito al team: la prossima missione è in preparazione.' : 'Grazie per aver giocato!';
+      } catch (_) { send.disabled = false; msg.textContent = 'Invio non riuscito. Riprova tra poco.'; }
+    }
+  });
+}
+
 // ---------------- nube di sedimento all'apertura ----------------
 const sediment = (() => {
   const N = 260, pos = new Float32Array(N * 3), vel = [];
@@ -513,13 +552,14 @@ function tick() {
   tmpC.copy(fogShallow).lerp(fogDeep, Math.pow(dn, 0.65));
   scene.fog.color.copy(tmpC); scene.background.copy(tmpC);
   const lit = Math.pow(1 - dn, 1.6);
-  scene.fog.density = 0.042 + dn * 0.024;
+  scene.fog.density = 0.042 + dn * 0.024 + Math.max(0, depth - 30) * 0.0012;   // oltre i 30 m ancora più buio
   hemi.intensity = 1.1 * lit + 0.06;
   sun.intensity = 1.6 * lit * lit + 0.02;
   scene.environmentIntensity = 0.4 * lit + 0.05;
   world.surface.uniforms.uTime.value = t; world.surface.uniforms.uCam.value.copy(camera.position);
   world.surface.uniforms.uFog.value.copy(tmpC); world.surface.uniforms.uDensity.value = scene.fog.density * 0.9;
   ui.depth.textContent = depth.toFixed(1).replace('.', ',');
+  ui.gauge.style.setProperty('--d', Math.min(1, depth / 50).toFixed(4));
   { const hd = ((Math.atan2(fwd.x, -fwd.z) * 180 / Math.PI) + 360) % 360; ui.strip.style.transform = `translateX(${-hd * 2}px)`; ui.hdg.textContent = String(Math.round(hd) % 360).padStart(3, '0') + '°'; }
   audio.depth(depth);
 
@@ -607,7 +647,7 @@ renderer.render(scene, camera);
 torch.intensity = 0;
 document.addEventListener('visibilitychange', () => { if (document.hidden && canPause()) pause(); });
 requestAnimationFrame(tick);
-ready();
+adsReady.then(() => { renderer.compile(scene, camera); ready(); }, ready);
 
 // per i test automatici (nessun effetto sul gioco)
 window.__abyss = { fish, THREE, scene, S, P, CODE, LOG, wreck, arts, spots, camera, pickup, toast, openHatch, openLog, setPos: (x, y, z, yaw, pitch) => { P.pos.set(x, y, z); P.vel.set(0, 0, 0); if (yaw !== undefined) { P.yaw = P.tyaw = yaw; P.pitch = P.tpitch = pitch; } } };

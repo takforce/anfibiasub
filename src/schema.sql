@@ -132,3 +132,13 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS verify_expires TIMESTAMPTZ;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS terms_accepted_at TIMESTAMPTZ;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS self_registered BOOLEAN NOT NULL DEFAULT FALSE;
 CREATE INDEX IF NOT EXISTS users_verify_token ON users(verify_token);
+
+-- Sondaggio di fine partita del gioco ABYSS
+CREATE TABLE IF NOT EXISTS abyss_feedback (
+  id         SERIAL PRIMARY KEY,
+  altra      BOOLEAN NOT NULL,
+  voto       SMALLINT NOT NULL DEFAULT 0,
+  commento   TEXT NOT NULL DEFAULT '',
+  ua         TEXT NOT NULL DEFAULT '',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

@@ -159,3 +159,58 @@ button{font:inherit;color:inherit}
   .ab-logp{align-items:flex-start;overflow:auto}.ab-logbox{max-height:none}
   .ab-logbox img{max-height:none;width:100%}
 }
+
+/* ---------- profondimetro 0-50 m ---------- */
+.ab-gauge{--d:0;position:absolute;right:26px;top:50%;height:240px;margin-top:-120px;width:2px;background:rgba(220,239,245,.3)}
+.ab-gauge i{position:absolute;right:0;width:12px;margin-top:-1px;border-top:2px solid rgba(220,239,245,.45);font-style:normal;font-size:10px;color:var(--grey);text-align:right}
+.ab-gauge i{padding-right:16px;width:auto;white-space:nowrap;line-height:0;border:0}
+.ab-gauge i::after{content:"";position:absolute;right:-5px;top:0;width:10px;border-top:2px solid rgba(220,239,245,.45)}
+.ab-g-fill{position:absolute;left:0;top:0;width:2px;height:calc(var(--d) * 100%);background:var(--cyan)}
+.ab-g-mark{position:absolute;left:4px;top:calc(var(--d) * 100%);margin-top:-7px;border-top:7px solid transparent;border-bottom:7px solid transparent;border-right:12px solid var(--cyan)}
+/* ---------- Anfibiasub nella schermata finale ---------- */
+.ab-ad{margin:18px 0 6px;padding-top:16px;border-top:1px solid rgba(141,169,184,.25)}
+.ab-ad-lab{margin:0 0 10px;font-size:11px;letter-spacing:.28em;color:var(--cyan)}
+.ab-ad-logo{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 0 8px}
+.ab-ad-logo img{width:56px;height:56px;border-radius:50%;border:2px solid var(--cyan)}
+.ab-ad-logo b{font-weight:800;font-size:26px}.ab-ad-logo b span{color:var(--cyan)}
+.ab-svc{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;margin:0 0 12px;padding:0;list-style:none;text-align:left;font-size:13px;color:var(--ice)}
+.ab-svc li::before{content:"— ";color:var(--cyan)}
+.ab-end .ab-box{width:min(600px,100%)}
+@media (pointer:coarse){.ab-gauge{top:236px;margin-top:0;height:150px;right:22px}.ab-svc{grid-template-columns:1fr}}
+
+/* ---------- tasto Termina ---------- */
+.ab-exit span{font-size:12px}
+/* ---------- sondaggio ---------- */
+.ab-poll{margin:16px 0 0;padding-top:14px;border-top:1px solid rgba(141,169,184,.25)}
+.ab-poll .picked{border-color:var(--cyan);background:rgba(60,198,245,.18)}
+.ab-stars{display:flex;justify-content:center;gap:4px;margin:12px 0 8px}
+.ab-stars button{width:40px;height:40px;border:0;background:none;font-size:26px;color:rgba(141,169,184,.45);cursor:pointer}
+.ab-stars button.on{color:var(--brass2)}
+#ab-poll-txt{display:block;width:100%;margin:0 0 10px;padding:10px 12px;border-radius:8px;border:1px solid rgba(141,169,184,.35);background:rgba(5,14,26,.6);color:var(--ice);font:inherit;font-size:14px;resize:vertical}
+.ab-poll-msg{margin:10px 0 0;min-height:1.2em;color:var(--cyan)}
+.ab-poll.sent .ab-poll-q,.ab-poll.sent .ab-stars,.ab-poll.sent textarea,.ab-poll.sent [data-poll="send"]{display:none}
+/* ---------- telefono in orizzontale: niente sovrapposizioni ---------- */
+.ab-hud{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+.ab-tl{left:calc(20px + env(safe-area-inset-left))}
+.ab-tr{right:calc(14px + env(safe-area-inset-right))}
+@media (pointer:coarse) and (orientation:landscape){
+  .ab-tl{top:10px}.ab-depth b{font-size:18px}.ab-mark{font-size:12px}.ab-obj{max-width:34vw;font-size:11px}
+  .ab-tr{top:8px;gap:6px}.ab-ico{height:38px;min-width:38px;padding:0 8px}
+  .ab-comp{top:8px;left:50%;right:auto;transform:translateX(-50%)}.ab-comp-win{width:170px}.ab-comp-strip{left:85px}
+  .ab-gauge{display:none}
+  .ab-tbtns button{width:52px;height:52px}
+  .ab-tbtns{right:calc(16px + env(safe-area-inset-right));bottom:calc(78px + env(safe-area-inset-bottom));gap:8px}
+  .ab-tbtns-r{bottom:calc(14px + env(safe-area-inset-bottom));gap:10px}
+  .ab-joy{left:calc(100px + env(safe-area-inset-left));bottom:110px}
+  .ab-hint{top:60px;width:min(70vw,520px)}
+  .ab-msg{bottom:90px}.ab-msg.big{top:36%}
+  .ab-exit span{display:none}
+}
+@media (pointer:coarse) and (orientation:portrait){.ab-exit span{display:none}}
+@media (max-height:520px){
+  .ab-intro{align-items:flex-start}
+  .ab-intro-txt{padding-top:52px}
+  .ab-logo{font-size:52px}.ab-lead{margin:1em 0 1.1em;font-size:14px}.ab-sec{margin-top:.8em;font-size:12px}.ab-how{font-size:12px}
+  .ab-end .ab-small,.ab-end .ab-sum{display:none}
+  .ab-end .ab-box{padding:18px 18px}
+}

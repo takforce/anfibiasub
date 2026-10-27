@@ -1,8 +1,8 @@
 // Ambiente: fondale, rocce, gorgonie, cima d'ormeggio, superficie, raggi, particelle, bolle, pesci
 import * as THREE from '../vendor/three/three.module.min.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
-import { fbm2, fbm3, noise2, rng } from './noise.js?v=d85506d6';
-import { CFG } from './config.js?v=d85506d6';
+import { fbm2, fbm3, noise2, rng } from './noise.js?v=67d9ee12';
+import { CFG } from './config.js?v=67d9ee12';
 
 export function heightAt(x, z) {
   let h = CFG.seabed + (fbm2(x * 0.022 + 10, z * 0.022 + 4) - 0.5) * 5 + (fbm2(x * 0.11, z * 0.11) - 0.5) * 1.1;
@@ -16,7 +16,7 @@ export function heightAt(x, z) {
     h = h * (1 - f * 0.7) + (CFG.seabed - 0.6) * f * 0.7;
   }
   const r = Math.hypot(x, z);
-  if (r > CFG.cliff) h -= (r - CFG.cliff) * 0.6 + Math.pow(Math.max(0, r - CFG.cliff), 2) * 0.02;   // la scarpata verso il blu
+  if (r > CFG.cliff) h -= (r - CFG.cliff) * 1.2 + Math.pow(r - CFG.cliff, 2) * 0.03;   // fino a circa 50 m sul bordo dell'area   // la scarpata verso il blu
   return h;
 }
 

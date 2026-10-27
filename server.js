@@ -61,6 +61,8 @@ app.use(express.static(path.join(__dirname, 'public'), {
 }));
 
 app.get('/health', (req, res) => res.send('ok'));
+// sondaggio del gioco ABYSS: prima del controllo di origine, perché può arrivare da www.anfibiasub.it
+app.use('/api/abyss', require('./src/abyss'));
 
 app.use(sessionMiddleware());
 app.use(sameOrigin);

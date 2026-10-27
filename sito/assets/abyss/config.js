@@ -22,6 +22,16 @@ export const CFG = {
     arco: { x: -50, z: 57, name: 'l\'arco di roccia' },
   },
 
+  // presenza di Anfibiasub nel gioco (cantiere, pallone di sollevamento, targa sul relitto)
+  ads: { x: 11.5, z: 9.5, rot: 0.35, bx: -3, bz: -12, plaque: [-7.6, 5.6, 0] },
+
+  // statue del palombaro con l'ancora ANFIBIASUB: lungo le rotte verso i luoghi dei reperti, rivolte verso il relitto
+  statues: [
+    { x: -23.0, z: 4.3, rot: 1.75 }, { x: -36.5, z: 15.8, rot: 1.98 }, { x: 11.6, z: 19.1, rot: -2.59 }, { x: 26.8, z: 26.9, rot: -2.36 },
+    { x: 6.0, z: -21.4, rot: -0.27 }, { x: 1.3, z: -37.8, rot: -0.04 }, { x: -23.6, z: 21.6, rot: 2.31 }, { x: -33.7, z: 43.0, rot: 2.48 },
+    { x: -24.0, z: -4.0, rot: 1.41 }, { x: 27.0, z: 10.0, rot: -1.93 },
+  ],
+
   // ordine delle ghiere sulla botola = ordine delle cifre del codice
   dials: ['rosa', 'ancora', 'chiave'],
 

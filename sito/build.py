@@ -653,6 +653,11 @@ def build_abyss():
             t = _re.sub(r"from '\./([\w-]+\.js)'", lambda m: f"from './{m.group(1)}?v={h}'", t)
             open(d, 'w', encoding='utf-8').write(bust(t))
     body = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'abyss_pagina.html'), encoding='utf-8').read()
+    # sondaggio di fine partita: online il sito sta su HostGator e l'API sull'area clienti
+    body = body.replace('{{API}}', 'https://clienti.anfibiasub.it/api/abyss/voto' if PROD else '/api/abyss/voto')
+    with open(os.path.join(OUT, 'abyss.webmanifest'), 'w', encoding='utf-8') as f:
+        _json.dump({'name': 'ABYSS · Anfibiasub', 'short_name': 'ABYSS', 'start_url': '/abyss.html', 'display': 'fullscreen', 'orientation': 'landscape',
+                    'background_color': '#050E1A', 'theme_color': '#050E1A', 'icons': [{'src': '/apple-touch-icon.png', 'sizes': '180x180', 'type': 'image/png'}]}, f, ensure_ascii=False)
     robots = '' if PROD else '<meta name="robots" content="noindex, nofollow">\n'
     doc = f'''<!doctype html>
 <html lang="it">
@@ -662,6 +667,12 @@ def build_abyss():
 <title>ABYSS · Il relitto dimenticato · Anfibiasub</title>
 <meta name="description" content="ABYSS: esplorazione subacquea in 3D di un relitto sul fondale del Mediterraneo. Un minigioco di Anfibiasub.">
 {robots}<meta name="theme-color" content="#050E1A">
+<link rel="manifest" href="/abyss.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ABYSS">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
 <meta property="og:title" content="ABYSS · Il relitto dimenticato">
 <meta property="og:image" content="{SITE_URL}/img/abyss/intro.webp">
 <link rel="icon" href="/favicon.png?v=3" type="image/png">

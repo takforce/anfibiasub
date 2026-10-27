@@ -70,9 +70,8 @@
   function setMsg(lat, lon, acc) {
     // niente emoji: su alcuni telefoni arrivano come simbolo rotto
     var t = lat != null
-      ? 'Ciao, ecco il punto di intervento:\nhttps://maps.google.com/?q=' + lat.toFixed(5) + ',' + lon.toFixed(5) + (acc ? '\n(precisione ' + Math.round(acc) + ' m)' : '') + '\n\n'
-      : 'Ciao, ti scrivo per un intervento. La posizione GPS non è disponibile, ti scrivo qui dove mi trovo:\n\n';
-    t += 'Inviato dal sito Anfibiasub';
+      ? 'Ciao, richiedo intervento in questa posizione:\nhttps://maps.google.com/?q=' + lat.toFixed(5) + ',' + lon.toFixed(5) + (acc ? '\n(precisione ' + Math.round(acc) + ' m)' : '')
+      : 'Ciao, richiedo intervento. La posizione GPS non è disponibile, ti scrivo qui dove mi trovo:\n';
     Array.prototype.forEach.call(links, function (a) { a.href = 'https://wa.me/' + a.getAttribute('data-sos-to') + '?text=' + encodeURIComponent(t); });
   }
   function open() {

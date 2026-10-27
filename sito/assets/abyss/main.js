@@ -1,10 +1,12 @@
 // ABYSS — Il relitto dimenticato. Motore principale e macchina a stati.
 import * as THREE from '../vendor/three/three.module.min.js';
-import { CFG, CODE } from './config.js';
-import { makeTextures } from './textures.js';
-import { buildWorld, collideWorld, heightAt } from './world.js';
+import { CFG, CODE, bearing } from './config.js';
+import { makeTextures, logbookPage } from './textures.js';
+import { buildWorld, collideWorld } from './world.js';
 import { buildWreck } from './wreck.js';
 import { buildArtifacts } from './artifacts.js';
+import { buildLandmarks } from './landmarks.js';
+import { buildFish } from './fish.js';
 import { createControls } from './controls.js';
 import { createAudio } from './audio.js';
 
@@ -16,7 +18,8 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const Q = { mobile, particles: mobile ? 1600 : 4200, tex: mobile ? 256 : 512, shadows: !mobile };
 
 // ---------------- stato ----------------
-const S = { state: 'INTRO', prev: null, t: 0, found: [], hatchSeen: false, reached: false, torch: false, torchTouched: false, panel: null, inspect: null, seq: null, fpsN: 0, fpsT: 0, hintT: 0 };
+// phase: 1 = tre reperti e botola, 2 = botola aperta (entrare nella camera), 3 = giornale letto (cercare il cofanetto)
+const S = { state: 'INTRO', prev: null, t: 0, phase: 1, found: [], hatchSeen: false, reached: false, torch: false, torchTouched: false, panel: null, inspect: null, seq: null, fpsN: 0, fpsT: 0, hintT: 0 };
 const setState = (s) => { S.prev = S.state; S.state = s; root.dataset.state = s; };
 
 // ---------------- renderer ----------------
@@ -38,7 +41,7 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0x1f6f8c, 0.03);
 scene.background = new THREE.Color(0x1f6f8c);
-const camera = new THREE.PerspectiveCamera(72, innerWidth / innerHeight, 0.05, 240);
+const camera = new THREE.PerspectiveCamera(72, innerWidth / innerHeight, 0.05, 260);
 scene.add(camera);
 
 // riflessi ambientali per i metalli (gradiente acqua, niente immagini esterne)
@@ -61,21 +64,30 @@ const sun = new THREE.DirectionalLight(0xbfefff, 1.5);
 sun.position.set(10, 40, 6); scene.add(sun);
 
 // torcia: vera luce che illumina le geometrie
-const torch = new THREE.SpotLight(0xeaf4ff, 0, CFG.torch.range, CFG.torch.angle, 0.6, 1.8);
+const torch = new THREE.SpotLight(0xeaf4ff, 0, CFG.torch.range, CFG.torch.angle, 0.6, 1.4);
 torch.castShadow = Q.shadows;
 torch.shadow.mapSize.set(1024, 1024);
 torch.shadow.camera.near = 0.3; torch.shadow.camera.far = CFG.torch.range;
 torch.shadow.bias = -0.0008; torch.shadow.normalBias = 0.03;
 scene.add(torch, torch.target);
-const TORCH_I = 22;
+const TORCH_I = 10;
 
 // ---------------- costruzione del mondo ----------------
 const tex = makeTextures(Q.tex, renderer.capabilities.getMaxAnisotropy());
+// texture fotografiche/IA opzionali: sostituiscono l'immagine di quelle generate, i materiali restano gli stessi
+{
+  const map = { sabbia: tex.sand, roccia: tex.rock, ruggine: tex.rust, legno: tex.wood, terracotta: tex.clay };
+  for (const k in CFG.textures) {
+    if (!CFG.textures[k] || !map[k]) continue;
+    const im = new Image();
+    im.onload = () => { map[k].map.image = im; map[k].map.needsUpdate = true; };
+    im.src = CFG.textures[k];
+  }
+}
 const wreck = buildWreck(scene, tex);
 const shipInv = new THREE.Matrix4().copy(wreck.ship.matrixWorld).invert();
-const arts = buildArtifacts(scene, wreck, tex);
 const avoid = (x, z, r) => {
-  for (const a of arts.list) if (Math.hypot(x - a.home.pos.x, z - a.home.pos.z) < 1.4 + r) return true;   // reperti liberi dalle rocce
+  for (const k in CFG.places) { const p = CFG.places[k]; if (Math.hypot(x - p.x, z - p.z) < 13 + r) return true; }   // i luoghi hanno rocce proprie
   const l = new THREE.Vector3(x, CFG.seabed, z).applyMatrix4(shipInv);
   if (l.x > -14 - r && l.x < 16 + r && Math.abs(l.z) < 5.5 + r) return true;            // impronta del relitto
   if (Math.hypot(x - CFG.line.bx, z - CFG.line.bz) < 2 + r) return true;                 // corpo morto
@@ -83,6 +95,11 @@ const avoid = (x, z, r) => {
   return false;
 };
 const world = buildWorld(scene, tex, Q, avoid);
+const spots = buildLandmarks(scene, world, tex);
+const arts = buildArtifacts(scene, wreck, tex, spots);
+const fish = buildFish(scene, Q); world.updaters.push(fish);
+// rotta e distanza scritte nel giornale di bordo: calcolate dalla posizione vera di poppa e arco
+const LOG = (() => { const a = wreck.sternWorld(), b = arts.casket.home.pos; return { deg: bearing(a, b), m: Math.hypot(b.x - a.x, b.z - a.z) }; })();
 
 // ---------------- giocatore ----------------
 const P = { pos: new THREE.Vector3(), vel: new THREE.Vector3(), yaw: 0, pitch: 0, tyaw: 0, tpitch: 0 };
@@ -109,8 +126,21 @@ const canPause = () => ['DESCENT', 'EXPLORATION'].includes(S.state);
 // ---------------- interfaccia ----------------
 const ui = {
   depth: $('#ab-depth b'), count: $('#ab-count'), prompt: $('#ab-prompt'), msg: $('#ab-msg'), hint: $('#ab-hint'),
-  veil: $('#ab-veil'), start: $('#ab-start'),
+  veil: $('#ab-veil'), start: $('#ab-start'), obj: $('#ab-obj'), strip: $('.ab-comp-strip'), hdg: $('#ab-hdg'),
 };
+// bussola da polso: striscia con i punti cardinali (2 px per grado, ripetuta)
+{
+  const lab = { 0: 'N', 45: 'NE', 90: 'E', 135: 'SE', 180: 'S', 225: 'SO', 270: 'O', 315: 'NO' };
+  let h = '';
+  for (let k = -1; k <= 1; k++) for (let d = 0; d < 360; d += 15) h += `<i style="left:${(d + k * 360) * 2}px"${lab[d] ? ' class="c"' : ''}>${lab[d] || ''}</i>`;
+  ui.strip.innerHTML = h;
+}
+function objective() {
+  const txt = S.phase === 1 ? (S.found.length < 3 ? `Trova i 3 reperti nascosti intorno al relitto (${S.found.length}/3)` : 'Apri la botola sul ponte del relitto')
+    : S.phase === 2 ? 'Scendi nella camera nascosta sotto la botola'
+      : S.phase === 3 ? 'Segui la rotta del giornale di bordo' : 'Missione completata';
+  ui.obj.textContent = txt;
+}
 let msgTimer = 0;
 function toast(text, ms = 3600, cls = '') {
   ui.msg.textContent = text; ui.msg.className = 'ab-msg on ' + cls;
@@ -124,6 +154,8 @@ function updCount() {
     el.classList.toggle('full', f);
     el.innerHTML = f ? `<img src="${a.img}" alt=""><b>${a.name}</b><span>${a.clue}</span>` : `<i></i><b>Reperto ${i + 1}</b><span>Non ancora trovato</span>`;
   });
+  root.querySelectorAll('[data-logbtn]').forEach((el) => { el.hidden = S.phase < 3; });
+  objective();
   root.querySelectorAll('[data-clues]').forEach((el) => {
     el.innerHTML = S.found.length ? CFG.artifacts.filter((a) => S.found.includes(a.id)).map((a) => `<li>${a.clue}</li>`).join('') : '<li>Nessun indizio raccolto</li>';
   });
@@ -133,13 +165,17 @@ function openPanel(name) {
   S.panel = name; controls.reset(); controls.release();
   root.querySelectorAll('.ab-panel').forEach((p) => { p.hidden = p.dataset.panel !== name; });
   const p = root.querySelector(`[data-panel="${name}"]`);
-  const f = p && p.querySelector('button, [tabindex]'); if (f) setTimeout(() => f.focus(), 30);
+  const f = p && p.querySelector('button, [tabindex]'); if (f) setTimeout(() => { f.focus({ preventScroll: true }); p.scrollTop = 0; const bx = p.querySelector('.ab-box'); if (bx) bx.scrollTop = 0; }, 30);
 }
 function closePanel() {
   root.querySelectorAll('.ab-panel').forEach((p) => { p.hidden = true; });
   const was = S.panel; S.panel = null;
   if (was === 'pause') resume();
-  else if (was === 'inv') { controls.enabled = true; relock(); }
+  else if (was === 'inv' || was === 'log') {
+    if (was === 'log' && S.phase === 2) { S.phase = 3; updCount(); toast(`Rotta ${Math.round(LOG.deg)}° dalla poppa del cargo. Usa la bussola in alto.`, 6000); }
+    if (S.state === 'READING') setState('EXPLORATION');
+    controls.enabled = true; relock();
+  }
 }
 function relock() {
   if (controls.touch || !canvas.requestPointerLock) return;
@@ -165,6 +201,7 @@ root.addEventListener('click', (e) => {
   else if (act === 'interact') interact();
   else if (act === 'restart') restart();
   else if (act === 'continue') continueExploring();
+  else if (act === 'log') openLog();
   else if (act === 'dial-up' || act === 'dial-dn') {
     const i = +b.dataset.i; dial[i] = (dial[i] + (act === 'dial-up' ? 1 : 9)) % 10; drawDials(); audio.click(); $('#ab-lockfb').textContent = '';
   } else if (act === 'confirm') confirmCode();
@@ -215,7 +252,8 @@ function target() {
   camera.getWorldDirection(_d);
   let best = null, bd = 1e9;
   const cands = arts.list.filter((a) => !a.taken).map((a) => ({ kind: 'art', a, c: a.center, r: a.hitR }));
-  if (S.state === 'EXPLORATION' || S.state === 'DESCENT') cands.push({ kind: 'hatch', c: wreck.hatchWorld(), r: 1.1 });
+  if (S.phase === 1) cands.push({ kind: 'hatch', c: wreck.hatchWorld(), r: 1.1 * wreck.S });
+  if (S.phase >= 2) { cands.push({ kind: 'book', c: wreck.bookWorld(), r: 0.45 }); cands.push({ kind: 'helmet', c: wreck.helmetWorld().add(new THREE.Vector3(0, 0.35, 0)), r: 0.45 }); }
   for (const k of cands) {
     _v.subVectors(k.c, camera.position); const dist = _v.length();
     if (dist > CFG.interactDist + k.r) continue;
@@ -226,7 +264,11 @@ function target() {
 }
 function interact() {
   const k = target(); if (!k) return;
-  if (k.kind === 'art') pickup(k.a);
+  if (k.kind === 'art') {
+    if (k.a.final && S.phase < 3) { toast('Un cofanetto incastrato tra le rocce. Non sai ancora cosa sia: forse qualcuno ha lasciato scritto qualcosa.', 5000); audio.clunk(); return; }
+    pickup(k.a);
+  } else if (k.kind === 'book') openLog();
+  else if (k.kind === 'helmet') toast('Un antico scafandro da palombaro in ottone, con tre oblò. Il capitano lo custodiva qui sotto chiave.', 4500);
   else if (k.kind === 'hatch') {
     if (wreck.hatch.userData.open) return;
     if (S.found.length < 3) { toast('Non hai ancora raccolto tutti gli indizi.'); audio.clunk(); return; }
@@ -234,9 +276,16 @@ function interact() {
   }
 }
 
+function openLog() {
+  const img = $('#ab-logimg');
+  const portrait = innerHeight > innerWidth;
+  if (img.dataset.mode !== String(portrait)) { img.src = logbookPage(LOG.deg, LOG.m, portrait); img.dataset.mode = String(portrait); }
+  setState('READING'); controls.enabled = false; openPanel('log');
+}
+
 function pickup(a) {
   if (a.taken) return;
-  a.taken = true; S.found.push(a.id);
+  a.taken = true; if (!a.final) S.found.push(a.id);
   a.glint.material.opacity = 0;
   (a.extra || []).forEach((m) => { m.visible = false; });
   audio.pickup();
@@ -245,7 +294,7 @@ function pickup(a) {
   S.inspect = { a, t: 0, lp: a.obj.position.clone() };
   setState('INSPECT'); controls.enabled = false; controls.reset();
   setTimeout(() => {
-    toast(a.found, 6500, 'card');
+    toast(a.found, a.final ? 9000 : 6500, 'card');
   }, 400);
   updCount();
 }
@@ -276,9 +325,9 @@ function openHatch() {
   setState('OPENING');
   controls.enabled = false; controls.reset(); controls.release();
   wreck.hatch.userData.open = true;
-  const hw = wreck.hatchWorld();
-  const view = hw.clone().addScaledVector(wreck.side, 2.2).addScaledVector(wreck.fwd, 1.8); view.y += 1.6;
-  const top = hw.clone().addScaledVector(wreck.fwd, 0.45).addScaledVector(wreck.side, 0.25); top.y += 1.3;
+  const hw = wreck.hatchWorld(), K = wreck.S;
+  const view = hw.clone().addScaledVector(wreck.side, 2.2 * K).addScaledVector(wreck.fwd, 1.8 * K); view.y += 1.6 * K;
+  const top = hw.clone().addScaledVector(wreck.fwd, 0.45 * K).addScaledVector(wreck.side, 0.25 * K); top.y += 1.3 * K;
   const helm = wreck.helmetWorld();
   const camFrom = camera.position.clone();
   const lookFrom = camera.position.clone().add(camera.getWorldDirection(new THREE.Vector3()).multiplyScalar(3));
@@ -303,7 +352,7 @@ function openHatch() {
       wreck.hatch.position.y = wreck.HY + 0.46 + Math.sin(Math.min(1, d * 3) * Math.PI) * 0.04;
       if (t > 3.0 && !S.seq.k2) {
         S.seq.k2 = 1; audio.creak(); wreck.chamber.visible = true;
-        world.bubbles.burst(hw, 70, 0.6); sediment.start(hw);
+        world.bubbles.burst(hw, 90, 0.9); sediment.start(hw);
       }
       // la camera nascosta si illumina
       wreck.chamber.userData.light.intensity = Math.min(1, Math.max(0, (t - 3.6) / 3)) * 10;
@@ -313,8 +362,12 @@ function openHatch() {
         camera.position.lerpVectors(view, top, e2);
         camera.lookAt(new THREE.Vector3().lerpVectors(hw, helm, e2));
       }
-      if (t > 6.2 && !S.seq.k3) { S.seq.k3 = 1; audio.finale(); toast('Il segreto del relitto…', 3500, 'big'); }
-      if (t > 11) { S.seq = null; finish(); }
+      if (t > 6.2 && !S.seq.k3) { S.seq.k3 = 1; audio.ping(); }
+      if (t > 9.2) {
+        S.seq = null; S.phase = 2; wreck.setOpen(true); updCount();
+        continueExploring();
+        toast('La botola è aperta. Scendi nella camera nascosta.', 5000);
+      }
     },
   };
 }
@@ -327,7 +380,7 @@ function finish() {
 }
 
 function continueExploring() {
-  closePanelSilently();
+  closePanelSilently(); controls.reset();
   root.classList.remove('is-done');
   // il sub riparte da sopra la botola, guardando dentro
   P.pos.copy(camera.position); P.vel.set(0, 0, 0);
@@ -339,8 +392,8 @@ function continueExploring() {
 function restart() {
   closePanelSilently();
   root.classList.remove('is-done');
-  S.found = []; S.hatchSeen = false; S.reached = false; S.seq = null; S.inspect = null;
-  arts.reset();
+  S.found = []; S.phase = 1; S.hatchSeen = false; S.reached = false; S.seq = null; S.inspect = null;
+  arts.reset(); wreck.setOpen(false);
   const { dials, latches } = wreck.hatch.userData;
   wreck.hatch.userData.open = false; wreck.hatch.rotation.z = 0; wreck.hatch.position.y = wreck.HY + 0.46;
   dials.forEach((d) => { d.rotation.x = 0; });
@@ -430,17 +483,24 @@ function tick() {
   if (S.inspect) {
     const it = S.inspect; it.t += dt;
     const o = it.a.obj;
-    const target = new THREE.Vector3(0, -0.06, -0.55);
+    const target = it.a.final ? new THREE.Vector3(0, -0.2, -0.9) : new THREE.Vector3(0, -0.06, -0.55);
     const k = ease(Math.min(1, it.t / 0.9));
     o.position.lerpVectors(it.lp, target, k);
-    o.rotation.y += dt * 1.6; o.rotation.x = 0.6 * k;
-    if (it.t > 2.6) {
-      const s = Math.max(0, 1 - (it.t - 2.6) / 0.4); o.scale.setScalar(s * (it.a.id === 'chiave' ? 1.25 : 1));
+    if (it.a.final) {
+      o.rotation.y = 0.4 + Math.sin(it.t * 0.5) * 0.25; o.rotation.x = 0.35 * k; o.rotation.z = 0;
+      const lid = o.userData.lid; if (lid) lid.rotation.x = -Math.min(1, Math.max(0, (it.t - 1.2) / 1.5)) * 1.9;
+      if (it.t > 1.6 && !it.sfx) { it.sfx = 1; audio.finale(); }
+      if (it.t > 7.5) { S.inspect = null; o.visible = false; scene.attach(o); S.phase = 4; updCount(); finish(); }
+    } else {
+      o.rotation.y += dt * 1.6; o.rotation.x = 0.6 * k;
     }
-    if (it.t > 3.0) {
+    if (!it.a.final && it.t > 2.6) {
+      const s = Math.max(0, 1 - (it.t - 2.6) / 0.4); o.scale.setScalar(s * it.a.home.scale);
+    }
+    if (!it.a.final && it.t > 3.0) {
       o.visible = false; scene.attach(o); S.inspect = null;
       setState(S.reached ? 'EXPLORATION' : 'DESCENT'); controls.enabled = true;
-      if (S.found.length === 3) setTimeout(() => toast('Hai recuperato tutti i reperti. Cerca la botola sul ponte del relitto.', 5200), 6800);
+      if (S.found.length === 3) setTimeout(() => toast('Hai recuperato tutti i reperti. Torna al relitto: c\'è una botola sul ponte.', 5200), 6800);
       else setTimeout(() => toast(`REPERTI RECUPERATI: ${S.found.length}/3`, 2600), 6800);
     }
   }
@@ -460,6 +520,7 @@ function tick() {
   world.surface.uniforms.uTime.value = t; world.surface.uniforms.uCam.value.copy(camera.position);
   world.surface.uniforms.uFog.value.copy(tmpC); world.surface.uniforms.uDensity.value = scene.fog.density * 0.9;
   ui.depth.textContent = depth.toFixed(1).replace('.', ',');
+  { const hd = ((Math.atan2(fwd.x, -fwd.z) * 180 / Math.PI) + 360) % 360; ui.strip.style.transform = `translateX(${-hd * 2}px)`; ui.hdg.textContent = String(Math.round(hd) % 360).padStart(3, '0') + '°'; }
   audio.depth(depth);
 
   if (playing && !S.reached && depth > 23) {
@@ -490,21 +551,22 @@ function tick() {
     if (a.taken) continue;
     _v.subVectors(a.center, camera.position); const dist = _v.length();
     const cone = _v.normalize().dot(fwd);
-    const lit = S.torch && dist < 11 && cone > Math.cos(CFG.torch.angle * 0.9) ? 1 : 0;
-    const tw = 0.5 + 0.5 * Math.sin(t * 3 + a.digit);
-    const want = lit * (0.35 + 0.65 * tw) * Math.min(1, (11 - dist) / 4);
+    if (a.final && S.phase < 3) { a.glint.material.opacity = 0; continue; }
+    const lit = S.torch && dist < 6.5 && cone > Math.cos(CFG.torch.angle * 0.55) ? 1 : 0;
+    const tw = Math.pow(0.5 + 0.5 * Math.sin(t * 2.3 + (a.digit || 7)), 6);   // brevi bagliori, non un faro
+    const want = lit * tw * 0.55 * Math.min(1, (6.5 - dist) / 3);
     a.glint.material.opacity += (want - a.glint.material.opacity) * Math.min(1, dt * 6);
   }
   if (playing && !S.hatchSeen) {
     const hw = wreck.hatchWorld(); _v.subVectors(hw, camera.position); const dist = _v.length();
-    if (S.torch && dist < 8 && _v.normalize().dot(fwd) > 0.9) { S.hatchSeen = true; toast('Un antico meccanismo blocca l\'accesso. Gli indizi raccolti potrebbero rivelare la combinazione.', 6000); }
+    if (S.torch && dist < 9 && _v.normalize().dot(fwd) > 0.9) { S.hatchSeen = true; toast('Un antico meccanismo blocca l\'accesso. Gli indizi raccolti potrebbero rivelare la combinazione.', 6000); }
   }
 
   // --- suggerimento di interazione ---
   if (playing) {
     const k = target();
     if (k) {
-      const what = k.kind === 'art' ? `Raccogli: ${k.a.name}` : (wreck.hatch.userData.open ? '' : 'Esamina la botola');
+      const what = k.kind === 'art' ? (k.a.final && S.phase < 3 ? 'Esamina' : `Raccogli: ${k.a.name}`) : k.kind === 'book' ? 'Leggi il giornale di bordo' : k.kind === 'helmet' ? 'Osserva lo scafandro' : (wreck.hatch.userData.open ? '' : 'Esamina la botola');
       ui.prompt.innerHTML = what ? `<kbd>${controls.touch ? '✋' : 'E'}</kbd> ${what}` : '';
       root.classList.toggle('can-act', !!what);
     } else { ui.prompt.innerHTML = ''; root.classList.remove('can-act'); }
@@ -548,4 +610,4 @@ requestAnimationFrame(tick);
 ready();
 
 // per i test automatici (nessun effetto sul gioco)
-window.__abyss = { THREE, scene, S, P, CODE, wreck, arts, camera, pickup, toast, openHatch, setPos: (x, y, z, yaw, pitch) => { P.pos.set(x, y, z); P.vel.set(0, 0, 0); if (yaw !== undefined) { P.yaw = P.tyaw = yaw; P.pitch = P.tpitch = pitch; } } };
+window.__abyss = { fish, THREE, scene, S, P, CODE, LOG, wreck, arts, spots, camera, pickup, toast, openHatch, openLog, setPos: (x, y, z, yaw, pitch) => { P.pos.set(x, y, z); P.vel.set(0, 0, 0); if (yaw !== undefined) { P.yaw = P.tyaw = yaw; P.pitch = P.tpitch = pitch; } } };

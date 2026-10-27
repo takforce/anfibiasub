@@ -4,7 +4,7 @@ import * as THREE from '../vendor/three/three.module.min.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
 import { noise2, rng } from './noise.js';
 import { heightAt } from './world.js';
-import { dialTex, symbolPlate } from './textures.js';
+import { dialTex, symbolPlate, logbookTex } from './textures.js';
 import { CFG } from './config.js';
 
 const rand = rng(31);
@@ -41,8 +41,10 @@ function boxBetween(a, b, w, t, up, extra) {
 export function buildWreck(scene, tex) {
   const ship = new THREE.Group();
   ship.rotation.order = 'YXZ';
+  const S = CFG.shipScale;          // il cargo è costruito in unità "locali" e poi ingrandito
   ship.rotation.set(0.19, 0.42, -0.035);
-  ship.position.set(0, heightAt(0, 0) - 1.25, 0);
+  ship.scale.setScalar(S);
+  ship.position.set(0, heightAt(0, 0) - 1.25 * S, 0);
   scene.add(ship);
   ship.updateMatrixWorld(true);
 
@@ -196,14 +198,23 @@ export function buildWreck(scene, tex) {
       const m = new THREE.Mesh(p(w, h), wallM); m.position.set(HATCH.x + dx, y0 + h / 2, dz); m.rotation.y = ry; chamber.add(m);
     });
     // supporto e scafandro
-    const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.36, 0.7, 16), rust); stand.position.set(HATCH.x + 0.15, y0 + 0.35, 0.1); chamber.add(stand);
-    const helmet = makeHelmet(brass);
-    helmet.position.set(HATCH.x + 0.15, y0 + 0.7, 0.1); helmet.rotation.y = -0.6;
+    const k = 1 / S;   // scafandro, supporto e giornale a grandezza reale
+    const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.28 * k, 0.36 * k, 0.75 * k, 16), rust); stand.position.set(HATCH.x + 0.3, y0 + 0.375 * k, -0.25); chamber.add(stand);
+    const helmet = makeHelmet(brass); helmet.scale.setScalar(k);
+    helmet.position.set(HATCH.x + 0.3, y0 + 0.75 * k, -0.25); helmet.rotation.y = -0.9;
     chamber.add(helmet);
+    // giornale di bordo aperto su una cassa, nell'angolo opposto
+    const crateB = new THREE.Mesh(new THREE.BoxGeometry(0.7 * k, 0.55 * k, 0.55 * k), wallM); crateB.position.set(HATCH.x - 0.55, y0 + 0.275 * k, 0.55); crateB.rotation.y = 0.3; chamber.add(crateB);
+    const book = new THREE.Group(); book.scale.setScalar(k); book.position.set(HATCH.x - 0.55, y0 + 0.555 * k, 0.55); book.rotation.y = 0.3 + Math.PI / 2;
+    const cover = new THREE.MeshStandardMaterial({ color: 0x3a2618, roughness: 0.9 });
+    const pageM = new THREE.MeshStandardMaterial({ map: logbookTex(), roughness: 1 });
+    const base = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.02, 0.32), cover); base.position.y = 0.01; book.add(base);
+    for (const sx of [-1, 1]) { const pg = new THREE.Mesh(new THREE.BoxGeometry(0.21, 0.025, 0.3), [cover, cover, pageM, cover, cover, cover]); pg.position.set(sx * 0.113, 0.03, 0); pg.rotation.z = sx * -0.06; book.add(pg); }
+    chamber.add(book);
     // casse e detriti
     for (let i = 0; i < 3; i++) { const c = new THREE.Mesh(new THREE.BoxGeometry(R(0.4, 0.6), R(0.3, 0.5), R(0.4, 0.6)), wallM); c.position.set(HATCH.x + R(-0.8, -0.4), y0 + 0.2, R(-0.7, 0.7)); c.rotation.y = R(0, 2); chamber.add(c); }
-    const light = new THREE.PointLight(0xffd59a, 0, 6, 1.6); light.position.set(HATCH.x, y0 + 1.6, 0.4); chamber.add(light);
-    chamber.userData = { light, helmet, floorY: y0 };
+    const light = new THREE.PointLight(0xffd59a, 0, 7, 1.6); light.position.set(HATCH.x, y0 + 1.6, 0.2); chamber.add(light);
+    chamber.userData = { light, helmet, book, floorY: y0 };
     chamber.visible = false;      // si rende visibile solo all'apertura (prima è chiusa e invisibile)
     ship.add(chamber);
   }
@@ -244,19 +255,19 @@ export function buildWreck(scene, tex) {
   const hawse = toW(12.2, deckY(12.2) - 0.5, -0.9);
   const fwd = toW(1, 0, 0).sub(toW(0, 0, 0)).normalize();
   const side = toW(0, 0, -1).sub(toW(0, 0, 0)).normalize();
-  const anchorPos = hawse.clone().addScaledVector(fwd, 6.5).addScaledVector(side, 2.2);
+  const anchorPos = hawse.clone().addScaledVector(fwd, 6.5 * S).addScaledVector(side, 2.2 * S);
   anchorPos.y = heightAt(anchorPos.x, anchorPos.z) + 0.2;
-  const anchor = makeAnchor(rust);
+  const anchor = makeAnchor(rust); anchor.scale.setScalar(1.5);
   anchor.position.copy(anchorPos); anchor.rotation.order = 'YXZ'; anchor.rotation.set(Math.PI / 2 - 0.15, Math.atan2(fwd.x, fwd.z) + 0.8, 0);
   anchor.traverse((o) => { if (o.isMesh) o.castShadow = o.receiveShadow = true; });
   scene.add(anchor);
-  const mid1 = hawse.clone().addScaledVector(fwd, 2.4).addScaledVector(side, 0.6); mid1.y = heightAt(mid1.x, mid1.z) + 0.08;
-  const mid2 = hawse.clone().addScaledVector(fwd, 4.2).addScaledVector(side, 2.6); mid2.y = heightAt(mid2.x, mid2.z) + 0.08;
-  const ring = anchorPos.clone().addScaledVector(fwd, -1.2).addScaledVector(side, 0.4); ring.y = heightAt(ring.x, ring.z) + 0.1;
+  const mid1 = hawse.clone().addScaledVector(fwd, 2.4 * S).addScaledVector(side, 0.6 * S); mid1.y = heightAt(mid1.x, mid1.z) + 0.1;
+  const mid2 = hawse.clone().addScaledVector(fwd, 4.2 * S).addScaledVector(side, 2.6 * S); mid2.y = heightAt(mid2.x, mid2.z) + 0.1;
+  const ring = anchorPos.clone().addScaledVector(fwd, -1.8).addScaledVector(side, 0.6); ring.y = heightAt(ring.x, ring.z) + 0.12;
   const chainCurve = new THREE.CatmullRomCurve3([hawse, hawse.clone().lerp(mid1, 0.5).setY((hawse.y + mid1.y) / 2 - 0.6), mid1, mid2, ring]);
   {
-    const len = chainCurve.getLength(), step = 0.13, n = Math.floor(len / step);
-    const lg = new THREE.TorusGeometry(0.075, 0.024, 6, 12).scale(1.35, 1, 1);
+    const len = chainCurve.getLength(), step = 0.18, n = Math.floor(len / step);
+    const lg = new THREE.TorusGeometry(0.105, 0.034, 6, 12).scale(1.35, 1, 1);
     const im = new THREE.InstancedMesh(lg, rust, n);
     const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), Q2 = new THREE.Quaternion(), X = new THREE.Vector3(1, 0, 0);
     for (let i = 0; i < n; i++) {
@@ -282,21 +293,50 @@ export function buildWreck(scene, tex) {
   }
 
   // ---- albero caduto sul fondale ----
-  const mastA = toW(-0.6, deckY(-0.6) + 0.2, -2.6), mastB = mastA.clone().addScaledVector(side, 6).addScaledVector(fwd, -3); mastB.y = heightAt(mastB.x, mastB.z) + 0.2;
-  { const m = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.22, mastA.distanceTo(mastB), 12), wood); m.position.copy(mastA).lerp(mastB, 0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), mastB.clone().sub(mastA).normalize()); m.castShadow = true; scene.add(m); }
+  const mastA = toW(-0.6, deckY(-0.6) + 0.2, -2.6), mastB = mastA.clone().addScaledVector(side, 6 * S).addScaledVector(fwd, -3 * S); mastB.y = heightAt(mastB.x, mastB.z) + 0.3;
+  { const m = new THREE.Mesh(new THREE.CylinderGeometry(0.17 * S, 0.22 * S, mastA.distanceTo(mastB), 12), wood); m.position.copy(mastA).lerp(mastB, 0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), mastB.clone().sub(mastA).normalize()); m.castShadow = true; scene.add(m); }
 
   // ---------- collisioni ----------
   const inv = new THREE.Matrix4().copy(ship.matrixWorld).invert();
   const lp = new THREE.Vector3();
-  const capsules = [{ a: mastA, b: mastB, r: 0.22 }, { a: anchorPos.clone().addScaledVector(fwd, -0.8), b: anchorPos.clone().addScaledVector(fwd, 1.2), r: 0.35 }];
+  const capsules = [{ a: mastA, b: mastB, r: 0.22 * S }, { a: anchorPos.clone().addScaledVector(fwd, -1.2), b: anchorPos.clone().addScaledVector(fwd, 1.8), r: 0.5 }];
   const boxes = [
     { min: new THREE.Vector3(CABIN.x0, deckY(-9), -CABIN.z), max: new THREE.Vector3(CABIN.x1, deckY(-9) + CABIN.h + 0.1, CABIN.z) },
-    { min: new THREE.Vector3(HATCH.x - HATCH.size, HY, -HATCH.size), max: new THREE.Vector3(HATCH.x + HATCH.size, HY + 0.6, HATCH.size) },
+
     { min: new THREE.Vector3(9.6, deckY(10), -0.9), max: new THREE.Vector3(10.8, deckY(10) + 0.8, 0.9) },
   ];
   const _c = new THREE.Vector3(), _ab = new THREE.Vector3();
-  function collide(p, r) {
+  // mastra della botola: 4 pareti + piano superiore forato; la camera sotto si può visitare quando la botola è aperta
+  const HS = HATCH.size, HOLE = HATCH.r - 0.06, Y0 = HY - 2.3, CW = 1.1, TOP = HY + 0.46;
+  const coaming = [
+    { min: new THREE.Vector3(HATCH.x - HS, HY, -HS), max: new THREE.Vector3(HATCH.x + HS, TOP, -HS + 0.12) },
+    { min: new THREE.Vector3(HATCH.x - HS, HY, HS - 0.12), max: new THREE.Vector3(HATCH.x + HS, TOP, HS) },
+    { min: new THREE.Vector3(HATCH.x - HS, HY, -HS), max: new THREE.Vector3(HATCH.x - HS + 0.12, TOP, HS) },
+    { min: new THREE.Vector3(HATCH.x + HS - 0.12, HY, -HS), max: new THREE.Vector3(HATCH.x + HS, TOP, HS) },
+  ];
+  const pushBox = (b, r) => {
+    if (lp.x > b.min.x - r && lp.x < b.max.x + r && lp.y > b.min.y - r && lp.y < b.max.y + r && lp.z > b.min.z - r && lp.z < b.max.z + r) {
+      const d = [lp.x - (b.min.x - r), b.max.x + r - lp.x, lp.y - (b.min.y - r), b.max.y + r - lp.y, lp.z - (b.min.z - r), b.max.z + r - lp.z];
+      const k = d.indexOf(Math.min(...d));
+      if (k === 0) lp.x = b.min.x - r; else if (k === 1) lp.x = b.max.x + r; else if (k === 2) lp.y = b.min.y - r; else if (k === 3) lp.y = b.max.y + r; else if (k === 4) lp.z = b.min.z - r; else lp.z = b.max.z + r;
+    }
+  };
+  const state = { open: false };
+  function collide(p, rw) {
+    const r = rw / S;
     lp.copy(p).applyMatrix4(inv);
+    const dh = Math.hypot(lp.x - HATCH.x, lp.z);
+    // dentro la camera nascosta o nel pozzo della botola aperta: solo le pareti della camera
+    if (state.open && lp.y > Y0 - 0.2 && lp.y < TOP + r && ((lp.y < HY - 0.02 && Math.abs(lp.x - HATCH.x) < CW + 0.3 && Math.abs(lp.z) < CW + 0.3) || dh < HOLE)) {
+      if (lp.y < HY - 0.02) {
+        lp.x = clamp(lp.x, HATCH.x - CW + r, HATCH.x + CW - r); lp.z = clamp(lp.z, -CW + r, CW - r);
+        if (lp.y < Y0 + r) lp.y = Y0 + r;
+        // dalla camera si esce solo dal pozzo
+        if (lp.y > HY - 0.02 - r && dh > HOLE - r) lp.y = HY - 0.02 - r;
+      } else if (dh > HOLE - r) { const k = (HOLE - r) / dh; lp.x = HATCH.x + (lp.x - HATCH.x) * k; lp.z *= k; }
+      p.copy(lp.applyMatrix4(ship.matrixWorld));
+      return;
+    }
     let x = lp.x;
     if (x > XS - r && x < XB + 0.6 + r) {
       const xc = clamp(x, XS, XB), y0 = keelY(xc), H = deckY(xc);
@@ -309,24 +349,25 @@ export function buildWreck(scene, tex) {
         }
       }
     }
-    for (const b of boxes) {
-      if (lp.x > b.min.x - r && lp.x < b.max.x + r && lp.y > b.min.y - r && lp.y < b.max.y + r && lp.z > b.min.z - r && lp.z < b.max.z + r) {
-        const d = [lp.x - (b.min.x - r), b.max.x + r - lp.x, lp.y - (b.min.y - r), b.max.y + r - lp.y, lp.z - (b.min.z - r), b.max.z + r - lp.z];
-        const k = d.indexOf(Math.min(...d));
-        if (k === 0) lp.x = b.min.x - r; else if (k === 1) lp.x = b.max.x + r; else if (k === 2) lp.y = b.min.y - r; else if (k === 3) lp.y = b.max.y + r; else if (k === 4) lp.z = b.min.z - r; else lp.z = b.max.z + r;
-      }
-    }
+    for (const b of boxes) pushBox(b, r);
+    for (const b of coaming) pushBox(b, r);
+    // piano della mastra: pieno se la botola è chiusa, forato al centro se è aperta
+    if (Math.abs(lp.x - HATCH.x) < HS + r && Math.abs(lp.z) < HS + r && lp.y > HY && lp.y < TOP + r && (!state.open || dh > HOLE)) lp.y = TOP + r;
     p.copy(lp.applyMatrix4(ship.matrixWorld));
     for (const c of capsules) {
       _ab.subVectors(c.b, c.a); const t = clamp(_c.subVectors(p, c.a).dot(_ab) / _ab.lengthSq(), 0, 1);
-      _c.copy(c.a).addScaledVector(_ab, t); const d = p.distanceTo(_c), rr = c.r + r;
+      _c.copy(c.a).addScaledVector(_ab, t); const d = p.distanceTo(_c), rr = c.r + rw;
       if (d < rr && d > 1e-4) p.sub(_c).multiplyScalar(rr / d).add(_c);
     }
   }
 
   return {
-    ship, hatch, chamber, collide, toW, fwd, side, anchorPos, chainCurve, debris,
+    ship, hatch, chamber, collide, toW, fwd, side, anchorPos, chainCurve, debris, S, state,
+    setOpen(v) { state.open = v; },
     hatchWorld: () => toW(HATCH.x, HY + 0.5, 0),
+    chamberWorld: () => toW(HATCH.x, Y0 + 0.9, 0),
+    bookWorld: () => chamber.userData.book.getWorldPosition(new THREE.Vector3()),
+    sternWorld: () => toW(XS + 0.3, 0, 0),
     helmetWorld: () => chamber.userData.helmet.getWorldPosition(new THREE.Vector3()),
     materials: { rust, wood, brass },
     deckY, halfW, HY,

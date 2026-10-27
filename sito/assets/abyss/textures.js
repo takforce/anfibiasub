@@ -68,7 +68,7 @@ export function makeTextures(size, aniso) {
       map: colorTex(size, (i) => {
         const k = 0.72 + n[i] * 0.45 + (h[i] - 0.5) * 0.25;
         const speck = g[i] > 0.8 ? 1.12 : g[i] < 0.2 ? 0.88 : 1;
-        return [108 * k * speck, 100 * k * speck, 84 * k * speck].map((c) => clamp(c, 0, 255));
+        return [92 * k * speck, 86 * k * speck, 72 * k * speck].map((c) => clamp(c, 0, 255));
       }, aniso),
       normalMap: normalTex(h, size, 3.2, aniso),
     };
@@ -156,6 +156,24 @@ export function makeTextures(size, aniso) {
         return c.map((x) => clamp(x, 0, 255));
       }, aniso),
       orm: colorTex(size, (i) => [255, clamp(0.32 + pat(i) * 0.55 + n[i] * 0.1) * 255, clamp(1 - pat(i) * 0.85) * 255], aniso, false),
+    };
+  }
+
+  // ---------- terracotta (anfore) con concrezioni ----------
+  {
+    const n = field(size, (u, v) => tileFbm(u * 6, v * 6, 6, 5));
+    const e = field(size, (u, v) => tileFbm(u * 4 + 2, v * 4 + 7, 4, 4));
+    const h = new Float32Array(size * size);
+    for (let i = 0; i < h.length; i++) h[i] = n[i] * 0.5 + smooth(0.55, 0.7, e[i]) * 0.6;
+    T.clay = {
+      map: colorTex(size, (i) => {
+        let c = [150, 92, 60].map((x) => x * (0.6 + n[i] * 0.55));
+        const enc = smooth(0.55, 0.72, e[i]);
+        c = c.map((x, j) => mix(x, [120, 118, 104][j] * (0.8 + n[i] * 0.4), enc * 0.8));     // concrezioni calcaree
+        c = c.map((x, j) => mix(x, [60, 82, 64][j], smooth(0.75, 0.85, e[i]) * 0.6));        // alghe
+        return c.map((x) => clamp(x, 0, 255));
+      }, aniso),
+      normalMap: normalTex(h, size, 4, aniso),
     };
   }
 
@@ -274,4 +292,54 @@ export function symbolPlate(name) {
     for (let i = 0; i < 300; i++) { g.fillStyle = `rgba(50,100,80,${Math.random() * 0.35})`; g.beginPath(); g.arc(Math.random() * 256, Math.random() * 256, 2 + Math.random() * 5, 0, 7); g.fill(); }
     engraved(g, (c) => SYMBOLS[name](g, 128, 128, 88, c));
   });
+}
+
+// ---- giornale di bordo ----
+function parchment(g, w, h) {
+  const r = g.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.2, w / 2, h / 2, Math.max(w, h) * 0.75);
+  r.addColorStop(0, '#d9c9a3'); r.addColorStop(0.7, '#bfa878'); r.addColorStop(1, '#7d6643');
+  g.fillStyle = r; g.fillRect(0, 0, w, h);
+  for (let i = 0; i < w * h / 250; i++) { g.fillStyle = `rgba(${90 + Math.random() * 40},${70 + Math.random() * 30},40,${Math.random() * 0.12})`; g.fillRect(Math.random() * w, Math.random() * h, 2 + Math.random() * 3, 2 + Math.random() * 3); }
+  for (let i = 0; i < 6; i++) { g.fillStyle = `rgba(70,60,40,${0.05 + Math.random() * 0.08})`; g.beginPath(); g.ellipse(Math.random() * w, Math.random() * h, 20 + Math.random() * 60, 15 + Math.random() * 40, Math.random() * 3, 0, 7); g.fill(); }
+}
+// pagina piccola (texture sul libro nella camera): solo righe di scrittura e uno schizzo
+export function logbookTex() {
+  return symbolCanvas(256, 360, (g, w, h) => {
+    parchment(g, w, h);
+    g.strokeStyle = 'rgba(40,28,15,0.75)'; g.lineWidth = 1.4;
+    for (let y = 30; y < 170; y += 12) { g.beginPath(); let x = 18; g.moveTo(x, y); while (x < w - 20) { x += 4 + Math.random() * 6; g.lineTo(x, y + Math.random() * 3 - 1.5); } g.stroke(); }
+    g.lineWidth = 2; g.beginPath(); g.moveTo(40, 320); g.lineTo(80, 210); g.lineTo(100, 210); g.lineTo(110, 320); g.moveTo(150, 320); g.lineTo(160, 205); g.lineTo(185, 205); g.lineTo(215, 320); g.moveTo(70, 210); g.quadraticCurveTo(135, 170, 195, 205); g.stroke();
+  });
+}
+// pagina grande leggibile, con la rotta vera calcolata dal gioco
+export function logbookPage(deg, meters, portrait) {
+  const c = document.createElement('canvas'); c.width = 1200; c.height = 820;
+  const g = c.getContext('2d'); parchment(g, 1200, 820);
+  g.strokeStyle = 'rgba(60,40,20,0.5)'; g.lineWidth = 3; g.beginPath(); g.moveTo(600, 30); g.lineTo(600, 790); g.stroke();
+  const ink = '#2b1c0e';
+  g.fillStyle = ink; g.font = 'italic 34px Georgia, serif';
+  const lines = ['14 marzo — mare grosso da libeccio.', 'Il cargo imbarca acqua a prua.', 'Ho lasciato lo scafandro nella', 'stiva, sotto la botola.', '', 'Il cofanetto l\'ho portato fuori:', 'troppo prezioso per affondare', 'con la nave. È sotto l\'arco', 'di pietra, dove il fondale', 'precipita nel blu.'];
+  lines.forEach((t, i) => g.fillText(t, 60, 100 + i * 52));
+  g.font = 'italic bold 38px Georgia, serif';
+  g.fillText(`Dalla poppa: rotta ${Math.round(deg)}°,`, 60, 670);
+  g.fillText(`circa ${Math.round(meters / 5) * 5} metri.`, 60, 722);
+  // schizzo dell'arco
+  g.strokeStyle = ink; g.lineWidth = 4; g.lineJoin = 'round';
+  g.beginPath(); g.moveTo(700, 560); g.lineTo(745, 330); g.lineTo(790, 320); g.lineTo(805, 560);
+  g.moveTo(900, 560); g.lineTo(915, 315); g.lineTo(965, 325); g.lineTo(1010, 560);
+  g.moveTo(735, 335); g.bezierCurveTo(800, 250, 900, 250, 975, 330); g.moveTo(745, 300); g.bezierCurveTo(820, 210, 900, 215, 985, 300); g.stroke();
+  g.setLineDash([10, 10]); g.beginPath(); g.moveTo(640, 600); g.lineTo(1150, 600); g.lineTo(1150, 720); g.stroke(); g.setLineDash([]);
+  g.font = 'italic 26px Georgia, serif'; g.fillText('il blu', 1060, 760);
+  // X del cofanetto
+  g.lineWidth = 6; g.strokeStyle = '#7a1d12'; g.beginPath(); g.moveTo(835, 520); g.lineTo(870, 555); g.moveTo(870, 520); g.lineTo(835, 555); g.stroke();
+  // rosa con la rotta
+  g.strokeStyle = ink; g.lineWidth = 3; drawRose(g, 1040, 140, 80, ink);
+  g.save(); g.translate(1040, 140); g.rotate(deg * Math.PI / 180); g.strokeStyle = '#7a1d12'; g.lineWidth = 5; g.beginPath(); g.moveTo(0, 0); g.lineTo(0, -110); g.lineTo(-10, -92); g.moveTo(0, -110); g.lineTo(10, -92); g.stroke(); g.restore();
+  g.fillStyle = ink; g.font = 'bold 28px Georgia, serif'; g.fillText('N', 1030, 40);
+  if (portrait) {   // su telefono in verticale: le due pagine una sotto l'altra, così il testo resta leggibile
+    const c2 = document.createElement('canvas'); c2.width = 600; c2.height = 1640;
+    const g2 = c2.getContext('2d'); g2.drawImage(c, 0, 0, 600, 820, 0, 0, 600, 820); g2.drawImage(c, 600, 0, 600, 820, 0, 820, 600, 820);
+    return c2.toDataURL('image/jpeg', 0.85);
+  }
+  return c.toDataURL('image/jpeg', 0.85);
 }

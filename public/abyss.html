@@ -8,9 +8,9 @@
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#050E1A">
 <meta property="og:title" content="ABYSS · Il relitto dimenticato">
-<meta property="og:image" content="https://www.anfibiasub.it/img/abyss/intro.webp?v=5396a2">
+<meta property="og:image" content="https://www.anfibiasub.it/img/abyss/intro.webp?v=2d582f">
 <link rel="icon" href="/favicon.png?v=3" type="image/png">
-<link rel="stylesheet" href="/abyss/abyss.css?v=beda70ae">
+<link rel="stylesheet" href="/abyss/abyss.css?v=d85506d6">
 </head>
 <body>
 <div id="abyss" class="ab" data-state="INTRO">
@@ -33,7 +33,8 @@
 </section>
 
 <div class="ab-hud" aria-live="polite">
-  <div class="ab-tl"><span class="ab-mark">ABYSS</span><span id="ab-depth" class="ab-depth"><b>0,0</b> m</span></div>
+  <div class="ab-tl"><span class="ab-mark">ABYSS</span><span id="ab-depth" class="ab-depth"><b>0,0</b> m</span><span id="ab-obj" class="ab-obj"></span></div>
+  <div class="ab-comp" aria-hidden="true"><div class="ab-comp-win"><div class="ab-comp-strip"></div></div><span id="ab-hdg">000°</span></div>
   <div class="ab-tr">
     <button class="ab-ico ab-inv-btn" type="button" data-act="inv" aria-label="Inventario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h16v12H4z"/><path d="M9 8V5h6v3"/></svg><span id="ab-count">0/3</span></button>
     <button class="ab-ico" type="button" data-act="audio" aria-label="Audio on/off"><svg class="snd-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg><svg class="snd-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg></button>
@@ -45,7 +46,7 @@
   <div id="ab-hint" class="ab-hint">
     <p class="ab-how-pc"><b>Clic</b> sullo schermo per guidare la visuale col mouse · <b>W A S D</b> nuoto · <b>Spazio</b> sali · <b>C</b> scendi · <b>Shift</b> veloce · <b>F</b> torcia · <b>E</b> interagisci · <b>I</b> inventario</p>
     <p class="ab-how-touch">Joystick a sinistra per nuotare · trascina a destra per guardare · ▲▼ per salire e scendere</p>
-    <p>Segui la cima d'ormeggio verso il fondale.</p>
+    <p>Segui la cima d'ormeggio verso il fondale. In alto c'è la bussola: il nord è N.</p>
   </div>
 </div>
 
@@ -65,7 +66,8 @@
   <div class="ab-box">
     <h2>Reperti recuperati <span class="ab-count2"></span></h2>
     <div class="ab-slots"><div class="ab-slot"></div><div class="ab-slot"></div><div class="ab-slot"></div></div>
-    <button class="ab-btn" type="button" data-act="close">Chiudi</button>
+    <p class="ab-small ab-where">Appunti del sub: una <b>grotta</b> a ovest, un <b>peschereccio capovolto</b> a sud-est, un <b>campo di anfore</b> a nord. Il relitto è al centro.</p>
+    <div class="ab-row"><button class="ab-btn" type="button" data-act="log" data-logbtn hidden>Rileggi il giornale di bordo</button><button class="ab-btn" type="button" data-act="close">Chiudi</button></div>
   </div>
 </div>
 
@@ -97,12 +99,20 @@
   </div>
 </div>
 
+<div class="ab-panel ab-logp" data-panel="log" hidden role="dialog" aria-modal="true" aria-label="Giornale di bordo">
+  <div class="ab-box ab-logbox">
+    <h2>Giornale di bordo del capitano</h2>
+    <img id="ab-logimg" alt="Pagina del giornale di bordo: il cofanetto è sotto l'arco di pietra, sul bordo della scarpata. Dalla poppa, rotta e distanza indicate sulla pagina.">
+    <button class="ab-btn ab-btn-main" type="button" data-act="close">HO CAPITO</button>
+  </div>
+</div>
+
 <div class="ab-panel ab-end" data-panel="end" hidden role="dialog" aria-modal="true" aria-label="Missione completata">
   <div class="ab-box">
     <p class="ab-sub">MISSIONE COMPLETATA</p>
     <h2>«Il segreto del relitto è stato finalmente svelato.»</h2>
-    <p class="ab-small">Nella camera nascosta riposava un antico scafandro da palombaro in ottone.</p>
-    <ul class="ab-sum"><li>Reperti recuperati: 3/3</li><li>Enigma risolto</li><li>Missione completata</li></ul>
+    <p class="ab-small">Lo scafandro del palombaro era nella camera nascosta; il cofanetto del capitano, sotto l'arco di roccia sul bordo dell'abisso.</p>
+    <ul class="ab-sum"><li>Reperti recuperati: 3/3</li><li>Enigma della botola risolto</li><li>Giornale di bordo decifrato</li><li>Cofanetto del capitano ritrovato</li></ul>
     <div class="ab-col">
       <button class="ab-btn ab-btn-main" type="button" data-act="restart">RIPETI IMMERSIONE</button>
       <button class="ab-btn" type="button" data-act="continue">Continua a esplorare</button>
@@ -114,6 +124,6 @@
 <div id="ab-veil" class="ab-veil" aria-hidden="true"></div>
 </div>
 
-<script type="module" src="/abyss/main.js?v=beda70ae"></script>
+<script type="module" src="/abyss/main.js?v=d85506d6"></script>
 </body>
 </html>

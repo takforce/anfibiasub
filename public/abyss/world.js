@@ -1,17 +1,22 @@
 // Ambiente: fondale, rocce, gorgonie, cima d'ormeggio, superficie, raggi, particelle, bolle, pesci
 import * as THREE from '../vendor/three/three.module.min.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
-import { fbm2, fbm3, noise2, rng } from './noise.js?v=beda70ae';
-import { CFG } from './config.js?v=beda70ae';
+import { fbm2, fbm3, noise2, rng } from './noise.js?v=d85506d6';
+import { CFG } from './config.js?v=d85506d6';
 
 export function heightAt(x, z) {
   let h = CFG.seabed + (fbm2(x * 0.022 + 10, z * 0.022 + 4) - 0.5) * 5 + (fbm2(x * 0.11, z * 0.11) - 0.5) * 1.1;
   const c = Math.abs(noise2(x * 0.045 + 3, z * 0.045 + 8) - 0.5);
   if (c < 0.05) h -= (1 - c / 0.05) * 1.4;                                   // crepacci
-  const w = Math.exp(-((x * x) / 500 + (z * z) / 200));                        // piano sotto il relitto
+  const u = x * 0.913 - z * 0.408, v = x * 0.408 + z * 0.913;                // assi del relitto
+  const w = Math.exp(-((u * u) / 1100 + (v * v) / 230));                       // piano sotto il relitto
   h = h * (1 - w) + (CFG.seabed - 0.3) * w;
+  for (const k in CFG.places) {                                                 // fondo più regolare nei luoghi dei reperti
+    const P = CFG.places[k], d2 = (x - P.x) ** 2 + (z - P.z) ** 2, f = Math.exp(-d2 / 60);
+    h = h * (1 - f * 0.7) + (CFG.seabed - 0.6) * f * 0.7;
+  }
   const r = Math.hypot(x, z);
-  if (r > 55) h -= (r - 55) * 0.45;                                           // oltre: la scarpata verso il blu
+  if (r > CFG.cliff) h -= (r - CFG.cliff) * 0.6 + Math.pow(Math.max(0, r - CFG.cliff), 2) * 0.02;   // la scarpata verso il blu
   return h;
 }
 
@@ -23,14 +28,15 @@ export function buildWorld(scene, tex, q, avoid) {
 
   // ---------------- fondale ----------------
   {
-    const seg = q.mobile ? 150 : 230;
-    const g = new THREE.PlaneGeometry(220, 220, seg, seg);
+    const seg = q.mobile ? 170 : 260;
+    const size = (CFG.limit + 30) * 2;
+    const g = new THREE.PlaneGeometry(size, size, seg, seg);
     g.rotateX(-Math.PI / 2);
     const p = g.attributes.position;
     for (let i = 0; i < p.count; i++) p.setY(i, heightAt(p.getX(i), p.getZ(i)));
     g.computeVertexNormals();
     const uv = g.attributes.uv;
-    for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 44, uv.getY(i) * 44);
+    for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * size / 5, uv.getY(i) * size / 5);
     const m = new THREE.MeshStandardMaterial({ map: tex.sand.map, normalMap: tex.sand.normalMap, normalScale: new THREE.Vector2(0.9, 0.9), roughness: 1, metalness: 0 });
     const mesh = new THREE.Mesh(g, m);
     mesh.receiveShadow = true;
@@ -65,14 +71,14 @@ export function buildWorld(scene, tex, q, avoid) {
       W.colliders.push({ c: new THREE.Vector3(x, y, z), s: sc.clone().multiplyScalar(0.92), rot });
     };
     // gruppi di rocce intorno al relitto e scogli più lontani
-    const clusters = [[16, -9, 9], [-15, 10, 8], [12, 11, 6], [-20, -12, 10], [26, 4, 8], [-4, 22, 7], [3, -20, 9], [-30, 2, 10], [30, -24, 10], [-26, 26, 9]];
+    const clusters = [[26, -16, 9], [-26, 22, 8], [18, 20, 6], [-30, -18, 10], [40, 6, 8], [-6, 32, 7], [4, -30, 9], [-40, 0, 10], [42, -30, 10], [-34, 38, 9], [20, 56, 8], [-66, -20, 9], [60, -50, 9], [-14, -64, 8], [64, 30, 9], [-70, 40, 8]];
     for (const [cx, cz, n] of clusters) {
       add(cx, cz, R(2.4, 4), R(0.5, 0.8));                                    // scoglio principale
       for (let i = 0; i < n; i++) { const a = R(0, 7), d = R(1.5, 6); add(cx + Math.cos(a) * d, cz + Math.sin(a) * d, R(0.3, 1.8) * (1 - d / 9), R(0.4, 0.85)); }
     }
-    for (let i = 0; i < 26; i++) { const a = R(0, 7), d = R(30, 66); add(Math.cos(a) * d, Math.sin(a) * d, R(2, 6), R(0.4, 0.9)); }   // scogli lontani
-    for (let i = 0; i < 30; i++) { const a = R(0, 7), d = R(12, 50); add(Math.cos(a) * d, Math.sin(a) * d, R(0.4, 1.4), R(0.4, 0.9)); }
-    for (let i = 0; i < 90; i++) { const a = R(0, 7), d = R(6, 40); add(Math.cos(a) * d, Math.sin(a) * d, R(0.15, 0.45), R(0.5, 0.9)); } // ciottoli
+    for (let i = 0; i < 40; i++) { const a = R(0, 7), d = R(40, 90); add(Math.cos(a) * d, Math.sin(a) * d, R(2, 6), R(0.4, 0.9)); }   // scogli lontani
+    for (let i = 0; i < 50; i++) { const a = R(0, 7), d = R(15, 75); add(Math.cos(a) * d, Math.sin(a) * d, R(0.4, 1.4), R(0.4, 0.9)); }
+    for (let i = 0; i < 160; i++) { const a = R(0, 7), d = R(8, 75); add(Math.cos(a) * d, Math.sin(a) * d, R(0.15, 0.45), R(0.5, 0.9)); } // ciottoli
     const m = new THREE.MeshStandardMaterial({ map: tex.rock.map, normalMap: tex.rock.normalMap, normalScale: new THREE.Vector2(1.2, 1.2), roughness: 0.95 });
     const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), E = new THREE.Euler();
     for (const b of bases) {
@@ -83,6 +89,7 @@ export function buildWorld(scene, tex, q, avoid) {
       scene.add(im);
     }
     W.rocks = bases.flatMap((b) => b.list);
+    W.rockBases = bases.map((b) => b.g); W.rockMat = m;
   }
 
   // ---------------- gorgonie rosse e spugne ----------------
@@ -272,66 +279,6 @@ export function buildWorld(scene, tex, q, avoid) {
     });
   }
 
-  // ---------------- pesci: castagnole in banco e qualche sarago ----------------
-  {
-    const fishGeo = (len, h, w) => {
-      const body = new THREE.SphereGeometry(1, 12, 8); body.scale(w, h, len * 0.5);
-      const tail = new THREE.BufferGeometry();
-      const z0 = -len * 0.45, z1 = -len * 0.72;
-      tail.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, z0, 0, h * 0.9, z1, 0, 0.05 * h, z1 + len * 0.06, 0, 0, z0, 0, -0.05 * h, z1 + len * 0.06, 0, -h * 0.9, z1], 3));
-      tail.computeVertexNormals();
-      const b = body.toNonIndexed(); b.deleteAttribute('uv');
-      return mergeGeometries([b, tail]);
-    };
-    const wiggle = (m, amp) => {
-      m.onBeforeCompile = (sh) => {
-        sh.uniforms.uTime = W.fishTime;
-        sh.vertexShader = 'uniform float uTime;\n' + sh.vertexShader.replace('#include <begin_vertex>',
-          `#include <begin_vertex>
-           float ph = float(gl_InstanceID)*1.7;
-           transformed.x += sin(uTime*9. + ph + position.z*22.) * ${amp.toFixed(3)} * smoothstep(.02,-.1,position.z);`);
-      };
-    };
-    W.fishTime = { value: 0 };
-    const schools = [];
-    const mk = (geo, color, metal, count, homes, speed, spread, scaleR) => {
-      const m = new THREE.MeshStandardMaterial({ color, roughness: 0.45, metalness: metal, side: THREE.DoubleSide });
-      wiggle(m, 0.012 * scaleR);
-      const im = new THREE.InstancedMesh(geo, m, count); im.frustumCulled = false; scene.add(im);
-      const f = [];
-      for (let i = 0; i < count; i++) {
-        const h = homes[i % homes.length];
-        f.push({ home: h, p: new THREE.Vector3(h.x + R(-3, 3), h.y + R(-1, 1), h.z + R(-3, 3)), v: new THREE.Vector3(R(-1, 1), 0, R(-1, 1)).multiplyScalar(0.3), off: new THREE.Vector3(R(-1, 1) * spread, R(-0.4, 0.4) * spread, R(-1, 1) * spread), s: R(0.8, 1.25) * scaleR });
-      }
-      schools.push({ im, f, speed });
-    };
-    const H = (x, z, dy) => new THREE.Vector3(x, heightAt(x, z) + dy, z);
-    mk(fishGeo(0.14, 0.05, 0.022), 0x2f3a4a, 0.35, q.mobile ? 70 : 130, [H(2, -1, 6.5), H(-7, 3, 5.5), H(10, 2, 5)], 0.9, 2.6, 1);
-    mk(fishGeo(0.34, 0.11, 0.04), 0x9aa3a8, 0.7, 10, [H(14, -6, 1.2), H(-12, 8, 1), H(5, 12, 0.8)], 0.6, 5, 1);
-    const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), S = new THREE.Vector3(), tgt = new THREE.Vector3(), des = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0), L = new THREE.Matrix4();
-    W.updaters.push((dt, t, cam) => {
-      W.fishTime.value = t;
-      for (const sc of schools) {
-        sc.f.forEach((f, i) => {
-          const h = f.home;
-          tgt.set(h.x + Math.sin(t * 0.07 + h.z) * 4, h.y + Math.sin(t * 0.13 + h.x) * 0.8, h.z + Math.cos(t * 0.06 + h.x) * 4).add(f.off);
-          des.subVectors(tgt, f.p).multiplyScalar(0.35);
-          const dc = f.p.distanceTo(cam.position);
-          if (dc < 3) des.add(f.p.clone().sub(cam.position).normalize().multiplyScalar((3 - dc) * 1.6)); // si allontanano dal sub
-          f.v.lerp(des, Math.min(1, dt * 0.9));
-          const sp = f.v.length(), mx = sc.speed * (dc < 3 ? 2.2 : 1);
-          if (sp > mx) f.v.multiplyScalar(mx / sp);
-          if (sp < 0.12) f.v.addScaledVector(f.v.clone().normalize(), 0.05);
-          f.p.addScaledVector(f.v, dt);
-          const fl = heightAt(f.p.x, f.p.z) + 0.3; if (f.p.y < fl) f.p.y = fl;
-          L.lookAt(f.p, tgt.copy(f.p).sub(f.v), up); Q.setFromRotationMatrix(L);
-          S.setScalar(f.s); M.compose(f.p, Q, S); sc.im.setMatrixAt(i, M);
-        });
-        sc.im.instanceMatrix.needsUpdate = true;
-      }
-    });
-  }
-
   return W;
 }
 
@@ -341,15 +288,15 @@ export function collideWorld(W, p, r) {
   for (const c of W.colliders) {
     _l.subVectors(p, c.c);
     if (Math.abs(_l.x) > c.s.x + r + 0.5 || Math.abs(_l.z) > c.s.z + r + 0.5 || Math.abs(_l.y) > c.s.y + r + 0.5) continue;
-    const cs = Math.cos(-c.rot), sn = Math.sin(-c.rot);
+    // nel sistema locale dell'ellissoide (rotazione attorno a y = c.rot, come mesh.rotation.y)
+    const cs = Math.cos(c.rot), sn = Math.sin(c.rot);
     const lx = _l.x * cs - _l.z * sn, lz = _l.x * sn + _l.z * cs;
     const ex = lx / (c.s.x + r), ey = _l.y / (c.s.y + r), ez = lz / (c.s.z + r);
     const d = Math.hypot(ex, ey, ez);
     if (d < 1 && d > 1e-4) {
       const k = 1 / d;
       const nx = ex * k * (c.s.x + r), ny = ey * k * (c.s.y + r), nz = ez * k * (c.s.z + r);
-      const cs2 = Math.cos(c.rot), sn2 = Math.sin(c.rot);
-      p.set(c.c.x + nx * cs2 - nz * sn2, c.c.y + ny, c.c.z + nx * sn2 + nz * cs2);
+      p.set(c.c.x + nx * cs + nz * sn, c.c.y + ny, c.c.z - nx * sn + nz * cs);
     }
   }
   const fl = heightAt(p.x, p.z) + r + 0.15;

@@ -87,7 +87,7 @@ button{font:inherit;color:inherit}
   .is-playing .ab-touch{display:block}
   .is-done .ab-touch{display:none}
   .ab-tbtns{display:flex}
-  .ab-hint{left:50%;transform:translateX(-50%);bottom:auto;top:76px;width:88vw;max-width:88vw}
+  .ab-hint{left:50%;transform:translateX(-50%);bottom:auto;top:124px;width:88vw;max-width:88vw}
   .ab-msg.big{top:44%;letter-spacing:.25em}
   .ab-msg{bottom:150px}
   .ab-prompt{top:calc(50% + 28px)}
@@ -138,4 +138,24 @@ button{font:inherit;color:inherit}
   .ab-lead{margin:1.2em 0 1.4em}
   .ab-slot{min-height:130px}.ab-slot img{width:60px;height:60px}
   .ab-dials{gap:10px}.ab-dial{width:80px}
+}
+
+/* ---------- obiettivo, bussola, giornale ---------- */
+.ab-obj{margin-top:6px;max-width:300px;font-size:12px;line-height:1.4;color:var(--ice);opacity:.8}
+.ab-comp{position:absolute;top:16px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:2px}
+.ab-comp-win{position:relative;width:240px;height:24px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 25%,#000 75%,transparent);mask-image:linear-gradient(90deg,transparent,#000 25%,#000 75%,transparent)}
+.ab-comp-win::after{content:"";position:absolute;left:50%;top:0;width:2px;height:24px;margin-left:-1px;background:var(--cyan)}
+.ab-comp-strip{position:absolute;left:120px;top:0;height:24px}
+.ab-comp-strip i{position:absolute;top:2px;width:30px;margin-left:-15px;text-align:center;font-style:normal;font-size:11px;font-weight:600;color:var(--grey);border-left:1px solid transparent}
+.ab-comp-strip i::before{content:"";position:absolute;left:50%;top:15px;width:1px;height:6px;background:rgba(141,169,184,.6)}
+.ab-comp-strip i.c{color:var(--ice);font-size:13px}
+#ab-hdg{font-size:12px;font-weight:600;color:var(--cyan);font-variant-numeric:tabular-nums}
+.ab-where{margin:0 0 14px}
+.ab-logbox{width:min(900px,100%)}
+.ab-logbox img{display:block;max-width:100%;max-height:calc(100vh - 170px);width:auto;height:auto;margin:0 auto 16px;border-radius:6px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.ab-logbox h2{font-size:17px}
+@media (pointer:coarse){
+  .ab-comp{top:64px;left:auto;right:14px;transform:none}.ab-comp-win{width:150px}.ab-comp-strip{left:75px}.ab-obj{max-width:52vw}
+  .ab-logp{align-items:flex-start;overflow:auto}.ab-logbox{max-height:none}
+  .ab-logbox img{max-height:none;width:100%}
 }

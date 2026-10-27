@@ -3,3 +3,6 @@ node_modules/
 dist-hostgator/
 __pycache__/
 *.log
+
+# immagini e video di lavoro per le IA (non vanno sul sito)
+video-ia/

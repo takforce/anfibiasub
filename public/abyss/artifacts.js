@@ -1,8 +1,7 @@
-// I tre reperti: modelli 3D generati (sostituibili con GLB), posizionati intorno al relitto
+// I reperti: modelli 3D generati (sostituibili con GLB), posizionati nei luoghi lontani dal relitto
 import * as THREE from '../vendor/three/three.module.min.js';
-import { heightAt } from './world.js?v=beda70ae';
-import { compassCard, plateTex, tagTex } from './textures.js?v=beda70ae';
-import { CFG } from './config.js?v=beda70ae';
+import { compassCard, plateTex, tagTex } from './textures.js?v=d85506d6';
+import { CFG } from './config.js?v=d85506d6';
 
 function glintTex() {
   const c = document.createElement('canvas'); c.width = c.height = 128;
@@ -51,49 +50,57 @@ function makeKey(brass) {
   return g;
 }
 
-export function buildArtifacts(scene, wreck, tex) {
+function makeCasket(wood, brass) {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.22, 0.3), wood); body.position.y = 0.11; g.add(body);
+  const lid = new THREE.Group(); lid.position.set(0, 0.22, -0.15); g.add(lid);
+  const top = new THREE.Mesh(new THREE.BoxGeometry(0.47, 0.07, 0.31), wood); top.position.set(0, 0.035, 0.155); lid.add(top);
+  const band = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.02, 0.04), brass); band.position.set(0, 0.075, 0.155); lid.add(band);
+  for (const x of [-0.2, 0.2]) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.235, 0.31), brass); b.position.set(x, 0.11, 0); g.add(b); }
+  const lock = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.09, 0.02), brass); lock.position.set(0, 0.17, 0.155); g.add(lock);
+  g.userData.lid = lid;
+  return g;
+}
+
+export function buildArtifacts(scene, wreck, tex, spots) {
   const brass = wreck.materials.brass.clone();
-  brass.emissive = new THREE.Color(0xb08d57); brass.emissiveIntensity = 0;
+  brass.envMapIntensity = 0.45;                 // ottone opaco e ossidato: niente "luccichio da videogioco"
+  const wood = new THREE.MeshStandardMaterial({ map: tex.wood.map, normalMap: tex.wood.normalMap, roughness: 0.9, color: 0x8a7a68 });
   const sandM = new THREE.MeshStandardMaterial({ map: tex.sand.map, normalMap: tex.sand.normalMap, roughness: 1 });
   const glint = glintTex();
   const list = [];
-  const place = (id, obj, pos, rot, hitR) => {
-    obj.position.copy(pos); obj.rotation.copy(rot);
+  const place = (def, obj, spot, hitR) => {
+    obj.position.copy(spot.pos); obj.rotation.copy(spot.rot);
     obj.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
     scene.add(obj);
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: glint, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, fog: false }));
-    sp.scale.setScalar(0.5); sp.position.copy(pos).add(new THREE.Vector3(0, 0.12, 0)); scene.add(sp);
-    const a = CFG.artifacts.find((x) => x.id === id);
-    list.push({ ...a, obj, glint: sp, hitR, home: { pos: pos.clone(), rot: rot.clone() }, center: pos.clone().add(new THREE.Vector3(0, 0.08, 0)), taken: false });
+    sp.scale.setScalar(0.22); sp.position.copy(spot.pos).add(new THREE.Vector3(0, 0.08, 0)); scene.add(sp);
+    const a = { ...def, obj, glint: sp, hitR, home: { pos: spot.pos.clone(), rot: spot.rot.clone(), scale: obj.scale.x }, center: spot.pos.clone().add(new THREE.Vector3(0, 0.08, 0)), taken: false, extra: spot.extra || [] };
+    list.push(a);
+    return a;
   };
+  const def = (id) => CFG.artifacts.find((x) => x.id === id);
 
-  // 1. bussola: semisepolta nella sabbia vicino alla poppa, tra le casse cadute
-  {
-    const w = wreck.toW(-9.6, 0, -7.4); w.y = heightAt(w.x, w.z) - 0.03;
-    place('bussola', makeCompass(brass), w, new THREE.Euler(0.32, 0.6, 0.12), 0.5);
-    const mound = new THREE.Mesh(new THREE.SphereGeometry(0.22, 16, 10).scale(1.2, 0.35, 0.8), sandM); mound.position.copy(w).add(new THREE.Vector3(0.12, 0.02, 0.05)); scene.add(mound);
-    list[list.length - 1].extra = [mound];
-  }
-  // 2. targhetta: rivettata a un pezzo di scafo staccato, appoggiato sul fondale davanti allo squarcio
-  {
-    const w = wreck.toW(7.6, 0, -7.6); w.y = heightAt(w.x, w.z) + 0.18;
-    place('targhetta', makePlate(brass, wreck.materials.rust), w, new THREE.Euler(-0.35, 1.9, 0.2), 0.7);
-  }
-  // 3. chiave: sotto la catena dell'ancora
-  {
-    const p = wreck.chainCurve.getPointAt(0.8), t = wreck.chainCurve.getTangentAt(0.8);
-    const sideV = new THREE.Vector3(-t.z, 0, t.x).normalize();
-    const w = p.clone().addScaledVector(sideV, 0.18); w.y = heightAt(w.x, w.z) + 0.03;
-    place('chiave', makeKey(brass), w, new THREE.Euler(0, Math.atan2(t.x, t.z) + 0.9, 0), 0.45);
-  }
+  // bussola: in fondo alla grotta, mezza sepolta
+  place(def('bussola'), makeCompass(brass), spots.bussola, 0.5);
+  { const a = list[list.length - 1]; const m = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 10).scale(1.3, 0.4, 0.9), sandM); m.position.copy(a.home.pos).add(new THREE.Vector3(0.1, 0.0, 0.06)); scene.add(m); a.extra.push(m); }
+  // targhetta: sotto la murata del peschereccio capovolto
+  place(def('targhetta'), makePlate(brass, wreck.materials.rust), spots.targhetta, 0.7);
+  // chiave: tra le anfore, coperta in parte da un coccio
+  place(def('chiave'), makeKey(brass), spots.chiave, 0.45);
+  { const a = list[list.length - 1]; const m = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 8).scale(1.6, 0.35, 1), sandM); m.position.copy(a.home.pos).add(new THREE.Vector3(0.14, 0.0, 0.05)); scene.add(m); a.extra.push(m); }
+  // cofanetto del capitano (seconda missione): sotto l'arco di roccia
+  const casket = place({ ...CFG.casket, final: true }, makeCasket(wood, brass), spots.cofanetto, 0.6);
 
   return {
-    list, brass,
+    list, brass, casket,
     reset() {
       for (const a of list) {
-        a.taken = false; a.obj.visible = true; a.obj.position.copy(a.home.pos); a.obj.rotation.copy(a.home.rot); a.obj.scale.setScalar(a.id === 'chiave' ? 1.25 : 1);
-        if (a.obj.parent !== scene) scene.add(a.obj);
-        (a.extra || []).forEach((m) => { m.visible = true; });
+        a.taken = false; a.obj.visible = true; a.obj.position.copy(a.home.pos); a.obj.rotation.copy(a.home.rot); a.obj.scale.setScalar(a.home.scale);
+        if (a.obj.parent !== scene) scene.attach(a.obj);
+        a.obj.position.copy(a.home.pos); a.obj.rotation.copy(a.home.rot);
+        if (a.obj.userData.lid) a.obj.userData.lid.rotation.x = 0;
+        a.extra.forEach((m) => { m.visible = true; });
       }
     },
   };

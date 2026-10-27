@@ -49,6 +49,10 @@ BEACON = '<span class="beacon" aria-hidden="true"><span class="bc-ray"></span><s
 MENU = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>'
 
 
+# voce di menu del minigioco ABYSS (il gioco è solo in italiano)
+GAME_LABEL = {'it': 'ABYSS · il gioco 3D', 'en': 'ABYSS · 3D game (Italian)', 'es': 'ABYSS · juego 3D (en italiano)', 'de': 'ABYSS · 3D-Spiel (auf Italienisch)'}
+
+
 def url(key, lang, anchor=''):
     f = PAGES[key][lang]
     f = '/' + (f[:-len('index.html')] if f.endswith('index.html') else f)
@@ -82,6 +86,8 @@ def header(cur, lang, overlay):
             continue
         all_key, sub = subs[k]
         items = f'<a class="dd-all" href="{url(k, lang)}">{tx(lang, all_key)}</a>' + ''.join(f'<a href="{url(k, lang, a)}">{e(b)}</a>' for a, b in sub)
+        if k == 'utilita':
+            items += f'<a class="dd-game" href="/abyss.html">{GAME_LABEL[lang]}</a>'
         links += (f'<div class="dd"><button class="dd-btn" type="button" aria-expanded="false" aria-haspopup="true"{cur_attr.replace("page", "true")}>{t}{CHEVRON}</button>'
                   f'<div class="dd-menu">{items}</div></div>')
     cur_l = ' aria-current="true"'

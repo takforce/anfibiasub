@@ -900,3 +900,7 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
   .foot-bottom{flex-wrap:nowrap;justify-content:space-between;text-align:left;gap:8px;font-size:10.5px}
   .foot-by img{width:44px}
 }
+
+/* a capo solo da PC (es. "Serietà, professionalità e competenza." nella prima schermata) */
+.br-pc{display:none}
+@media (min-width:1024px){.br-pc{display:inline}}

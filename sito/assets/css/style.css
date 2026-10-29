@@ -894,7 +894,8 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
 /* firma del sito a piè pagina: "by" + logo IT di Ivano Taccucci, sulla stessa riga della Privacy */
 .foot-bottom{align-items:center}
 .foot-by{display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.08em;color:var(--dim)}
-.foot-by img{width:100px;height:auto;display:block}
+.foot-by img{width:70px;height:auto;display:block}
+@media (min-width:768px){.foot-by{order:3}.foot-bottom>a{margin-left:auto}}  /* PC: © a sinistra, Privacy e logo a destra */
 @media (max-width:767px){
   .foot-bottom{flex-wrap:nowrap;justify-content:space-between;text-align:left;gap:8px;font-size:10.5px}
   .foot-by img{width:44px}

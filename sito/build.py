@@ -211,7 +211,7 @@ def footer(lang):
 <p><a href="{area_url(lang)}">{U["area"]}</a></p>
 </div>
 </div>
-<div class="foot-bottom"><span>© Anfibiasub · P.I. 01326660097</span><span class="foot-by"><picture><source media="(max-width:767px)" srcset="/img/logo-it-m.webp"><img src="/img/logo-it.webp" alt="By Ivano Taccucci" width="100" height="49" loading="lazy"></picture></span><a href="{url('privacy', lang)}">{U["privacy"]}</a></div>
+<div class="foot-bottom"><span>© Anfibiasub · P.I. 01326660097</span><span class="foot-by"><img src="/img/logo-it.webp" alt="By Ivano Taccucci" width="70" height="33" loading="lazy"></span><a href="{url('privacy', lang)}">{U["privacy"]}</a></div>
 </div>
 </footer>
 <a class="wa" href="{WA}" target="_blank" rel="noopener" aria-label="{U["wa"]}">{WA_ICON}</a>

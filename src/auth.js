@@ -76,6 +76,7 @@ function requireUser(req, res, next) {
 function requireAdmin(req, res, next) {
   if (!res.locals.user) return res.redirect('/area/login');
   if (res.locals.user.role !== 'admin') return res.status(403).render('error', { code: 403, message: 'Accesso riservato ad Anfibiasub.' });
+  if (res.locals.user.must_change_password) return res.redirect('/area/profilo'); // primo accesso: prima la password
   next();
 }
 

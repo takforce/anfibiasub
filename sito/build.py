@@ -527,13 +527,13 @@ def utilita_html(lang):
     h = phero('catenarie', dict(UI[lang]['nav'])['utilita'], T('uti_h1'), T('uti_lead'))
     note = f'<p class="hint" style="margin-top:12px">{T("tbl_note")}</p>'
 
-    def table(head, rows, caption):
+    def table(head, rows, caption, cls=''):
         th = ''.join(f'<th scope="col">{x}</th>' for x in head)
         tr = ''.join('<tr>' + ''.join(f'<td>{c}</td>' for c in r) + '</tr>' for r in rows)
-        return f'<div class="tbl-scroll"><table class="data"><caption>{caption}</caption><thead><tr>{th}</tr></thead><tbody>{tr}</tbody></table></div>'
+        return f'<div class="tbl-scroll"><table class="data{cls}"><caption>{caption}</caption><thead><tr>{th}</tr></thead><tbody>{tr}</tbody></table></div>'
 
     dec = (lambda v: v.replace(',', '.')) if lang == 'en' else (lambda v: v)
-    bf = table(T('bf_cols'), [(f'<b>{f}</b>', names[lang][0], kmh, kn, names[lang][1]) for f, kmh, kn, names in BEAUFORT4], T('bf_cap'))
+    bf = table(T('bf_cols'), [(f'<b>{f}</b>', names[lang][0], kmh, kn, names[lang][1]) for f, kmh, kn, names in BEAUFORT4], T('bf_cap'), ' bf')
     hemp, poly = T('rope_cols')
     cime = table(['Ø mm', 'Manila', hemp, poly, 'Nylon', 'Manila', hemp, poly, 'Nylon'],
                  [(f'<b>{r[0]}</b>',) + tuple(fmt(x, lang) for x in r[1:]) for r in CIME], T('rope_cap'))

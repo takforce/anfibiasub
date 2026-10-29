@@ -867,3 +867,6 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
 
 /* bolle del sub tolte */
 .dv-canvas,.dv-bub{display:none!important}
+
+/* scala del vento da cellulare: la colonna dell'effetto sul mare non si stringe (righe altissime), la tabella scorre di lato */
+@media (max-width:767px){.data.bf td:nth-child(5),.data.bf th:nth-child(5){min-width:320px}.data.bf td:nth-child(2){white-space:nowrap}}

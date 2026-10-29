@@ -103,12 +103,12 @@
   var mq = window.matchMedia('(min-width:1024px)');
   var surf = bg.querySelector('.ab-surf'), sl = bg.querySelector('.ab-l'), sr = bg.querySelector('.ab-r'), veil = bg.querySelector('.ab-veil'), RATIO = 4515 / 821;
   var val = document.querySelector('[data-depth]'), bar = document.querySelector('[data-depth-bar]'), diver = document.querySelector('.diver'), line = document.querySelector('.dv-line');
-  var MAX = +bg.getAttribute('data-max') || 50, shallow = bg.classList.contains('is-shallow'), ticking = false;
+  var MAX = +bg.getAttribute('data-max') || 50, shallow = bg.classList.contains('is-shallow'), fixed = bg.classList.contains('is-fixed'), ticking = false;
   function update() {
     ticking = false;
     if (!mq.matches) return;
     var h = document.documentElement.scrollHeight - window.innerHeight;
-    var p = h > 0 ? Math.min(1, Math.max(0, window.scrollY / h)) : 0;
+    var p = fixed ? 0 : (h > 0 ? Math.min(1, Math.max(0, window.scrollY / h)) : 0); // Contatti: fermo a 1 m
     // due immagini verticali ai lati (0-50 m): scorrono dalla superficie al fondale insieme alla pagina
     if (sl && sr && veil) {
       var vw = window.innerWidth, vh = window.innerHeight, side = Math.max(0, (vw - veil.offsetWidth) / 2) + 48;
@@ -122,7 +122,7 @@
     // pagine interne: in cima la superficie del mare si muove (stesso video della Home), poi sale via con la discesa
     if (surf) {
       if (!surf.src) { surf.src = surf.canPlayType('video/mp4; codecs="avc1.42E01E"') ? '/img/superficie-3.mp4' : '/img/superficie-3.webm'; }
-      var sy = Math.round(-window.scrollY * 0.6);
+      var sy = fixed ? 0 : Math.round(-window.scrollY * 0.6);
       surf.style.transform = 'translate3d(0,' + sy + 'px,0)';
       var seen = sy + surf.offsetHeight > 0 && !document.hidden;
       if (seen && surf.paused) { var pp = surf.play(); if (pp && pp.catch) pp.catch(function () {}); }

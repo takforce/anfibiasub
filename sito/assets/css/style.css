@@ -834,3 +834,33 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
 }
 /* video OK ritagliato più largo a destra: la mano sulla cima resta intera */
 @media (min-width:1700px){.dv-ok{width:140.51%}}
+
+/* ---------- VIDEO (ottobre 2026) ---------- */
+/* sub da PC: video trasparenti al posto della foto, stessa posizione */
+.dv-v{display:none}
+@media (min-width:1700px){
+  .dv-v{display:block;position:absolute;left:-10%;top:-20%;width:115.56%;height:128%;opacity:0;pointer-events:none;
+    filter:drop-shadow(0 10px 24px rgba(0,0,0,.6))}
+  .dv-v.on{opacity:1}
+  .diver.has-vid img{opacity:0}
+  .dv-hose{transform:translateX(var(--hosex,0px))}
+  .dv-scr{transform:translate(var(--sdx,0px),var(--sdy,0px));opacity:var(--sop,1);transition:none}
+  .dv-lamp{transform:translate(var(--hx,0px),var(--hy,0px))}
+}
+/* prima schermata: superficie del mare in movimento */
+.hero-vid{display:none}
+@media (min-width:1024px){
+  .hero-vid{display:block;position:absolute;z-index:0;left:50%;width:100vw;transform:translateX(-50%);top:-160px;height:calc(100% + 160px);
+    object-fit:cover;object-position:center top;pointer-events:none;
+    -webkit-mask-image:linear-gradient(180deg,#000 0,#000 60%,transparent 100%);mask-image:linear-gradient(180deg,#000 0,#000 60%,transparent 100%)}
+  .hero::before{background:linear-gradient(180deg,rgba(5,14,26,.2) 0,rgba(5,14,26,.45) 45%,rgba(5,14,26,0) 100%)}
+}
+@media (max-width:767px){
+  .hero-vid{display:block;position:absolute;z-index:0;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;pointer-events:none}
+}
+/* relitto in fondo alla discesa (lato destro, PC): solo la luce si muove */
+.ab-rel{display:none}
+@media (min-width:1024px){
+  .abyss-bg .ab-rel{display:block;position:absolute;left:0;bottom:0;width:100%;height:auto;pointer-events:none;
+    -webkit-mask-image:linear-gradient(180deg,transparent 0,transparent 37%,#000 45%);mask-image:linear-gradient(180deg,transparent 0,transparent 37%,#000 45%)}
+}

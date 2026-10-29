@@ -125,6 +125,7 @@
     // dai 40 m in giù si accende la torcia sul casco
     if (diver) diver.style.setProperty('--lamp', Math.min(1, Math.max(0, (depth - 40) / 3)).toFixed(2));
     if (diver && diver.okAt) diver.okAt(depth);
+    if (window.relittoAt) window.relittoAt(depth);
     if (bar) bar.style.height = (p * 100).toFixed(1) + '%';
     // il sub scende dall'alto (sotto l'header) fino in fondo allo schermo
     if (diver && diver.offsetHeight) {
@@ -175,8 +176,8 @@
     var side = Math.random() < 0.5 ? -1 : 1;
     var big = Math.random() < 0.35;
     bubbles.push({
-      x: r.left + r.width * VX + side * r.width * (0.06 + Math.random() * 0.04),
-      y: r.top + r.height * VY + (Math.random() - 0.5) * 6,
+      x: r.left + r.width * (VX + (diver._hx || 0)) + side * r.width * (0.06 + Math.random() * 0.04),
+      y: r.top + r.height * (VY + (diver._hy || 0)) + (Math.random() - 0.5) * 6,
       vx: side * (25 + Math.random() * 55) * scale,     // si allargano ai lati del casco
       vy: -(8 + Math.random() * 25) * scale,
       r: (big ? 5 + Math.random() * 6 : 1.5 + Math.random() * 3.5) * scale,
@@ -297,39 +298,93 @@
   dlg.addEventListener('click', function (e) { if (e.target === dlg) close(); });
 })();
 
-// ---------- Arrivato sul fondo (50 m): il sub fa il segno OK, ogni volta che tocca il fondo ----------
+// ---------- Sub da PC: video che galleggia in continuo; a 50 m, a fine giro, fa il segno OK ----------
 (function () {
-  var diver = document.querySelector('.diver'), v = diver && diver.querySelector('.dv-ok');
-  if (!v || !v.canPlayType) return;
+  var diver = document.querySelector('.diver');
+  var vg = diver && diver.querySelector('.dv-giro'), vo = diver && diver.querySelector('.dv-okv');
+  if (!vg || !vo || !vg.canPlayType) return;
   // Safari non mostra la trasparenza dei video webm: lì resta la foto ferma
   var safari = /^((?!chrome|chromium|android|edg).)*safari/i.test(navigator.userAgent);
-  if (safari || !v.canPlayType('video/webm; codecs="vp9"')) return;
+  if (safari || !vg.canPlayType('video/webm; codecs="vp9"')) return;
   if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var loaded = false, armed = true, playing = false;
-  function show() { diver.classList.remove('ok-out'); diver.classList.add('is-ok'); }
-  function hide() { diver.classList.add('ok-out'); diver.classList.remove('is-ok'); }
-  // il video compare di colpo solo quando il primo fotogramma è già disegnato
-  function whenFrame(cb) {
-    if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(function () { cb(); });
-    else v.addEventListener('playing', function h() { v.removeEventListener('playing', h); setTimeout(cb, 60); });
+  var img = diver.querySelector('img'), line = document.querySelector('.dv-line');
+  var D = null, started = false, cur = null, armed = true;
+  // posizione di tubo, cima, schermo del polso e casco fotogramma per fotogramma (misurata sui video)
+  function apply(rows, t) {
+    if (!D || !rows) return;
+    var r = rows[Math.min(rows.length - 1, Math.max(0, Math.round(t * 24)))];
+    var w = diver.offsetWidth, h = img.offsetHeight, st = diver.style;
+    st.setProperty('--hosex', (r[0] * w).toFixed(1) + 'px');
+    st.setProperty('--sdx', (r[2] * w).toFixed(1) + 'px');
+    st.setProperty('--sdy', (r[3] * h).toFixed(1) + 'px');
+    st.setProperty('--sop', r[4]);
+    st.setProperty('--hx', (r[5] * w).toFixed(1) + 'px');
+    st.setProperty('--hy', (r[6] * h).toFixed(1) + 'px');
+    diver._hx = r[5]; diver._hy = r[6];
+    if (line) line.style.transform = 'translateX(' + (r[1] * w).toFixed(1) + 'px)';
   }
-  diver.okAt = function (depth) {
-    if (!diver.offsetWidth) return;
-    if (!loaded && depth > 38) { loaded = true; v.preload = 'auto'; v.src = '/img/sub-ok-5.webm'; }
-    if (depth < 45 && !playing) armed = true;           // risalito: al prossimo arrivo sul fondo lo rifà
-    if (depth >= 49.9 && armed && loaded && !playing) {
-      armed = false; playing = true;
-      try { v.currentTime = 0; } catch (e) {}
-      whenFrame(show);
-      var p = v.play();
-      if (p && p.catch) p.catch(function () { playing = false; armed = true; hide(); });
+  function follow(v, key) {
+    if (v.requestVideoFrameCallback) {
+      var cb = function (now, m) { if (cur === v) apply(D && D[key], m.mediaTime); v.requestVideoFrameCallback(cb); };
+      v.requestVideoFrameCallback(cb);
+    } else {
+      (function tick() { if (cur === v && !v.paused) apply(D && D[key], v.currentTime); requestAnimationFrame(tick); })();
     }
-  };
-  // negli ultimi istanti il video sfuma sulla foto ferma
-  v.addEventListener('timeupdate', function () {
-    if (playing && v.duration && v.currentTime > v.duration - 0.45 && diver.classList.contains('is-ok')) hide();
+  }
+  // il passaggio da un video all'altro avviene solo quando il nuovo ha già disegnato il primo fotogramma
+  function whenFrame(v, cb) {
+    if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(function () { cb(); });
+    else v.addEventListener('playing', function h() { v.removeEventListener('playing', h); setTimeout(cb, 40); });
+  }
+  function show(v) {
+    vg.classList.toggle('on', v === vg); vo.classList.toggle('on', v === vo);
+    diver.classList.add('has-vid'); cur = v;
+  }
+  function play(v) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+  function start() {
+    started = true;
+    fetch('/js/sub-dati.json').then(function (r) { return r.json(); }).then(function (d) { D = d; }).catch(function () {});
+    vg.loop = true; vg.preload = 'auto'; vg.src = '/img/sub-giro-a.webm';
+    vo.preload = 'auto'; vo.src = '/img/sub-ok-a.webm';
+    follow(vg, 'sub-giro-a'); follow(vo, 'sub-ok-a');
+    whenFrame(vg, function () { show(vg); });
+    play(vg);
+  }
+  // fine del giro con la richiesta di OK: parte il segno OK (stessa posa, nessuno stacco)
+  vg.addEventListener('ended', function () {
+    try { vo.currentTime = 0; } catch (e) {}
+    whenFrame(vo, function () { show(vo); });
+    play(vo);
   });
-  v.addEventListener('ended', function () { hide(); playing = false; });
+  vo.addEventListener('ended', function () {
+    vg.loop = true;
+    try { vg.currentTime = 0; } catch (e) {}
+    whenFrame(vg, function () { show(vg); });
+    play(vg);
+  });
+  diver.okAt = function (depth) {
+    if (!diver.offsetWidth) { if (cur) cur.pause(); return; }
+    if (!started) start();
+    else if (cur && cur.paused && !cur.ended) play(cur);
+    if (depth < 45) armed = true;                       // risalito: al prossimo arrivo sul fondo lo rifà
+    if (depth >= 49.9 && armed && cur === vg) { armed = false; vg.loop = false; }
+  };
+  document.addEventListener('visibilitychange', function () { if (document.hidden && cur) cur.pause(); else if (cur && diver.offsetWidth) play(cur); });
+})();
+
+// ---------- PC: in fondo alla discesa la luce si muove sul relitto ----------
+(function () {
+  var v = document.querySelector('.ab-rel');
+  if (!v || !v.canPlayType) return;
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var loaded = false;
+  window.relittoAt = function (depth) {
+    if (!v.offsetWidth) return;
+    if (depth > 30 && !loaded) { loaded = true; v.preload = 'auto'; v.src = v.canPlayType('video/mp4; codecs="avc1.42E01E"') ? '/img/relitto-3.mp4' : '/img/relitto-3.webm'; }
+    if (!loaded) return;
+    if (depth > 36) { if (v.paused) { var p = v.play(); if (p && p.catch) p.catch(function () {}); } }
+    else if (!v.paused) v.pause();
+  };
 })();
 
 // ---------- Cellulare: in fondo alla home il sub fa OK in continuo (parte solo quando è visibile) ----------
@@ -341,10 +396,14 @@
     es.forEach(function (e) {
       if (!box.offsetWidth) return;
       if (e.isIntersecting) {
-        if (!v.src) v.src = v.canPlayType('video/mp4; codecs="avc1.42E01E"') ? '/img/sub-ok-mobile-2.mp4' : '/img/sub-ok-mobile-2.webm';
+        if (!v.src) { v.preload = 'auto'; v.src = v.canPlayType('video/mp4; codecs="avc1.42E01E"') ? '/img/sub-mobile-3.mp4' : '/img/sub-mobile-3.webm'; }
         var p = v.play(); if (p && p.catch) p.catch(function () {});
       } else if (v.src) v.pause();
     });
   }, { rootMargin: '200px 0px' });
   io.observe(box);
+  // con il risparmio energetico iPhone blocca l'avvio automatico: riprova al primo tocco o scorrimento
+  function retry() { if (v.src && v.paused && box.getBoundingClientRect().top < innerHeight && box.getBoundingClientRect().bottom > 0) { var p = v.play(); if (p && p.catch) p.catch(function () {}); } }
+  window.addEventListener('touchstart', retry, { passive: true });
+  window.addEventListener('scroll', retry, { passive: true });
 })();

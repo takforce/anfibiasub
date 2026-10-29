@@ -129,8 +129,8 @@ SHALLOW = {'chi', 'contatti'}  # pagine corte: discesa fino a 30 m, senza relitt
 
 def depth_bg(lang, key=''):
     """Sfondo da PC: dalla superficie al relitto mentre si scorre, con profondimetro digitale 0-50 m."""
-    return f'''<div class="abyss-bg{' is-shallow' if key in SHALLOW else ''}" aria-hidden="true" data-max="{30 if key in SHALLOW else 50}"><i class="ab-l"></i><i class="ab-r"></i><span class="ab-veil"></span></div>
-<span class="dv-line" aria-hidden="true"></span><div class="diver" aria-hidden="true"><span class="dv-hose"></span><span class="dv-bub"></span><span class="dv-rope"></span><span class="dv-rope2"></span><img src="/img/sub-ots.webp" alt="" width="602" height="1672"><video class="dv-ok" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><span class="dv-lamp"></span><span class="dv-scr"><b data-depth>0.0</b><small>m</small></span></div>'''
+    return f'''<div class="abyss-bg{' is-shallow' if key in SHALLOW else ''}" aria-hidden="true" data-max="{30 if key in SHALLOW else 50}"><i class="ab-l"></i><i class="ab-r">{'' if key in SHALLOW else '<video class="ab-rel" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>'}</i><span class="ab-veil"></span></div>
+<span class="dv-line" aria-hidden="true"></span><div class="diver" aria-hidden="true"><span class="dv-hose"></span><span class="dv-bub"></span><span class="dv-rope"></span><span class="dv-rope2"></span><img src="/img/sub-ots.webp" alt="" width="602" height="1672"><video class="dv-v dv-giro" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><video class="dv-v dv-okv" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><span class="dv-lamp"></span><span class="dv-scr"><b data-depth>0.0</b><small>m</small></span></div>'''
 
 
 def sos_dialog(lang):
@@ -397,6 +397,7 @@ def build_lang(lang):
     badges = ''.join(f'<div class="badge">{ic}<span><strong>{a}</strong><br><span>{b}</span></span></div>' for ic, (a, b) in zip(B_ICONS, T('badges')))
     home = f'''<section class="hero" aria-label="{T('intro')}">
 <img class="hero-img" src="/img/porto-loano.webp" alt="{T('hero_alt')}" fetchpriority="high">
+<video class="hero-vid" muted loop playsinline autoplay preload="auto" poster="/img/superficie-3.webp" aria-hidden="true" tabindex="-1"><source src="/img/superficie-3.mp4" type="video/mp4"><source src="/img/superficie-3.webm" type="video/webm"></video>
 <div class="wrap hero-body">
 <p class="hero-kicker"><span class="kick-d">{T('hero_kicker')}</span><span class="kick-m">{T('hero_kicker_m')}</span></p>
 <h1>{T('hero_h1')}</h1>
@@ -446,7 +447,7 @@ def build_lang(lang):
 </div>
 </section>
 
-<div class="m-ok" aria-hidden="true"><video muted loop playsinline preload="none" poster="/img/sub-ok-mobile-2.webp" width="540" height="720"></video></div>
+<div class="m-ok" aria-hidden="true"><video muted loop playsinline preload="none" poster="/img/sub-mobile-3.webp" width="540" height="720"></video></div>
 
 <section class="section band m-hide" id="area" aria-labelledby="area-t">
 <div class="wrap split">

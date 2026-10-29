@@ -101,7 +101,7 @@
   var bg = document.querySelector('.abyss-bg');
   if (!bg || !window.matchMedia) return;
   var mq = window.matchMedia('(min-width:1024px)');
-  var sl = bg.querySelector('.ab-l'), sr = bg.querySelector('.ab-r'), veil = bg.querySelector('.ab-veil'), RATIO = 4515 / 821;
+  var surf = bg.querySelector('.ab-surf'), sl = bg.querySelector('.ab-l'), sr = bg.querySelector('.ab-r'), veil = bg.querySelector('.ab-veil'), RATIO = 4515 / 821;
   var val = document.querySelector('[data-depth]'), bar = document.querySelector('[data-depth-bar]'), diver = document.querySelector('.diver'), line = document.querySelector('.dv-line');
   var MAX = +bg.getAttribute('data-max') || 50, shallow = bg.classList.contains('is-shallow'), ticking = false;
   function update() {
@@ -118,6 +118,15 @@
       sl.style.height = sr.style.height = Math.round(ih) + 'px';
       sl.style.left = Math.round(side - iw) + 'px';
       sl.style.transform = sr.style.transform = 'translate3d(0,' + y + 'px,0)';
+    }
+    // pagine interne: in cima la superficie del mare si muove (stesso video della Home), poi sale via con la discesa
+    if (surf) {
+      if (!surf.src) { surf.src = surf.canPlayType('video/mp4; codecs="avc1.42E01E"') ? '/img/superficie-3.mp4' : '/img/superficie-3.webm'; }
+      var sy = Math.round(-window.scrollY * 0.6);
+      surf.style.transform = 'translate3d(0,' + sy + 'px,0)';
+      var seen = sy + surf.offsetHeight > 0 && !document.hidden;
+      if (seen && surf.paused) { var pp = surf.play(); if (pp && pp.catch) pp.catch(function () {}); }
+      else if (!seen && !surf.paused) surf.pause();
     }
     // profondità da 1 m (appena sotto la superficie) al massimo della pagina
     var depth = 1 + p * (MAX - 1);

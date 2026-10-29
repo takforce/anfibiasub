@@ -131,7 +131,7 @@ SHALLOW = {'chi', 'contatti'}  # pagine corte: discesa fino a 30 m, senza relitt
 
 def depth_bg(lang, key=''):
     """Sfondo da PC: dalla superficie al relitto mentre si scorre, con profondimetro digitale 0-50 m."""
-    return f'''<div class="abyss-bg{' is-shallow' if key in SHALLOW else ''}" aria-hidden="true" data-max="{30 if key in SHALLOW else 50}"><i class="ab-l"></i><i class="ab-r">{'' if key in SHALLOW else '<video class="ab-rel" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>'}</i><span class="ab-veil"></span></div>
+    return f'''<div class="abyss-bg{' is-shallow' if key in SHALLOW else ''}" aria-hidden="true" data-max="{30 if key in SHALLOW else 50}">{'' if key == 'home' else '<video class="ab-surf" muted loop playsinline preload="none" poster="/img/superficie-3.webp" aria-hidden="true" tabindex="-1"></video>'}<i class="ab-l"></i><i class="ab-r">{'' if key in SHALLOW else '<video class="ab-rel" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>'}</i><span class="ab-veil"></span></div>
 <span class="dv-line" aria-hidden="true"></span><div class="diver" aria-hidden="true"><span class="dv-hose"></span><span class="dv-bub"></span><span class="dv-rope"></span><span class="dv-rope2"></span><img src="/img/sub-ots.webp" alt="" width="602" height="1672"><video class="dv-v dv-giro" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><video class="dv-v dv-okv" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><span class="dv-lamp"></span><span class="dv-scr"><b data-depth>0.0</b><small>m</small></span></div>'''
 
 

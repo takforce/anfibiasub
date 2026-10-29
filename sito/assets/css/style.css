@@ -891,7 +891,11 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
 /* cellulare: immagine del meteo più leggera (metà dimensione) */
 @media (max-width:767px){.mb-art{background-image:url(/img/meteo-mare-m.webp)}}
 
-/* firma del sito a piè pagina: logo IT di Ivano Taccucci */
-.foot-credit{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:22px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
-.it-logo{width:200px;height:auto;display:block}
-@media (max-width:767px){.foot-credit{flex-direction:column;gap:8px;margin-top:16px}.it-logo{width:180px}}
+/* firma del sito a piè pagina: "by" + logo IT di Ivano Taccucci, sulla stessa riga della Privacy */
+.foot-bottom{align-items:center}
+.foot-by{display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.08em;color:var(--dim)}
+.foot-by img{width:100px;height:auto;display:block}
+@media (max-width:767px){
+  .foot-bottom{flex-wrap:nowrap;justify-content:space-between;text-align:left;gap:8px;font-size:10.5px}
+  .foot-by img{width:44px}
+}

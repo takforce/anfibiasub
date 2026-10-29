@@ -890,3 +890,8 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
 
 /* cellulare: immagine del meteo più leggera (metà dimensione) */
 @media (max-width:767px){.mb-art{background-image:url(/img/meteo-mare-m.webp?v=6fd04f)}}
+
+/* firma del sito a piè pagina: logo IT di Ivano Taccucci */
+.foot-credit{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:22px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.it-logo{width:200px;height:auto;display:block}
+@media (max-width:767px){.foot-credit{flex-direction:column;gap:8px;margin-top:16px}.it-logo{width:180px}}

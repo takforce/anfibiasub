@@ -130,6 +130,11 @@ SHALLOW = {'chi', 'contatti'}  # pagine corte: discesa fino a 30 m, senza relitt
 FIXED = {'contatti'}  # pagina troppo corta: il sub resta fermo a 1 m, l'acqua si muove sempre
 
 
+# firma del sito: logo di Ivano Taccucci a piè pagina (IVANO nella I, TACCUCCI nella T)
+LOGO_IT = '''<svg class="it-logo" viewBox="0 0 360 130" role="img" aria-label="Ivano Taccucci"> <defs> <linearGradient id="met" x1="0" y1="0" x2="1" y2="1"> <stop offset="0" stop-color="#F4F8FC"/> <stop offset=".45" stop-color="#B9C6D3"/> <stop offset=".55" stop-color="#E8EEF4"/> <stop offset="1" stop-color="#8D9DAE"/> </linearGradient> <filter id="glow" x="-20%" y="-30%" width="140%" height="160%"> <feGaussianBlur stdDeviation="3.2" result="b"/> <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge> </filter> </defs> <g fill="#1F8BF0"> <rect x="6" y="52" width="8" height="8" opacity=".55"/> <rect x="18" y="40" width="9" height="9" opacity=".8"/> <rect x="18" y="66" width="7" height="7" opacity=".5"/> <rect x="31" y="54" width="10" height="10" fill="#3CC6F5"/> <rect x="31" y="30" width="7" height="7" opacity=".6"/> <rect x="31" y="78" width="8" height="8" opacity=".7"/> <rect x="44" y="42" width="8" height="8" fill="#3CC6F5" opacity=".85"/> <rect x="44" y="68" width="9" height="9" opacity=".9"/> </g> <g transform="skewX(-14) translate(32 0)" filter="url(#glow)"> <rect x="58" y="10" width="54" height="112" rx="3" fill="url(#met)" stroke="#3CC6F5" stroke-width="2.5"/> <text x="85" y="66" transform="rotate(-90 85 66)" text-anchor="middle" dominant-baseline="central" font-family="Montserrat,Arial,sans-serif" font-weight="800" font-size="36" textLength="98" lengthAdjust="spacingAndGlyphs" fill="#06223D">IVANO</text> <path d="M124 10 H318 V60 H246 V122 H196 V60 H124 Z" fill="url(#met)" stroke="#3CC6F5" stroke-width="2.5" stroke-linejoin="round"/> <text x="221" y="35" text-anchor="middle" dominant-baseline="central" font-family="Montserrat,Arial,sans-serif" font-weight="800" font-size="34" textLength="176" lengthAdjust="spacingAndGlyphs" fill="#06223D">TACCUCCI</text> </g> </svg>'''
+CREDIT = {'it': 'Sito realizzato da', 'en': 'Website by', 'es': 'Sitio web de', 'de': 'Website von'}
+
+
 def depth_bg(lang, key=''):
     """Sfondo da PC: dalla superficie al relitto mentre si scorre, con profondimetro digitale 0-50 m."""
     return f'''<div class="abyss-bg{' is-shallow' if key in SHALLOW else ''}{' is-fixed' if key in FIXED else ''}" aria-hidden="true" data-max="{30 if key in SHALLOW else 50}">{'' if key == 'home' else '<video class="ab-surf" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>'}<i class="ab-l"></i><i class="ab-r">{'' if key in SHALLOW else '<video class="ab-rel" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>'}</i><span class="ab-veil"></span></div>
@@ -212,6 +217,7 @@ def footer(lang):
 </div>
 </div>
 <div class="foot-bottom"><span>© Anfibiasub · P.I. 01326660097</span><a href="{url('privacy', lang)}">{U["privacy"]}</a></div>
+<div class="foot-credit"><span>{CREDIT[lang]}</span>{LOGO_IT}</div>
 </div>
 </footer>
 <a class="wa" href="{WA}" target="_blank" rel="noopener" aria-label="{U["wa"]}">{WA_ICON}</a>

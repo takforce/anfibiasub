@@ -45,6 +45,8 @@ Q_ICON = lambda d: f'<svg aria-hidden="true" width="30" height="30" viewBox="0 0
 QI_AREA = Q_ICON('<rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>')
 QI_METEO = Q_ICON('<path d="M3 8h11a3 3 0 1 0-3-3"/><path d="M3 12h16a3 3 0 1 1-3 3"/><path d="M3 16h7"/>')
 PIN = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.6"/></svg>'
+# Utilità: chiave inglese
+QI_UTIL = Q_ICON('<path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L4 16.8V20h3.2l5.3-5.3a4 4 0 0 0 5.2-5.4l-2.5 2.5-2.5-.6-.6-2.5z"/>')
 QI_GPS = Q_ICON('<path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.6"/>')
 BEACON = '<span class="beacon" aria-hidden="true"><span class="bc-ray"></span><span class="bc-dome"></span><span class="bc-base"></span></span>'
 MENU = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>'
@@ -115,7 +117,7 @@ def header(cur, lang, overlay):
 <nav class="quick wrap" aria-label="{U['area']}">
 <a class="q-tile q-area" href="{area_url(lang)}">{QI_AREA}<strong>{tx(lang, 'q_area')[0]}</strong><span>{tx(lang, 'q_area')[1]}</span></a>
 <a class="q-tile q-help" href="{WA}" target="_blank" rel="noopener">{WA_ICON}<strong>{tx(lang, 'q_help')[0]}</strong><span>{tx(lang, 'q_help')[1]}</span></a>
-<a class="q-tile" href="{url('utilita', lang, 'gps')}">{QI_GPS}<strong>{tx(lang, 'q_gps')[0]}</strong><span>{tx(lang, 'q_gps')[1]}</span></a>
+<a class="q-tile" href="{url('utilita', lang)}">{QI_UTIL}<strong>{tx(lang, 'q_util')[0]}</strong><span>{tx(lang, 'q_util')[1]}</span></a>
 <button class="q-tile q-sos" type="button" data-sos>{QI_GPS}<strong>{SOS[lang]["btn"]}</strong></button>
 </nav>
 </header>'''

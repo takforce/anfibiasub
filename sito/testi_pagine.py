@@ -184,5 +184,6 @@ TX = {
     'q_area': {'it': ('Accedi', 'Area clienti'), 'en': ('Log in', 'Customer area'), 'es': ('Acceder', 'Área de clientes'), 'de': ('Anmelden', 'Kundenbereich')},
     'q_help': {'it': ('Assistenza', 'Chat WhatsApp'), 'en': ('Support', 'WhatsApp chat'), 'es': ('Asistencia', 'Chat de WhatsApp'), 'de': ('Hilfe', 'WhatsApp-Chat')},
     'q_meteo': {'it': ('Meteo', 'Vento e mare a Loano'), 'en': ('Weather', 'Wind and sea in Loano'), 'es': ('Tiempo', 'Viento y mar en Loano'), 'de': ('Wetter', 'Wind und See in Loano')},
+    'q_util': {'it': ('Utilità', 'Meteo, webcam, tabelle'), 'en': ('Tools', 'Weather, webcam, tables'), 'es': ('Utilidades', 'Meteo, webcam, tablas'), 'de': ('Nützliches', 'Wetter, Webcam, Tabellen')},
     'q_gps': {'it': ('Posizione', 'Marcatore GPS'), 'en': ('Position', 'GPS marker'), 'es': ('Posición', 'Marcador GPS'), 'de': ('Position', 'GPS-Markierung')},
 }

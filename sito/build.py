@@ -53,6 +53,11 @@ MENU = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill=
 
 
 # voce di menu del minigioco ABYSS (il gioco è solo in italiano)
+# tasto del gioco nella pagina Utilità (solo cellulare): titolo, sottotitolo, pulsante
+GAME_CARD = {'it': ('Gioco 3D', 'Il relitto dimenticato', 'GIOCA'),
+             'en': ('3D game · in Italian', 'The forgotten wreck', 'PLAY'),
+             'es': ('Juego 3D · en italiano', 'El pecio olvidado', 'JUGAR'),
+             'de': ('3D-Spiel · auf Italienisch', 'Das vergessene Wrack', 'SPIELEN')}
 GAME_LABEL = {'it': 'ABYSS · il gioco 3D', 'en': 'ABYSS · 3D game (Italian)', 'es': 'ABYSS · juego 3D (en italiano)', 'de': 'ABYSS · 3D-Spiel (auf Italienisch)'}
 
 
@@ -543,6 +548,7 @@ def utilita_html(lang):
     anc = table(['Ø mm', 'CP 1-1b', 'CR 1-1b', 'CP 2', 'CR 2', 'CP 3', 'CR 3', T('anchor_join'), 'Kenter'],
                 [(f'<b>{r[0]}</b>',) + tuple(fmt(x, lang) for x in r[1:]) for r in CATENE_ANCORE], T('anchor_cap'))
     live = f'''<section class="tool-sec" id="meteo"><h2 class="vh">{title['meteo'][lang]}</h2>
+<a class="game-card" href="/abyss.html"><span class="gc-k">{GAME_CARD[lang][0]}</span><strong class="gc-t">ABYSS</strong><span class="gc-s">{GAME_CARD[lang][1]}</span><span class="btn gc-b">{GAME_CARD[lang][2]} <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></a>
 <div class="meteo" data-meteo data-lang="{lang}" data-title="{title['meteo'][lang]}"><div class="mb-frame"><div class="mb-art"></div></div></div>
 <div class="gb" data-giorni data-lang="{lang}" data-title="{GB_TITLE[lang]}"><div class="gb-frame"><div class="gb-art"></div></div></div>
 </section>

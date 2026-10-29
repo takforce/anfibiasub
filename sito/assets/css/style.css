@@ -904,3 +904,16 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
 /* a capo solo da PC (es. "Serietà, professionalità e competenza." nella prima schermata) */
 .br-pc{display:none}
 @media (min-width:1024px){.br-pc{display:inline}}
+
+/* Utilità da cellulare: tasto del gioco ABYSS sopra il meteo, largo come il meteo, con lo sfondo del gioco */
+.game-card{display:none}
+@media (max-width:767px){
+  .game-card{position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;margin:0 0 14px;padding:18px 18px;min-height:150px;
+    border-radius:16px;border:1px solid rgba(60,198,245,.45);overflow:hidden;text-decoration:none;color:#fff;
+    background:linear-gradient(90deg,rgba(3,10,22,.92) 0%,rgba(3,10,22,.6) 45%,rgba(3,10,22,0) 75%),url(/img/abyss-card.webp) 70% 40%/cover no-repeat #04101e;
+    box-shadow:0 0 22px rgba(60,198,245,.18),0 12px 28px rgba(0,0,0,.5)}
+  .gc-k{font-size:10.5px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#3CC6F5}
+  .gc-t{font-size:34px;line-height:1.05;font-weight:800;letter-spacing:.12em;text-shadow:0 0 18px rgba(60,198,245,.65),0 2px 0 #031020}
+  .gc-s{font-size:13px;color:#cfe3ef;margin-bottom:10px}
+  .game-card .gc-b{padding:8px 16px;min-height:0;font-size:12.5px;letter-spacing:.1em;gap:6px}
+}

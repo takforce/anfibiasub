@@ -878,3 +878,12 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
     will-change:transform;-webkit-mask-image:linear-gradient(180deg,#000 0,#000 50%,transparent 100%);mask-image:linear-gradient(180deg,#000 0,#000 50%,transparent 100%)}
   .abyss-bg .ab-veil{z-index:2}
 }
+
+/* ---------- TASTI UNIFORMI: tutti come "Dove sono" (blu in rilievo, bordo azzurro, testo bianco) ---------- */
+.btn,.btn-ghost,.nav .btn,.hc-q,.hc-c,.sos-go,.sos-no,.linkbtn,.btn-wa,.chip-sm{
+  background:linear-gradient(180deg,#14507E,#0B2F4E)!important;color:#fff!important;border:1px solid rgba(60,198,245,.5)!important;border-radius:999px!important;
+  font-weight:700;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 3px 0 #061a2c,0 6px 12px rgba(0,0,0,.4)!important;transition:filter .15s,transform .1s}
+.btn:hover,.btn-ghost:hover,.hc-q:hover,.hc-c:hover,.sos-go:hover,.sos-no:hover,.linkbtn:hover,.btn-wa:hover,.chip-sm:hover{filter:brightness(1.15);color:#fff!important}
+.btn:active,.hc-q:active,.hc-c:active,.sos-go:active,.sos-no:active,.linkbtn:active,.btn-wa:active,.chip-sm:active{transform:translateY(2px)}
+.btn svg,.hc-q svg,.hc-c svg,.sos-no svg,.linkbtn svg{color:#3CC6F5}
+.sos-go svg,.btn-wa svg{color:#25D366}

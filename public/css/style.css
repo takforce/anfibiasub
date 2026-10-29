@@ -887,3 +887,6 @@ h1,h2,h3,.fasi-list b{text-wrap:balance}
 .btn:active,.hc-q:active,.hc-c:active,.sos-go:active,.sos-no:active,.linkbtn:active,.btn-wa:active,.chip-sm:active{transform:translateY(2px)}
 .btn svg,.hc-q svg,.hc-c svg,.sos-no svg,.linkbtn svg{color:#3CC6F5}
 .sos-go svg,.btn-wa svg{color:#25D366}
+
+/* cellulare: immagine del meteo più leggera (metà dimensione) */
+@media (max-width:767px){.mb-art{background-image:url(/img/meteo-mare-m.webp?v=6fd04f)}}

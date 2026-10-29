@@ -96,6 +96,12 @@
   Array.prototype.forEach.call(links, function (a) { a.addEventListener('click', function () { setTimeout(close, 300); }); });
 })();
 
+// ---------- I video partono solo a pagina caricata: prima testi e foto, poi le animazioni ----------
+window.__ready = false;
+window.addEventListener('load', function () {
+  setTimeout(function () { window.__ready = true; window.dispatchEvent(new Event('resize')); }, 300);
+});
+
 // ---------- Sfondo "discesa" da PC: superficie -> relitto, profondimetro 0-50 m ----------
 (function () {
   var bg = document.querySelector('.abyss-bg');
@@ -121,11 +127,11 @@
     }
     // pagine interne: in cima la superficie del mare si muove (stesso video della Home), poi sale via con la discesa
     if (surf) {
-      if (!surf.src) { surf.src = surf.canPlayType('video/mp4; codecs="avc1.42E01E"') ? '/img/superficie-3.mp4' : '/img/superficie-3.webm'; }
+      if (!surf.src && window.__ready) { surf.poster = '/img/superficie-3.webp?v=8fb661'; surf.src = surf.canPlayType('video/mp4; codecs="avc1.42E01E"') ? '/img/superficie-3.mp4' : '/img/superficie-3.webm'; }
       var sy = fixed ? 0 : Math.round(-window.scrollY * 0.6);
       surf.style.transform = 'translate3d(0,' + sy + 'px,0)';
       var seen = sy + surf.offsetHeight > 0 && !document.hidden;
-      if (seen && surf.paused) { var pp = surf.play(); if (pp && pp.catch) pp.catch(function () {}); }
+      if (seen && surf.paused && surf.src) { var pp = surf.play(); if (pp && pp.catch) pp.catch(function () {}); }
       else if (!seen && !surf.paused) surf.pause();
     }
     // profondità da 1 m (appena sotto la superficie) al massimo della pagina
@@ -355,7 +361,6 @@
     started = true;
     fetch('/js/sub-dati.json').then(function (r) { return r.json(); }).then(function (d) { D = d; }).catch(function () {});
     vg.loop = true; vg.preload = 'auto'; vg.src = '/img/sub-giro-a.webm';
-    vo.preload = 'auto'; vo.src = '/img/sub-ok-a.webm';
     follow(vg, 'sub-giro-a'); follow(vo, 'sub-ok-a');
     whenFrame(vg, function () { show(vg); });
     play(vg);
@@ -374,8 +379,9 @@
   });
   diver.okAt = function (depth) {
     if (!diver.offsetWidth) { if (cur) cur.pause(); return; }
-    if (!started) start();
-    else if (cur && cur.paused && !cur.ended) play(cur);
+    if (!started) { if (window.__ready) start(); return; }
+    if (cur && cur.paused && !cur.ended) play(cur);
+    if (depth > 35 && !vo.src) { vo.preload = 'auto'; vo.src = '/img/sub-ok-a.webm'; } // il segno OK si scarica solo verso il fondo
     if (depth < 45) armed = true;                       // risalito: al prossimo arrivo sul fondo lo rifà
     if (depth >= 49.9 && armed && cur === vg) { armed = false; vg.loop = false; }
   };

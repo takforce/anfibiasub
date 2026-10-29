@@ -101,7 +101,7 @@ def header(cur, lang, overlay):
 <header class="site-header{'' if overlay else ' solid'}">
 <div class="wrap nav-row">
 <a class="logo" href="{url('home', lang)}" aria-label="Anfibiasub, home">
-<img class="logo-img" src="/img/logo-libero.png" alt="" width="64" height="64">
+<img class="logo-img" src="/img/logo-libero-160.webp" alt="" width="64" height="64">
 <span class="logo-txt"><span class="logo-name">ANFIBIA<span class="hl">SUB</span></span><span class="logo-sub">{U["tagline"]}</span></span>
 </a>
 <a class="btn nav-cta" data-quote href="{url('contatti', lang)}">{U["quote"]}</a>
@@ -132,8 +132,8 @@ FIXED = {'contatti'}  # pagina troppo corta: il sub resta fermo a 1 m, l'acqua s
 
 def depth_bg(lang, key=''):
     """Sfondo da PC: dalla superficie al relitto mentre si scorre, con profondimetro digitale 0-50 m."""
-    return f'''<div class="abyss-bg{' is-shallow' if key in SHALLOW else ''}{' is-fixed' if key in FIXED else ''}" aria-hidden="true" data-max="{30 if key in SHALLOW else 50}">{'' if key == 'home' else '<video class="ab-surf" muted loop playsinline preload="none" poster="/img/superficie-3.webp" aria-hidden="true" tabindex="-1"></video>'}<i class="ab-l"></i><i class="ab-r">{'' if key in SHALLOW else '<video class="ab-rel" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>'}</i><span class="ab-veil"></span></div>
-<span class="dv-line" aria-hidden="true"></span><div class="diver" aria-hidden="true"><span class="dv-hose"></span><span class="dv-bub"></span><span class="dv-rope"></span><span class="dv-rope2"></span><img src="/img/sub-ots.webp" alt="" width="602" height="1672"><video class="dv-v dv-giro" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><video class="dv-v dv-okv" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><span class="dv-lamp"></span><span class="dv-scr"><b data-depth>0.0</b><small>m</small></span></div>'''
+    return f'''<div class="abyss-bg{' is-shallow' if key in SHALLOW else ''}{' is-fixed' if key in FIXED else ''}" aria-hidden="true" data-max="{30 if key in SHALLOW else 50}">{'' if key == 'home' else '<video class="ab-surf" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>'}<i class="ab-l"></i><i class="ab-r">{'' if key in SHALLOW else '<video class="ab-rel" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>'}</i><span class="ab-veil"></span></div>
+<span class="dv-line" aria-hidden="true"></span><div class="diver" aria-hidden="true"><span class="dv-hose"></span><span class="dv-bub"></span><span class="dv-rope"></span><span class="dv-rope2"></span><img src="/img/sub-ots.webp" alt="" width="602" height="1672" loading="lazy"><video class="dv-v dv-giro" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><video class="dv-v dv-okv" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><span class="dv-lamp"></span><span class="dv-scr"><b data-depth>0.0</b><small>m</small></span></div>'''
 
 
 def sos_dialog(lang):
@@ -191,7 +191,7 @@ def footer(lang):
 <div class="wrap">
 <div class="foot-grid">
 <div class="foot-brand">
-<img src="/img/logo-libero.png" alt="Anfibiasub" width="80" height="80">
+<img src="/img/logo-libero-160.webp" alt="Anfibiasub" width="80" height="80" loading="lazy">
 <p>{U["foot_about"]}</p>
 </div>
 <div>
@@ -329,7 +329,7 @@ def schede_dialog(lang):
         bodies += (f'<div class="sch-body" data-sch-body="{k}" hidden>{foto}'
                    f'<h3>{U["fun"]}</h3><p>{e(fun)}</p><h3>{U["imp"]}</h3><p>{e(imp)}</p>'
                    f'<h3>{U["car"]}</h3><ul class="rim-list">{"".join(f"<li>{e(c)}</li>" for c in car)}</ul>'
-                   + (f'<p class="sch-src">{U["fonti"]}:</p><ul class="sch-fonti">{fonti}</ul>' if fonti else '') + '</div>')
+                   + '</div>')  # fonti tolte dalle schede (ottobre 2026)
     return (f'<dialog class="sch-dlg" id="sch-dlg" aria-labelledby="sch-t"><div class="sch-head"><h2 id="sch-t" data-sch-title></h2>'
             f'<button class="sch-x" type="button" data-sch-close aria-label="{U["close"]}">×</button></div>{bodies}</dialog>')
 

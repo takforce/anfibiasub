@@ -149,6 +149,7 @@
 
 // ---------- Bolle di scarico dell'OTS: escono dalle valvole sotto il mento, a ritmo di respiro ----------
 (function () {
+  return; // bolle tolte (ottobre 2026): sembravano finte
   var diver = document.querySelector('.diver');
   if (!diver || !window.matchMedia || !window.requestAnimationFrame) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;

@@ -63,5 +63,18 @@ export function createAudio() {
     for (let i = 0; i < 30; i++) tone(200 + Math.random() * 900, 0.08, 0.04, 'sine', 1 + Math.random() * 2, 2);
   };
   A.finale = () => { [196, 247, 294, 392].forEach((f, i) => tone(f, 6, 0.045, 'sine', i * 0.4)); [784, 988].forEach((f, i) => tone(f, 4, 0.015, 'sine', 1.5 + i * 0.5)); };
+  // getto d'aria dalla bombola (continuo finché si tiene premuto)
+  let hiss = null;
+  A.hissOn = () => {
+    if (!A.ready || hiss) return;
+    const c = A.ctx, s = c.createBufferSource(); s.buffer = A.white; s.loop = true;
+    const f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 900; f.Q.value = 0.6;
+    const g = c.createGain(); g.gain.value = 0; g.gain.linearRampToValueAtTime(0.32, c.currentTime + 0.08);
+    s.connect(f).connect(g).connect(master); s.start(); hiss = { s, g };
+  };
+  A.hissOff = () => { if (!hiss) return; const c = A.ctx; hiss.g.gain.linearRampToValueAtTime(0, c.currentTime + 0.15); hiss.s.stop(c.currentTime + 0.2); hiss = null; };
+  // pericolo: due note basse che si ripetono (stile documentario, non arcade)
+  A.danger = () => { [0, 0.6, 1.2, 1.8].forEach((t, i) => tone(i % 2 ? 98 : 92, 0.5, 0.12, 'triangle', t)); };
+  A.hit = () => { noiseHit(0.8, 120, 0.8, 0.6, 'lowpass', 0.005); tone(60, 1.2, 0.2, 'sawtooth', 0, 0.5); };
   return A;
 }

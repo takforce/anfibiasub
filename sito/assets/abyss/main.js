@@ -7,6 +7,7 @@ import { buildWreck, makeHelmet } from './wreck.js';
 import { buildArtifacts } from './artifacts.js';
 import { buildLandmarks } from './landmarks.js';
 import { buildFish } from './fish.js';
+import { buildShark } from './shark.js';
 import { buildAds, buildStatues } from './ads.js';
 import { createControls } from './controls.js';
 import { createAudio } from './audio.js';
@@ -20,7 +21,7 @@ const Q = { mobile, particles: mobile ? 1600 : 4200, tex: mobile ? 256 : 512, sh
 
 // ---------------- stato ----------------
 // phase: 1 = tre reperti e botola, 2 = botola aperta (entrare nella camera), 3 = giornale letto (cercare il cofanetto)
-const S = { state: 'INTRO', prev: null, t: 0, phase: 1, found: [], hatchSeen: false, reached: false, torch: false, torchTouched: false, panel: null, inspect: null, seq: null, fpsN: 0, fpsT: 0, hintT: 0 };
+const S = { state: 'INTRO', prev: null, t: 0, phase: 1, air: 220, reserveSaid: false, found: [], hatchSeen: false, reached: false, torch: false, torchTouched: false, panel: null, inspect: null, seq: null, fpsN: 0, fpsT: 0, hintT: 0 };
 const setState = (s) => { S.prev = S.state; S.state = s; root.dataset.state = s; };
 
 // ---------------- renderer ----------------
@@ -101,6 +102,9 @@ const world = buildWorld(scene, tex, Q, avoid);
 const spots = buildLandmarks(scene, world, tex);
 const arts = buildArtifacts(scene, wreck, tex, spots);
 const fish = buildFish(scene, Q); world.updaters.push(fish);
+const shark = buildShark(scene);
+// aria: 220 bar per 50 minuti; il getto d'aria contro lo squalo consuma il 2% al secondo
+const AIR = { max: 220, rate: 220 / (50 * 60), blast: 220 * 0.02, reserve: 50 };
 buildStatues(scene, world, tex, CFG.statues, makeHelmet);
 const adsReady = buildAds(scene, wreck, tex, CFG.ads);
 // rotta e distanza scritte nel giornale di bordo: calcolate dalla posizione vera di poppa e arco
@@ -117,6 +121,7 @@ resetPlayer();
 const audio = createAudio();
 const controls = createControls(canvas, root, {
   escape() {
+    if (S.state === 'DEAD') return;
     if (S.panel) { closePanel(); return; }
     if (S.state === 'PAUSED') resume(); else if (canPause()) pause();
   },
@@ -131,7 +136,7 @@ const canPause = () => ['DESCENT', 'EXPLORATION'].includes(S.state);
 // ---------------- interfaccia ----------------
 const ui = {
   depth: $('#ab-depth b'), count: $('#ab-count'), prompt: $('#ab-prompt'), msg: $('#ab-msg'), hint: $('#ab-hint'),
-  veil: $('#ab-veil'), start: $('#ab-start'), obj: $('#ab-obj'), gauge: $('.ab-gauge'), strip: $('.ab-comp-strip'), hdg: $('#ab-hdg'),
+  veil: $('#ab-veil'), start: $('#ab-start'), bar: $('#ab-bar'), needle: $('.ab-man-needle'), obj: $('#ab-obj'), gauge: $('.ab-gauge'), strip: $('.ab-comp-strip'), hdg: $('#ab-hdg'),
 };
 // bussola da polso: striscia con i punti cardinali (2 px per grado, ripetuta)
 {
@@ -229,7 +234,15 @@ function ready() {
   root.classList.add('is-ready');
 }
 // iPhone: Safari non permette di nascondere la barra degli indirizzi; da icona sulla Home il gioco va a schermo intero
-if (/iPhone|iPod/.test(navigator.userAgent) && !navigator.standalone) { const t = $('.ab-ios'); if (t) t.hidden = false; }
+if (/iPhone|iPod/.test(navigator.userAgent) && !navigator.standalone) {
+  const t = $('.ab-ios'); if (t) t.hidden = false;
+  // Safari iPhone: la barra si riduce solo se la pagina scorre. Rendo la pagina un po' più alta dello schermo
+  // (il gioco resta fisso): scorrendo verso l'alto la barra si riduce a una striscia e resta così durante il gioco.
+  document.documentElement.classList.add('ios-scroll');
+  const hide = () => { if (scrollY < 2) window.scrollTo(0, 1); };
+  addEventListener('orientationchange', () => setTimeout(hide, 400));
+  setTimeout(hide, 300);
+}
 function goFullscreen() {
   const el = document.documentElement, f = el.requestFullscreen || el.webkitRequestFullscreen;
   if (!f || document.fullscreenElement) return;
@@ -386,6 +399,19 @@ function openHatch() {
   };
 }
 
+// ---------------- morte: aria finita o attacco dello squalo ----------------
+function die(reason) {
+  if (S.state === 'DEAD') return;
+  setState('DEAD'); S.seq = null; S.inspect = null;
+  controls.enabled = false; controls.reset(); controls.release(); audio.hissOff();
+  root.classList.add('is-dead');
+  $('#ab-dead-t').textContent = reason === 'squalo' ? 'LO SQUALO TI HA ATTACCATO' : 'ARIA FINITA';
+  $('#ab-dead-p').textContent = reason === 'squalo'
+    ? 'Il fossato oltre la scarpata è il suo territorio. La prossima volta, quando si avvicina, usa il getto d\'aria della bombola.'
+    : 'La bombola è vuota. Tieni d\'occhio il manometro: con 50 bar è ora di risalire o di finire in fretta.';
+  setTimeout(() => openPanel('dead'), reason === 'squalo' ? 900 : 400);
+}
+
 function finish() {
   setState('COMPLETED');
   controls.release();
@@ -407,6 +433,7 @@ function restart() {
   closePanelSilently();
   root.classList.remove('is-done');
   S.found = []; S.phase = 1; S.hatchSeen = false; S.reached = false; S.seq = null; S.inspect = null;
+  S.air = AIR.max; S.reserveSaid = false; shark.reset(); audio.hissOff(); root.classList.remove('is-dead');
   arts.reset(); wreck.setOpen(false);
   const { dials, latches } = wreck.hatch.userData;
   wreck.hatch.userData.open = false; wreck.hatch.rotation.z = 0; wreck.hatch.position.y = wreck.HY + 0.46;
@@ -617,6 +644,30 @@ function tick() {
   } else { root.classList.remove('can-act'); ui.prompt.innerHTML = ''; }
 
   for (const u of world.updaters) u(dt, t, camera);
+
+  // --- aria nella bombola ---
+  const breathing = ['DESCENT', 'EXPLORATION', 'INSPECT', 'READING', 'LOCK_PUZZLE', 'OPENING'].includes(S.state);
+  if (breathing) {
+    S.air -= AIR.rate * dt;
+    if (controls.blast && playing && S.air > 0) {
+      S.air -= AIR.blast * dt; audio.hissOn();
+      const o = camera.position.clone().addScaledVector(fwd, 0.5);
+      world.bubbles.burst(o, 4, 0.25);
+      if (shark.blast(camera.position, fwd)) { toast('Lo squalo si spaventa e se ne va.', 3500); }
+    } else audio.hissOff();
+    if (!S.reserveSaid && S.air < AIR.reserve) { S.reserveSaid = true; toast('Riserva: 50 bar. Finisci in fretta.', 4500); }
+    if (S.air <= 0) { S.air = 0; die('aria'); }
+  } else if (S.state !== 'DEAD') audio.hissOff();
+  ui.bar.textContent = Math.ceil(S.air);
+  ui.needle.style.transform = `rotate(${-135 + 270 * (S.air / AIR.max)}deg)`;
+  root.classList.toggle('air-low', S.air < AIR.reserve);
+
+  // --- squalo del fossato ---
+  if (S.state !== 'DEAD') shark.update(dt, t, P.pos, {
+    warn() { audio.danger(); toast(controls.touch ? 'Uno squalo! Tieni premuto il tasto ARIA quando è davanti a te.' : 'Uno squalo! Tieni premuto Q (getto d\'aria) quando è davanti a te.', 5000); },
+    charge() { audio.danger(); },
+    hit() { audio.hit(); die('squalo'); },
+  });
   sediment.update(dt);
 
   if (S.state !== 'INTRO' && S.state !== 'DIVE') renderer.render(scene, camera);
@@ -654,4 +705,4 @@ requestAnimationFrame(tick);
 adsReady.then(() => { renderer.compile(scene, camera); ready(); }, ready);
 
 // per i test automatici (nessun effetto sul gioco)
-window.__abyss = { fish, THREE, scene, S, P, CODE, LOG, wreck, arts, spots, camera, pickup, toast, openHatch, openLog, setPos: (x, y, z, yaw, pitch) => { P.pos.set(x, y, z); P.vel.set(0, 0, 0); if (yaw !== undefined) { P.yaw = P.tyaw = yaw; P.pitch = P.tpitch = pitch; } } };
+window.__abyss = { shark, die, fish, THREE, scene, S, P, CODE, LOG, wreck, arts, spots, camera, pickup, toast, openHatch, openLog, setPos: (x, y, z, yaw, pitch) => { P.pos.set(x, y, z); P.vel.set(0, 0, 0); if (yaw !== undefined) { P.yaw = P.tyaw = yaw; P.pitch = P.tpitch = pitch; } } };

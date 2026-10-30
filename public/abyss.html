@@ -16,7 +16,7 @@
 <meta property="og:title" content="ABYSS · Il relitto dimenticato">
 <meta property="og:image" content="https://www.anfibiasub.it/img/abyss/intro.webp?v=2d582f">
 <link rel="icon" href="/favicon.png?v=3" type="image/png">
-<link rel="stylesheet" href="/abyss/abyss.css?v=4950bdea">
+<link rel="stylesheet" href="/abyss/abyss.css?v=7f984fb7">
 </head>
 <body>
 <div id="abyss" class="ab" data-state="INTRO" data-api="/api/abyss/voto">
@@ -34,13 +34,14 @@
     <p class="ab-sec">Un relitto dimenticato, tre reperti da ritrovare e un segreto nascosto negli abissi.</p>
     <p class="ab-how ab-how-pc">Usa il mouse per orientare la torcia e la visuale, W A S D per nuotare.</p>
     <p class="ab-how ab-how-touch">Gioca con il telefono in orizzontale: joystick sinistro per nuotare, destro per guardare. Per scendere guarda in basso e nuota avanti.</p>
-    <p class="ab-how ab-ios" hidden>Su iPhone, per giocare a schermo intero: <b>Condividi → Aggiungi alla schermata Home</b> e apri ABYSS dall'icona.</p>
+    <p class="ab-how ab-ios" hidden>iPhone: gira il telefono e <b>scorri lo schermo verso l'alto</b> per ridurre la barra di Safari. Per lo schermo intero vero: <b>Condividi → Aggiungi alla schermata Home</b> e apri ABYSS dall'icona.</p>
     <p id="ab-nowebgl" class="ab-sec" hidden>Il tuo browser non supporta la grafica 3D (WebGL): prova con una versione recente di Chrome, Safari, Firefox o Edge.</p>
   </div>
 </section>
 
 <div class="ab-hud" aria-live="polite">
-  <div class="ab-tl"><span class="ab-mark">ABYSS</span><span id="ab-depth" class="ab-depth"><b>0,0</b> m</span><span id="ab-obj" class="ab-obj"></span></div>
+  <div class="ab-tl"><span class="ab-mark">ABYSS</span><span id="ab-depth" class="ab-depth"><b>0,0</b> m</span>
+    <span class="ab-man" title="Manometro"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" class="m-bg"/><path d="M17.5 82.5A46 46 0 1 1 82.5 82.5" class="m-arc"/><path d="M71 76A33 33 0 0 0 82.5 82.5" class="m-red"/><g class="m-ticks"></g><line x1="50" y1="50" x2="50" y2="14" class="ab-man-needle"/><circle cx="50" cy="50" r="5" class="m-hub"/></svg><span class="m-val"><b id="ab-bar">220</b> bar</span></span><span id="ab-obj" class="ab-obj"></span></div>
   <div class="ab-comp" aria-hidden="true"><div class="ab-comp-win"><div class="ab-comp-strip"></div></div><span id="ab-hdg">000°</span></div>
   <div class="ab-tr">
     <button class="ab-ico ab-inv-btn" type="button" data-act="inv" aria-label="Inventario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h16v12H4z"/><path d="M9 8V5h6v3"/></svg><span id="ab-count">0/3</span></button>
@@ -53,7 +54,7 @@
   <p id="ab-prompt" class="ab-prompt"></p>
   <p id="ab-msg" class="ab-msg" role="status"></p>
   <div id="ab-hint" class="ab-hint">
-    <p class="ab-how-pc"><b>Clic</b> sullo schermo per guidare la visuale col mouse · <b>W A S D</b> nuoto · <b>Spazio</b> sali · <b>C</b> scendi · <b>Shift</b> veloce · <b>F</b> torcia · <b>E</b> interagisci · <b>I</b> inventario</p>
+    <p class="ab-how-pc"><b>Clic</b> sullo schermo per guidare la visuale col mouse · <b>W A S D</b> nuoto · <b>Spazio</b> sali · <b>C</b> scendi · <b>Shift</b> veloce · <b>F</b> torcia · <b>E</b> interagisci · <b>I</b> inventario · <b>Q</b> getto d'aria (contro lo squalo)</p>
     <p class="ab-how-touch">Joystick sinistro per nuotare · joystick destro per guardare</p>
     <p>Segui la cima d'ormeggio verso il fondale. In alto c'è la bussola: il nord è N.</p>
   </div>
@@ -63,6 +64,7 @@
   <div class="ab-joy ab-joy-l"><i></i></div>
   <div class="ab-joy ab-joy-r"><i></i></div>
   <div class="ab-tbtns">
+    <button type="button" class="ab-blast" data-blast aria-label="Getto d'aria (tieni premuto)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="8" cy="15" r="3.2"/><circle cx="15.5" cy="9" r="4.2"/><circle cx="17" cy="18" r="2"/></svg></button>
     <button type="button" class="ab-torch" data-act="torch" aria-label="Torcia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6l-1 6h-4z"/><path d="M10 9h4v11a2 2 0 0 1-4 0z"/></svg></button>
     <button type="button" class="ab-act" data-act="interact" aria-label="Interagisci">✋</button>
   </div>
@@ -97,8 +99,8 @@
 <div class="ab-panel" data-panel="pause" hidden role="dialog" aria-modal="true" aria-label="Pausa">
   <div class="ab-box">
     <h2>Immersione in pausa</h2>
-    <p class="ab-small ab-how-pc">W A S D nuoto · Spazio sali · C scendi · Shift veloce · F torcia · E interagisci · I inventario · Esc pausa</p>
-    <p class="ab-small ab-how-touch">Joystick sinistro: nuoto · joystick destro: sguardo · per scendere guarda in basso e nuota avanti · ✋ interagisci</p>
+    <p class="ab-small ab-how-pc">W A S D nuoto · Spazio sali · C scendi · Shift veloce · F torcia · E interagisci · I inventario · Q getto d'aria · Esc pausa</p>
+    <p class="ab-small ab-how-touch">Joystick sinistro: nuoto · joystick destro: sguardo · per scendere guarda in basso e nuota avanti · ✋ interagisci · bolle: getto d'aria contro lo squalo</p>
     <div class="ab-col">
       <button class="ab-btn ab-btn-main" type="button" data-act="resume">RIPRENDI</button>
       <button class="ab-btn" type="button" data-act="restart">Ricomincia l'immersione</button>
@@ -112,6 +114,17 @@
     <h2>Giornale di bordo del capitano</h2>
     <img id="ab-logimg" alt="Pagina del giornale di bordo: il cofanetto è sotto l'arco di pietra, sul bordo della scarpata. Dalla poppa, rotta e distanza indicate sulla pagina.">
     <button class="ab-btn ab-btn-main" type="button" data-act="close">HO CAPITO</button>
+  </div>
+</div>
+
+<div class="ab-panel ab-dead" data-panel="dead" hidden role="alertdialog" aria-modal="true" aria-labelledby="ab-dead-t">
+  <div class="ab-box">
+    <p class="ab-sub" id="ab-dead-t">ARIA FINITA</p>
+    <p class="ab-small" id="ab-dead-p"></p>
+    <div class="ab-col">
+      <button class="ab-btn ab-btn-main" type="button" data-act="restart">RICOMINCIA L'IMMERSIONE</button>
+      <a class="ab-btn" href="/">Torna al sito</a>
+    </div>
   </div>
 </div>
 
@@ -147,6 +160,6 @@
 <div id="ab-veil" class="ab-veil" aria-hidden="true"></div>
 </div>
 
-<script type="module" src="/abyss/main.js?v=4950bdea"></script>
+<script type="module" src="/abyss/main.js?v=7f984fb7"></script>
 </body>
 </html>

@@ -236,3 +236,37 @@ button{font:inherit;color:inherit}
   .ab .ab-touch .ab-tbtns{bottom:calc(136px + env(safe-area-inset-bottom))}
   .ab .ab-touch .ab-tbtns button{width:46px;height:46px}
 }
+
+/* ---------- manometro 0-220 bar ---------- */
+.ab-man{display:flex;align-items:center;gap:8px;margin-top:6px}
+.ab-man svg{width:54px;height:54px}
+.ab-man .m-bg{fill:rgba(5,14,26,.55);stroke:rgba(176,141,87,.7);stroke-width:3}
+.ab-man .m-arc{fill:none;stroke:rgba(220,239,245,.35);stroke-width:4}
+.ab-man .m-red{fill:none;stroke:#d9534f;stroke-width:5}
+.ab-man-needle{stroke:var(--ice);stroke-width:3.5;stroke-linecap:round;transform-origin:50px 50px;transition:transform .3s}
+.ab-man .m-hub{fill:var(--brass2)}
+.ab-man .m-val{font-size:12px;color:var(--grey);letter-spacing:.05em}
+.ab-man .m-val b{font-size:16px;color:var(--ice);font-variant-numeric:tabular-nums}
+.air-low .ab-man .m-val b{color:#ff6b5e}
+.air-low .ab-man-needle{stroke:#ff6b5e}
+/* ---------- morte ---------- */
+.ab-dead{background:radial-gradient(circle,rgba(60,0,0,.35),rgba(2,8,13,.9));animation:ab-in 1.2s ease}
+.ab-dead .ab-sub{color:#ff8a7a;font-size:16px}
+.is-dead #ab-c{filter:saturate(.4) brightness(.6);transition:filter 1s}
+/* ---------- tasti del telefono: uno sopra l'altro, a sinistra del joystick destro ---------- */
+@media (pointer:coarse){
+  .ab .ab-touch .ab-tbtns{flex-direction:column;gap:10px;right:calc(166px + env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom))}
+  .ab .ab-touch .ab-tbtns button{width:50px;height:50px}
+  .ab-blast{color:var(--cyan)}.ab-blast.on{background:rgba(60,198,245,.35)!important}
+  .ab-man svg{width:44px;height:44px}.ab-man{margin-top:2px}
+}
+@media (pointer:coarse) and (max-height:340px){
+  .ab .ab-touch .ab-tbtns{right:calc(146px + env(safe-area-inset-right));bottom:calc(14px + env(safe-area-inset-bottom));gap:8px}
+  .ab .ab-touch .ab-tbtns button{width:44px;height:44px}
+}
+
+/* iPhone Safari: pagina scorrevole di poco, così la barra degli indirizzi si riduce */
+html.ios-scroll,html.ios-scroll body{height:auto;overflow-y:auto;overflow-x:hidden}
+html.ios-scroll body{min-height:calc(100vh + 160px)}
+html.ios-scroll .ab{position:fixed;inset:0}
+html.ios-scroll .ab{touch-action:pan-y}

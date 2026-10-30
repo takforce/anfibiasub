@@ -23,11 +23,12 @@ export function createControls(canvas, root, on) {
     if (e.repeat) return;
     keys.add(e.code); upd();
     if (e.code === 'KeyE') on.interact();
+    if (e.code === 'KeyQ') C.blast = true;
     if (e.code === 'KeyF') on.torch();
     if (e.code === 'KeyI' || e.code === 'Tab') { e.preventDefault(); on.inventory(); }
   });
-  addEventListener('keyup', (e) => { keys.delete(e.code); upd(); });
-  addEventListener('blur', () => { keys.clear(); upd(); });
+  addEventListener('keyup', (e) => { keys.delete(e.code); upd(); if (e.code === 'KeyQ') C.blast = false; });
+  addEventListener('blur', () => { keys.clear(); C.blast = false; upd(); });
 
   // ---- mouse: pointer lock, con ripiego a trascinamento ----
   canvas.addEventListener('click', () => {
@@ -96,8 +97,17 @@ export function createControls(canvas, root, on) {
     area.addEventListener('touchend', end); area.addEventListener('touchcancel', end);
   }
   let btnUD = 0;   // (tasti su/giù rimossi: resta 0)
+  // tasto ARIA: si tiene premuto
+  C.blast = false;
+  const bb = root.querySelector('[data-blast]');
+  if (bb) {
+    const dn = (e) => { e.preventDefault(); if (C.enabled) { C.blast = true; bb.classList.add('on'); } };
+    const up = (e) => { e.preventDefault(); C.blast = false; bb.classList.remove('on'); };
+    bb.addEventListener('touchstart', dn, { passive: false }); bb.addEventListener('touchend', up); bb.addEventListener('touchcancel', up);
+    bb.addEventListener('mousedown', dn); bb.addEventListener('mouseup', up); bb.addEventListener('mouseleave', up);
+  }
 
-  C.reset = () => { keys.clear(); C.move.f = C.move.r = C.move.u = 0; btnUD = 0; C.look.dx = C.look.dy = 0; if (C.stick) C.stick.x = C.stick.y = 0; };
+  C.reset = () => { keys.clear(); C.blast = false; C.move.f = C.move.r = C.move.u = 0; btnUD = 0; C.look.dx = C.look.dy = 0; if (C.stick) C.stick.x = C.stick.y = 0; };
   C.consumeLook = () => { const l = { ...C.look }; C.look.dx = C.look.dy = 0; return l; };
   C.release = () => { if (document.pointerLockElement) document.exitPointerLock(); };
   return C;

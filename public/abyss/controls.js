@@ -50,56 +50,54 @@ export function createControls(canvas, root, on) {
   addEventListener('mouseup', () => { drag = false; });
 
   // ---- touch ----
-  const joy = { active: false, id: null, x0: 0, y0: 0 };
-  const look = { id: null, x: 0, y: 0 };
-  const stick = root.querySelector('.ab-joy'), knob = root.querySelector('.ab-joy i');
-  let btnUD = 0;
+  // ---- touch: due joystick fissi. Sinistro = nuoto (avanti/indietro/laterale), destro = sguardo (gira e inclina).
+  //      Si nuota nella direzione in cui si guarda: per scendere si guarda in basso e si va avanti.
+  const joy = { active: false, id: null, el: root.querySelector('.ab-joy-l'), cx: 0, cy: 0 };
+  const lk = { active: false, id: null, el: root.querySelector('.ab-joy-r'), cx: 0, cy: 0 };
+  C.stick = { x: 0, y: 0 };            // joystick destro: velocità di rotazione (-1..1)
   const area = root.querySelector('.ab-touch');
+  const M = 46;
+  const center = (s) => { const r = s.el.getBoundingClientRect(); s.cx = r.left + r.width / 2; s.cy = r.top + r.height / 2; };
+  const knobAt = (s, dx, dy) => { s.el.querySelector('i').style.transform = `translate(${dx}px,${dy}px)`; };
+  const stickVal = (s, t) => {
+    let dx = t.clientX - s.cx, dy = t.clientY - s.cy; const L = Math.hypot(dx, dy);
+    if (L > M) { dx *= M / L; dy *= M / L; }
+    knobAt(s, dx, dy);
+    const dz = (v) => (Math.abs(v) < 0.12 ? 0 : (v - Math.sign(v) * 0.12) / 0.88);   // zona morta
+    return { x: dz(dx / M), y: dz(dy / M) };
+  };
   if (area) {
     area.addEventListener('touchstart', (e) => {
       if (!C.enabled) return;
-      // i tocchi sui pulsanti (✋, torcia) devono restare clic normali
-      if ([...e.changedTouches].every((t) => t.target.closest('button'))) return;
+      if ([...e.changedTouches].every((t) => t.target.closest('button'))) return;   // ✋ e torcia restano clic normali
       for (const t of e.changedTouches) {
         if (t.target.closest('button')) continue;
-        if (t.clientX < innerWidth * 0.45 && joy.id === null) {
-          joy.id = t.identifier; joy.active = true; joy.x0 = t.clientX; joy.y0 = t.clientY;
-          stick.style.left = t.clientX + 'px'; stick.style.top = t.clientY + 'px'; stick.classList.add('on');
-        } else if (look.id === null) { look.id = t.identifier; look.x = t.clientX; look.y = t.clientY; }
+        const s = t.clientX < innerWidth / 2 ? joy : lk;
+        if (s.id !== null) continue;
+        s.id = t.identifier; s.active = true; center(s); s.el.classList.add('on');
+        const v = stickVal(s, t);
+        if (s === joy) { C.move.r = v.x; C.move.f = -v.y; } else { C.stick.x = v.x; C.stick.y = v.y; }
       }
       e.preventDefault();
     }, { passive: false });
     area.addEventListener('touchmove', (e) => {
       for (const t of e.changedTouches) {
-        if (t.identifier === joy.id) {
-          let dx = t.clientX - joy.x0, dy = t.clientY - joy.y0; const L = Math.hypot(dx, dy), M = 48;
-          if (L > M) { dx *= M / L; dy *= M / L; }
-          knob.style.transform = `translate(${dx}px,${dy}px)`;
-          C.move.r = dx / M; C.move.f = -dy / M;
-        } else if (t.identifier === look.id) {
-          C.look.dx += (t.clientX - look.x) * 1.6; C.look.dy += (t.clientY - look.y) * 1.6; look.x = t.clientX; look.y = t.clientY;
-        }
+        if (t.identifier === joy.id) { const v = stickVal(joy, t); C.move.r = v.x; C.move.f = -v.y; }
+        else if (t.identifier === lk.id) { const v = stickVal(lk, t); C.stick.x = v.x; C.stick.y = v.y; }
       }
       e.preventDefault();
     }, { passive: false });
     const end = (e) => {
       for (const t of e.changedTouches) {
-        if (t.identifier === joy.id) { joy.id = null; joy.active = false; C.move.f = C.move.r = 0; knob.style.transform = ''; stick.classList.remove('on'); }
-        if (t.identifier === look.id) look.id = null;
+        if (t.identifier === joy.id) { joy.id = null; joy.active = false; C.move.f = C.move.r = 0; knobAt(joy, 0, 0); joy.el.classList.remove('on'); }
+        if (t.identifier === lk.id) { lk.id = null; lk.active = false; C.stick.x = C.stick.y = 0; knobAt(lk, 0, 0); lk.el.classList.remove('on'); }
       }
     };
     area.addEventListener('touchend', end); area.addEventListener('touchcancel', end);
-    const hold = (sel, v) => {
-      const b = root.querySelector(sel); if (!b) return;
-      const dn = (e) => { e.preventDefault(); btnUD = v; C.move.u = v; b.classList.add('on'); };
-      const up = (e) => { e.preventDefault(); btnUD = 0; C.move.u = 0; b.classList.remove('on'); };
-      b.addEventListener('touchstart', dn, { passive: false }); b.addEventListener('touchend', up); b.addEventListener('touchcancel', up);
-      b.addEventListener('mousedown', dn); b.addEventListener('mouseup', up); b.addEventListener('mouseleave', up);
-    };
-    hold('[data-up]', 1); hold('[data-down]', -1);
   }
+  let btnUD = 0;   // (tasti su/giù rimossi: resta 0)
 
-  C.reset = () => { keys.clear(); C.move.f = C.move.r = C.move.u = 0; btnUD = 0; C.look.dx = C.look.dy = 0; };
+  C.reset = () => { keys.clear(); C.move.f = C.move.r = C.move.u = 0; btnUD = 0; C.look.dx = C.look.dy = 0; if (C.stick) C.stick.x = C.stick.y = 0; };
   C.consumeLook = () => { const l = { ...C.look }; C.look.dx = C.look.dy = 0; return l; };
   C.release = () => { if (document.pointerLockElement) document.exitPointerLock(); };
   return C;

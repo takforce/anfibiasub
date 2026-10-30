@@ -487,6 +487,10 @@ function tick() {
     const l = controls.consumeLook();
     const sens = controls.touch ? 0.0042 : 0.0022;
     if (playing) { P.tyaw -= l.dx * sens; P.tpitch = Math.max(-1.45, Math.min(1.45, P.tpitch - l.dy * sens)); }
+    if (playing && controls.stick) {   // joystick destro: gira e inclina in modo continuo
+      const sx = controls.stick.x, sy = controls.stick.y;
+      P.tyaw -= sx * Math.abs(sx) * 2.0 * dt; P.tpitch = Math.max(-1.45, Math.min(1.45, P.tpitch - sy * Math.abs(sy) * 1.35 * dt));
+    }
     const k = 1 - Math.exp(-dt * 16);
     P.yaw += (P.tyaw - P.yaw) * k; P.pitch += (P.tpitch - P.pitch) * k;
     camera.rotation.set(P.pitch, P.yaw, 0, 'YXZ');

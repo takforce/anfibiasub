@@ -214,3 +214,25 @@ button{font:inherit;color:inherit}
   .ab-end .ab-small,.ab-end .ab-sum{display:none}
   .ab-end .ab-box{padding:18px 18px}
 }
+
+/* ---------- telefono: due joystick fissi, schermo pulito ---------- */
+.ab-rotate{display:none}
+@media (pointer:coarse){
+  .ab .ab-hint,.ab .ab-obj,.ab .ab-gauge{display:none}
+  .ab .ab-touch .ab-joy{position:absolute;top:auto;left:auto;right:auto;margin:0;width:124px;height:124px;bottom:calc(18px + env(safe-area-inset-bottom));border-radius:50%;border:1.5px solid rgba(220,239,245,.28);background:radial-gradient(circle,rgba(5,14,26,.15),rgba(5,14,26,.4));opacity:.75;transition:opacity .2s}
+  .ab .ab-touch .ab-joy.on{opacity:1}
+  .ab .ab-touch .ab-joy i{width:52px;height:52px;margin:-26px}
+  .ab .ab-touch .ab-joy-l{left:calc(26px + env(safe-area-inset-left))}
+  .ab .ab-touch .ab-joy-r{right:calc(26px + env(safe-area-inset-right))}
+  .ab .ab-touch .ab-tbtns{display:flex;flex-direction:row;gap:12px;left:auto;right:calc(26px + env(safe-area-inset-right));bottom:calc(158px + env(safe-area-inset-bottom))}
+  .ab .ab-touch .ab-tbtns button{width:52px;height:52px}
+  .ab-rotate{position:absolute;inset:0;z-index:35;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(5,14,26,.94);color:var(--ice);font-size:16px;letter-spacing:.06em;text-align:center;padding:24px}
+  .ab-rotate svg{width:72px;height:72px;color:var(--cyan);animation:ab-rot 2.4s ease-in-out infinite}
+  @keyframes ab-rot{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+}
+@media (pointer:coarse) and (orientation:portrait){ .is-playing:not(.is-done) .ab-rotate{display:flex} }
+@media (pointer:coarse) and (max-height:340px){
+  .ab .ab-touch .ab-joy{width:108px;height:108px}
+  .ab .ab-touch .ab-tbtns{bottom:calc(136px + env(safe-area-inset-bottom))}
+  .ab .ab-touch .ab-tbtns button{width:46px;height:46px}
+}

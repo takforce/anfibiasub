@@ -12,7 +12,7 @@
     <button id="ab-start" class="ab-btn ab-btn-main" type="button" disabled>PREPARAZIONE DELL'IMMERSIONE…</button>
     <p class="ab-sec">Un relitto dimenticato, tre reperti da ritrovare e un segreto nascosto negli abissi.</p>
     <p class="ab-how ab-how-pc">Usa il mouse per orientare la torcia e la visuale, W A S D per nuotare.</p>
-    <p class="ab-how ab-how-touch">Trascina il dito a destra per guardarti intorno, usa il joystick a sinistra per nuotare.</p>
+    <p class="ab-how ab-how-touch">Gioca con il telefono in orizzontale: joystick sinistro per nuotare, destro per guardare. Per scendere guarda in basso e nuota avanti.</p>
     <p class="ab-how ab-ios" hidden>Su iPhone, per giocare a schermo intero: <b>Condividi → Aggiungi alla schermata Home</b> e apri ABYSS dall'icona.</p>
     <p id="ab-nowebgl" class="ab-sec" hidden>Il tuo browser non supporta la grafica 3D (WebGL): prova con una versione recente di Chrome, Safari, Firefox o Edge.</p>
   </div>
@@ -33,22 +33,21 @@
   <p id="ab-msg" class="ab-msg" role="status"></p>
   <div id="ab-hint" class="ab-hint">
     <p class="ab-how-pc"><b>Clic</b> sullo schermo per guidare la visuale col mouse · <b>W A S D</b> nuoto · <b>Spazio</b> sali · <b>C</b> scendi · <b>Shift</b> veloce · <b>F</b> torcia · <b>E</b> interagisci · <b>I</b> inventario</p>
-    <p class="ab-how-touch">Joystick a sinistra per nuotare · trascina a destra per guardare · ▲▼ per salire e scendere</p>
+    <p class="ab-how-touch">Joystick sinistro per nuotare · joystick destro per guardare</p>
     <p>Segui la cima d'ormeggio verso il fondale. In alto c'è la bussola: il nord è N.</p>
   </div>
 </div>
 
 <div class="ab-touch" aria-hidden="true">
-  <div class="ab-joy"><i></i></div>
+  <div class="ab-joy ab-joy-l"><i></i></div>
+  <div class="ab-joy ab-joy-r"><i></i></div>
   <div class="ab-tbtns">
-    <button type="button" data-up aria-label="Sali">▲</button>
-    <button type="button" data-down aria-label="Scendi">▼</button>
-  </div>
-  <div class="ab-tbtns ab-tbtns-r">
-    <button type="button" class="ab-act" data-act="interact" aria-label="Interagisci">✋</button>
     <button type="button" class="ab-torch" data-act="torch" aria-label="Torcia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6l-1 6h-4z"/><path d="M10 9h4v11a2 2 0 0 1-4 0z"/></svg></button>
+    <button type="button" class="ab-act" data-act="interact" aria-label="Interagisci">✋</button>
   </div>
 </div>
+
+<div class="ab-rotate" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="6" width="24" height="42" rx="4"/><path d="M50 40a18 18 0 0 1-18 18M28 54l4 4-4 4"/></svg><p>Ruota il telefono in orizzontale</p></div>
 
 <div class="ab-panel" data-panel="inv" hidden role="dialog" aria-modal="true" aria-label="Inventario">
   <div class="ab-box">
@@ -78,7 +77,7 @@
   <div class="ab-box">
     <h2>Immersione in pausa</h2>
     <p class="ab-small ab-how-pc">W A S D nuoto · Spazio sali · C scendi · Shift veloce · F torcia · E interagisci · I inventario · Esc pausa</p>
-    <p class="ab-small ab-how-touch">Joystick a sinistra per nuotare · trascina a destra per guardare · ▲▼ sali e scendi · ✋ interagisci</p>
+    <p class="ab-small ab-how-touch">Joystick sinistro: nuoto · joystick destro: sguardo · per scendere guarda in basso e nuota avanti · ✋ interagisci</p>
     <div class="ab-col">
       <button class="ab-btn ab-btn-main" type="button" data-act="resume">RIPRENDI</button>
       <button class="ab-btn" type="button" data-act="restart">Ricomincia l'immersione</button>

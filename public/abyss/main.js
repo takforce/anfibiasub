@@ -1,18 +1,18 @@
 // ABYSS — Il relitto dimenticato. Motore principale e macchina a stati.
 import * as THREE from '../vendor/three/three.module.min.js';
-import { CFG, CODE, bearing } from './config.js?v=191c2b3d';
-import { t as tr, L as TX } from './i18n.js?v=191c2b3d';
-import { addCaustics, makeBeam, CAUSTIC } from './look.js?v=191c2b3d';
-import { makeTextures, logbookPage } from './textures.js?v=191c2b3d';
-import { buildWorld, collideWorld } from './world.js?v=191c2b3d';
-import { buildWreck, makeHelmet } from './wreck.js?v=191c2b3d';
-import { buildArtifacts } from './artifacts.js?v=191c2b3d';
-import { buildLandmarks } from './landmarks.js?v=191c2b3d';
-import { buildFish } from './fish.js?v=191c2b3d';
-import { buildShark } from './shark.js?v=191c2b3d';
-import { buildAds, buildStatues, buildServiceSigns } from './ads.js?v=191c2b3d';
-import { createControls } from './controls.js?v=191c2b3d';
-import { createAudio } from './audio.js?v=191c2b3d';
+import { CFG, CODE, bearing } from './config.js?v=f4621fa7';
+import { t as tr, L as TX } from './i18n.js?v=f4621fa7';
+import { addCaustics, makeBeam, CAUSTIC } from './look.js?v=f4621fa7';
+import { makeTextures, logbookPage } from './textures.js?v=f4621fa7';
+import { buildWorld, collideWorld } from './world.js?v=f4621fa7';
+import { buildWreck, makeHelmet } from './wreck.js?v=f4621fa7';
+import { buildArtifacts } from './artifacts.js?v=f4621fa7';
+import { buildLandmarks } from './landmarks.js?v=f4621fa7';
+import { buildFish } from './fish.js?v=f4621fa7';
+import { buildShark } from './shark.js?v=f4621fa7';
+import { buildAds, buildStatues, buildServiceSigns } from './ads.js?v=f4621fa7';
+import { createControls } from './controls.js?v=f4621fa7';
+import { createAudio } from './audio.js?v=f4621fa7';
 
 const $ = (s) => document.querySelector(s);
 const root = $('#abyss');
@@ -90,14 +90,20 @@ camera.add(beam); beam.position.set(0.18, -0.15, 0);
 
 // ---------------- costruzione del mondo ----------------
 const tex = makeTextures(Q.tex, renderer.capabilities.getMaxAnisotropy());
+const photos = [];
 // texture fotografiche/IA opzionali: sostituiscono l'immagine di quelle generate, i materiali restano gli stessi
 {
   const map = { sabbia: tex.sand, roccia: tex.rock, ruggine: tex.rust, legno: tex.wood, terracotta: tex.clay };
+  // superfici fotografiche (Poly Haven, CC0): colore + rilievo; finché non arrivano restano quelle generate
+  const suf = mobile ? '_m' : '';
   for (const k in CFG.textures) {
     if (!CFG.textures[k] || !map[k]) continue;
-    const im = new Image();
-    im.onload = () => { map[k].map.image = im; map[k].map.needsUpdate = true; };
-    im.src = CFG.textures[k];
+    for (const [slot, ch] of [['map', 'c'], ['normalMap', 'n']]) {
+      const t = map[k][slot]; if (!t) continue;
+      const im = new Image();
+      photos.push(new Promise((ok) => { im.onload = () => { t.dispose(); t.image = im; t.needsUpdate = true; ok(); }; im.onerror = ok; }));
+      im.src = new URL(`./tex/${CFG.textures[k]}_${ch}${suf}.jpg?v=1`, import.meta.url).href;
+    }
   }
 }
 const wreck = buildWreck(scene, tex);
@@ -741,7 +747,7 @@ renderer.render(scene, camera);
 torch.intensity = 0;
 document.addEventListener('visibilitychange', () => { if (document.hidden && canPause()) pause(); });
 requestAnimationFrame(tick);
-Promise.allSettled([adsReady, signsReady]).then(() => {
+Promise.allSettled([adsReady, signsReady, ...photos]).then(() => {
   const inChamber = (o) => { for (let p = o; p; p = p.parent) if (p.name === 'chamber') return true; return false; };
   addCaustics(scene, inChamber);
   renderer.compile(scene, camera); ready();

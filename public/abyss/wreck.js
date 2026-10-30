@@ -2,10 +2,10 @@
 // Geometria generata via codice (costole, fasciame, ponte, cabina, ancora, catena, botola, camera nascosta).
 import * as THREE from '../vendor/three/three.module.min.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
-import { noise2, rng } from './noise.js?v=191c2b3d';
-import { heightAt } from './world.js?v=191c2b3d';
-import { dialTex, symbolPlate, logbookTex } from './textures.js?v=191c2b3d';
-import { CFG } from './config.js?v=191c2b3d';
+import { noise2, rng } from './noise.js?v=f4621fa7';
+import { heightAt } from './world.js?v=f4621fa7';
+import { dialTex, symbolPlate, logbookTex } from './textures.js?v=f4621fa7';
+import { CFG } from './config.js?v=f4621fa7';
 
 const rand = rng(31);
 const R = (a, b) => a + (b - a) * rand();

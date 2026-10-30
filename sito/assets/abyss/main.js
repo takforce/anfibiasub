@@ -90,14 +90,20 @@ camera.add(beam); beam.position.set(0.18, -0.15, 0);
 
 // ---------------- costruzione del mondo ----------------
 const tex = makeTextures(Q.tex, renderer.capabilities.getMaxAnisotropy());
+const photos = [];
 // texture fotografiche/IA opzionali: sostituiscono l'immagine di quelle generate, i materiali restano gli stessi
 {
   const map = { sabbia: tex.sand, roccia: tex.rock, ruggine: tex.rust, legno: tex.wood, terracotta: tex.clay };
+  // superfici fotografiche (Poly Haven, CC0): colore + rilievo; finché non arrivano restano quelle generate
+  const suf = mobile ? '_m' : '';
   for (const k in CFG.textures) {
     if (!CFG.textures[k] || !map[k]) continue;
-    const im = new Image();
-    im.onload = () => { map[k].map.image = im; map[k].map.needsUpdate = true; };
-    im.src = CFG.textures[k];
+    for (const [slot, ch] of [['map', 'c'], ['normalMap', 'n']]) {
+      const t = map[k][slot]; if (!t) continue;
+      const im = new Image();
+      photos.push(new Promise((ok) => { im.onload = () => { t.dispose(); t.image = im; t.needsUpdate = true; ok(); }; im.onerror = ok; }));
+      im.src = new URL(`./tex/${CFG.textures[k]}_${ch}${suf}.jpg?v=1`, import.meta.url).href;
+    }
   }
 }
 const wreck = buildWreck(scene, tex);
@@ -741,7 +747,7 @@ renderer.render(scene, camera);
 torch.intensity = 0;
 document.addEventListener('visibilitychange', () => { if (document.hidden && canPause()) pause(); });
 requestAnimationFrame(tick);
-Promise.allSettled([adsReady, signsReady]).then(() => {
+Promise.allSettled([adsReady, signsReady, ...photos]).then(() => {
   const inChamber = (o) => { for (let p = o; p; p = p.parent) if (p.name === 'chamber') return true; return false; };
   addCaustics(scene, inChamber);
   renderer.compile(scene, camera); ready();

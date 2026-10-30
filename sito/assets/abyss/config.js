@@ -78,7 +78,7 @@ export const CFG = {
   // pesci: PNG trasparente 1024x512, pesce di profilo rivolto a destra (es. '/img/abyss/pesci/castagnola.png')
   skins: { castagnola: null, sarago: null, cernia: null },
   // texture ripetibili (seamless) 1024x1024 al posto di quelle generate (es. '/img/abyss/tex/sabbia.webp')
-  textures: { sabbia: null, roccia: null, ruggine: null, legno: null, terracotta: null },
+  textures: { sabbia: 'sand', roccia: 'rock', ruggine: 'rust', legno: 'wood', terracotta: null },   // file in abyss/tex/: <nome>_c.jpg (colore) e <nome>_n.jpg (rilievo); _m = versione leggera per telefoni
   // Modelli GLB definitivi (opzionali): stesso principio.
   models: { bussola: null, targhetta: null, chiave: null, elmo: null, cofanetto: null },
 };

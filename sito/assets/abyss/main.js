@@ -9,7 +9,7 @@ import { buildArtifacts } from './artifacts.js';
 import { buildLandmarks } from './landmarks.js';
 import { buildFish } from './fish.js';
 import { buildShark } from './shark.js';
-import { buildAds, buildStatues } from './ads.js';
+import { buildAds, buildStatues, buildServiceSigns } from './ads.js';
 import { createControls } from './controls.js';
 import { createAudio } from './audio.js';
 
@@ -92,6 +92,7 @@ const shipInv = new THREE.Matrix4().copy(wreck.ship.matrixWorld).invert();
 const avoid = (x, z, r) => {
   for (const k in CFG.places) { const p = CFG.places[k]; if (Math.hypot(x - p.x, z - p.z) < 13 + r) return true; }   // i luoghi hanno rocce proprie
   for (const st of CFG.statues) if (Math.hypot(x - st.x, z - st.z) < 3 + r) return true;
+  for (const sg of CFG.serviceSigns) if (Math.hypot(x - sg.x, z - sg.z) < 3 + r) return true;
   if (Math.hypot(x - CFG.ads.x, z - CFG.ads.z) < 3 + r || Math.hypot(x - CFG.ads.bx, z - CFG.ads.bz) < 2.5 + r) return true;
   const l = new THREE.Vector3(x, CFG.seabed, z).applyMatrix4(shipInv);
   if (l.x > -14 - r && l.x < 16 + r && Math.abs(l.z) < 5.5 + r) return true;            // impronta del relitto
@@ -104,10 +105,12 @@ const spots = buildLandmarks(scene, world, tex);
 const arts = buildArtifacts(scene, wreck, tex, spots);
 const fish = buildFish(scene, Q); world.updaters.push(fish);
 const shark = buildShark(scene);
+const _sdir = new THREE.Vector3();
 // aria: 220 bar per 50 minuti; il getto d'aria contro lo squalo consuma il 2% al secondo
 const AIR = { max: 220, rate: 220 / (50 * 60), blast: 220 * 0.02, reserve: 50 };
 buildStatues(scene, world, tex, CFG.statues, makeHelmet);
 const adsReady = buildAds(scene, wreck, tex, CFG.ads);
+buildServiceSigns(scene, world, tex, CFG.serviceSigns, TX.srv || [], TX.srv_head || '');
 // rotta e distanza scritte nel giornale di bordo: calcolate dalla posizione vera di poppa e arco
 const LOG = (() => { const a = wreck.sternWorld(), b = arts.casket.home.pos; return { deg: bearing(a, b), m: Math.hypot(b.x - a.x, b.z - a.z) }; })();
 
@@ -660,8 +663,9 @@ function tick() {
   ui.needle.style.transform = `rotate(${-135 + 270 * (S.air / AIR.max)}deg)`;
   root.classList.toggle('air-low', S.air < AIR.reserve);
 
-  // --- squalo del fossato ---
+  // --- squalo del fossato (attacca sempre da davanti: lo vedi arrivare) ---
   if (S.state !== 'DEAD') shark.update(dt, t, P.pos, {
+    dir: camera.getWorldDirection(_sdir),
     warn() { audio.danger(); toast(controls.touch ? tr('shark_touch') : tr('shark_pc'), 5000); },
     charge() { audio.danger(); },
     hit() { audio.hit(); die('squalo'); },

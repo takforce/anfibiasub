@@ -32,6 +32,12 @@ export const CFG = {
     { x: -24.0, z: -4.0, rot: 1.41 }, { x: 27.0, z: 10.0, rot: -1.93 },
   ],
 
+  // cartelli con i servizi di Anfibiasub, sparsi sul fondale lontano dal relitto (rivolti verso il relitto)
+  serviceSigns: [
+    { x: 45, z: -20 }, { x: 60, z: 15 }, { x: -30, z: -40 }, { x: -65, z: -10 }, { x: 20, z: 66 },
+    { x: -15, z: 66 }, { x: 40, z: -55 }, { x: -62, z: 36 }, { x: 62, z: -32 }, { x: -40, z: -56 },
+  ],
+
   // ordine delle ghiere sulla botola = ordine delle cifre del codice
   dials: ['rosa', 'ancora', 'chiave'],
 

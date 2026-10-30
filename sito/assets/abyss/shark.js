@@ -126,7 +126,7 @@ export function buildShark(scene) {
   // ---------- comportamento ----------
   // idle: pattuglia lontano nel blu; circle: gira intorno al sub; charge: attacca; flee: scappa; cooldown dopo la fuga.
   const S = { mode: 'idle', t: 0, cool: 0, pos: new THREE.Vector3(0, CFG.seabed - 14, CFG.limit + 20), vel: new THREE.Vector3(1, 0, 0), ang: 0 };
-  const tmp = new THREE.Vector3(), des = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0), M4 = new THREE.Matrix4(), Q = new THREE.Quaternion();
+  const tmp = new THREE.Vector3(), des = new THREE.Vector3(), fw = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0), M4 = new THREE.Matrix4(), Q = new THREE.Quaternion();
   const steer = (target, speed, turn, dt) => {
     des.subVectors(target, S.pos); const d = des.length(); if (d > 1e-3) des.multiplyScalar(speed / d);
     S.vel.lerp(des, Math.min(1, dt * turn));
@@ -151,15 +151,22 @@ export function buildShark(scene) {
         ev.warn();
       }
     } else if (S.mode === 'circle') {
-      // due giri intorno al sub, sempre più stretti, poi attacca
-      const r = Math.max(5, 11 - S.t * 0.9), a = S.t * 0.7 + Math.atan2(S.pos.z - player.z, S.pos.x - player.x) * 0.02;
-      tmp.set(player.x + Math.cos(a) * r, player.y - 0.5 + Math.sin(S.t) * 0.8, player.z + Math.sin(a) * r);
-      steer(tmp, 4.2, 1.1, dt); swim.value = 1.2;
+      // si avvicina e ondeggia DAVANTI al sub (sempre nel campo visivo), sempre più vicino, poi attacca
+      fw.set(ev.dir ? ev.dir.x : 0, 0, ev.dir ? ev.dir.z : -1); if (fw.lengthSq() < 1e-4) fw.set(0, 0, -1); fw.normalize();
+      const r = Math.max(7, 13 - S.t * 0.9), a = Math.atan2(fw.z, fw.x) + Math.sin(S.t * 0.8) * 0.75;
+      tmp.set(player.x + Math.cos(a) * r, player.y - 0.4 + Math.sin(S.t) * 0.8, player.z + Math.sin(a) * r);
+      steer(tmp, 5, 1.3, dt); swim.value = 1.2;
       if (!outside && pr < CFG.cliff - 3) { S.mode = 'leave'; S.t = 0; }
-      else if (S.t > 6.5) { S.mode = 'charge'; S.t = 0; ev.charge(); }
+      else if (S.t > 6.5) { S.mode = 'charge'; S.t = 0; S.go = false; ev.charge(); }
     } else if (S.mode === 'charge') {
-      steer(player, 6.2, 2.4, dt); swim.value = 1.9;
-      if (S.pos.distanceTo(player) < 1.25) { S.mode = 'leave'; S.t = 0; ev.hit(); }
+      // attacco sempre frontale: se non è davanti al sub, prima si porta davanti, poi carica dritto verso di lui
+      fw.set(ev.dir ? ev.dir.x : 0, 0, ev.dir ? ev.dir.z : -1); if (fw.lengthSq() < 1e-4) fw.set(0, 0, -1); fw.normalize();
+      tmp.set(S.pos.x - player.x, 0, S.pos.z - player.z); const dh = tmp.length(); const front = dh > 1e-3 ? tmp.multiplyScalar(1 / dh).dot(fw) : 1;
+      if (S.go && front < 0.45) S.go = false;                         // il sub si è girato: torna davanti
+      if (!S.go && front > 0.8) S.go = true;
+      if (S.go) { steer(player, 6.2, 2.4, dt); swim.value = 1.9; }
+      else { des.set(player.x + fw.x * 10, player.y - 0.3, player.z + fw.z * 10); steer(des, 8, 2, dt); swim.value = 1.9; }
+      if (S.go && front > 0.3 && S.pos.distanceTo(player) < 1.25) { S.mode = 'leave'; S.t = 0; ev.hit(); }
       else if (!outside && pr < CFG.cliff - 6 && S.t > 2) { S.mode = 'leave'; S.t = 0; }
     } else if (S.mode === 'flee' || S.mode === 'leave') {
       const out = tmp.set(S.pos.x, 0, S.pos.z).normalize();

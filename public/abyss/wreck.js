@@ -2,10 +2,10 @@
 // Geometria generata via codice (costole, fasciame, ponte, cabina, ancora, catena, botola, camera nascosta).
 import * as THREE from '../vendor/three/three.module.min.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
-import { noise2, rng } from './noise.js?v=0b1daeda';
-import { heightAt } from './world.js?v=0b1daeda';
-import { dialTex, symbolPlate, logbookTex } from './textures.js?v=0b1daeda';
-import { CFG } from './config.js?v=0b1daeda';
+import { noise2, rng } from './noise.js?v=db909cb4';
+import { heightAt } from './world.js?v=db909cb4';
+import { dialTex, symbolPlate, logbookTex } from './textures.js?v=db909cb4';
+import { CFG } from './config.js?v=db909cb4';
 
 const rand = rng(31);
 const R = (a, b) => a + (b - a) * rand();
@@ -21,9 +21,10 @@ const hullPt = (x, v, s) => { const h = keelY(x) + v * (deckY(x) - keelY(x)); re
 
 export const HATCH = { x: 4.2, size: 1.2, r: 0.78 };
 const CABIN = { x0: -11, x1: -7.6, z: 1.7, h: 2.2 };
-const COLLAPSE = [-5.6, -2.2];
+const COLLAPSE = [1e9, 1e9];   // niente più ponte crollato: il ponte è integro
 // lato alto (dopo lo sbandamento) = z negativo: lì lo scafo è squarciato
-const breach = (x, v) => (x > -7.5 && x < 1.8 && noise2(x * 0.32 + 4, v * 3.2) > 0.48) || (x > 6.8 && x < 9.5 && v > 0.35 && noise2(x * 0.5, v * 4) > 0.5);
+// lo scafo è integro: l'unico accesso all'interno è la botola (scopo della prima parte del gioco)
+const breach = () => false;
 
 function boxBetween(a, b, w, t, up, extra) {
   // box allungato da a a b, con l'asse "w" lungo up
@@ -76,12 +77,10 @@ export function buildWreck(scene, tex) {
   for (const s of [-1, 1]) for (let j = 0; j < rows; j++) {
     const v = (j + 0.5) / rows;
     const off = j % 2 ? 1.0 : 0;
-    for (let xa = XS + off; xa < XB - 0.4; xa += 2) {
-      const xb = Math.min(xa + 2, XB - 0.35);
+    for (let xa = off ? XS : XS + off; xa < XB - 0.4; xa = (xa === XS && off) ? XS + off : xa + 2) {
+      const xb = (xa === XS && off) ? XS + off : Math.min(xa + 2, XB - 0.35);   // fila sfalsata: tavola corta a poppa, così lo scafo è chiuso
       const xm = (xa + xb) / 2;
       if (s === -1 && breach(xm, v)) continue;
-      if (rand() < (s === -1 ? 0.06 : 0.04)) continue;
-      if (v > 0.86 && rand() < 0.25) continue;
       const a = hullPt(xa, v, s), b = hullPt(xb, v, s);
       const up = hullPt(xm, Math.min(1, v + 0.02), s).sub(hullPt(xm, Math.max(0, v - 0.02), s)).normalize();
       const w = (deckY(xm) - keelY(xm)) / rows * 1.05;
@@ -94,6 +93,23 @@ export function buildWreck(scene, tex) {
     }
   }
 
+  // ---- specchio di poppa (chiude lo scafo a poppa) ----
+  {
+    const sh = new THREE.Shape();
+    for (let k = 0; k <= 16; k++) { const p = hullPt(XS, k / 16, 1); k ? sh.lineTo(p.z, p.y) : sh.moveTo(p.z, p.y); }
+    for (let k = 16; k >= 0; k--) { const p = hullPt(XS, k / 16, -1); sh.lineTo(p.z, p.y); }
+    const g = new THREE.ExtrudeGeometry(sh, { depth: 0.12, bevelEnabled: false });
+    g.rotateY(-Math.PI / 2); g.translate(XS + 0.02, 0, 0);
+    woodG.push(g);
+  }
+  // ---- trincarino: tavola lungo il bordo del ponte, niente fessure tra ponte e murata ----
+  for (const s of [-1, 1]) for (let xa = XS + 0.1; xa < XB - 0.6; xa += 1) {
+    const xb = Math.min(xa + 1, XB - 0.5);
+    const pa = new THREE.Vector3(xa, deckY(xa) + 0.03, s * (halfW(xa, deckY(xa)) - 0.18));
+    const pb = new THREE.Vector3(xb, deckY(xb) + 0.03, s * (halfW(xb, deckY(xb)) - 0.18));
+    woodG.push(boxBetween(pa, pb, 0.4, 0.08, new THREE.Vector3(0, 0, 1)));
+  }
+
   // ---- ponte: bagli in ferro e tavolato deformato ----
   for (let x = XS + 0.9; x < XB - 1.5; x += 1.05) {
     const H = deckY(x), bw = halfW(x, H) * 0.97;
@@ -104,7 +120,7 @@ export function buildWreck(scene, tex) {
     }
     rustG.push(boxBetween(new THREE.Vector3(x, H - 0.14, -bw), new THREE.Vector3(x, H - 0.14, bw), 0.18, 0.13, new THREE.Vector3(1, 0, 0)));
   }
-  const brk = [-10.8, -8.8, -6.8, COLLAPSE[0], COLLAPSE[1], -0.2, HATCH.x - HATCH.size, HATCH.x + HATCH.size, 7.4, 9.4, 11.4];
+  const brk = [XS + 0.3, -10.8, -8.8, -6.8, -4.5, -2.2, -0.2, HATCH.x - HATCH.size, HATCH.x + HATCH.size, 7.4, 9.4, 11.4];
   for (let zr = -3.2; zr <= 3.2; zr += 0.32) {
     for (let i = 0; i < brk.length - 1; i++) {
       const xa = brk[i], xb = brk[i + 1], xm = (xa + xb) / 2;
@@ -118,7 +134,6 @@ export function buildWreck(scene, tex) {
       if (Math.abs(zr) < HATCH.size && xm > HATCH.x - HATCH.size && xm < HATCH.x + HATCH.size) continue;
       const lim = Math.min(halfW(xa, deckY(xa)), halfW(xb, deckY(xb))) - 0.12;
       if (Math.abs(zr) > lim) continue;
-      if (rand() < 0.07) continue;
       const def = (x) => deckY(x) + 0.05 * Math.sin(x * 0.8 + zr * 2) + 0.02;
       woodG.push(boxBetween(new THREE.Vector3(xa, def(xa), zr), new THREE.Vector3(xb, def(xb), zr), 0.3, 0.06, new THREE.Vector3(0, 0, 1)));
     }
@@ -141,17 +156,19 @@ export function buildWreck(scene, tex) {
   {
     const H = deckY(-9), { x0, x1, z, h } = CABIN;
     const wall = (a, b, wh, y0 = 0) => woodG.push(boxBetween(new THREE.Vector3(a[0], H + y0 + wh / 2, a[1]), new THREE.Vector3(b[0], H + y0 + wh / 2, b[1]), wh, 0.1, new THREE.Vector3(0, 1, 0)));
-    // parete di prua con due finestre
-    wall([x1, -z], [x1, -0.95], h); wall([x1, -0.35], [x1, 0.35], h); wall([x1, 0.95], [x1, z], h);
-    wall([x1, -0.95], [x1, -0.35], 0.9); wall([x1, 0.35], [x1, 0.95], 0.9); wall([x1, -0.95], [x1, -0.35], 0.5, 1.7); wall([x1, 0.35], [x1, 0.95], 0.5, 1.7);
+    // cabina chiusa: pareti piene, porta sbarrata (nessuna apertura sull'interno)
+    wall([x1, -z], [x1, z], h);
     wall([x0, -z], [x0, z], h);
     wall([x0, z], [x1, z], h);
-    wall([x0, -z], [x0 + 1.4, -z], h); wall([x0 + 2.4, -z], [x1, -z], h); wall([x0 + 1.4, -z], [x0 + 2.4, -z], 0.6, 1.6); // porta
+    wall([x0, -z], [x1, -z], h);
+    // porta sbarrata: battente in ferro arrugginito appoggiato sulla parete
+    rustG.push(new THREE.BoxGeometry(1.0, 1.6, 0.06).translate(x0 + 1.9, H + 0.8, -z - 0.08));
+    for (const yy of [0.5, 1.2]) rustG.push(new THREE.BoxGeometry(1.25, 0.1, 0.08).translate(x0 + 1.9, H + yy, -z - 0.13));
     // tetto crollato a metà
     for (let k = 0; k < 7; k++) {
       const zz = -z + 0.25 + k * 0.5;
       if (k > 3) woodG.push(boxBetween(new THREE.Vector3(x0, H + h, zz), new THREE.Vector3(x1, H + h - (k - 3) * 0.25, zz), 0.46, 0.07, new THREE.Vector3(0, 0, 1)));
-      else woodG.push(boxBetween(new THREE.Vector3(x0, H + h, zz), new THREE.Vector3(x1 - (k === 3 ? 1.6 : 0), H + h, zz), 0.46, 0.07, new THREE.Vector3(0, 0, 1)));
+      else woodG.push(boxBetween(new THREE.Vector3(x0, H + h, zz), new THREE.Vector3(x1, H + h, zz), 0.46, 0.07, new THREE.Vector3(0, 0, 1)));
     }
   }
 

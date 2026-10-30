@@ -680,7 +680,9 @@ def build_abyss():
         path = abyss_url(lang)
         body = tpl.replace('{{API}}', api).replace('{{home}}', url('home', lang)).replace('{{contatti}}', url('contatti', lang)).replace('{{servizi}}', url('servizi', lang))
         body = _re.sub(r'\{\{(\w+)\}\}', lambda m: AH[m.group(1)][lang], body)
-        js = _json.dumps({k: v[lang] for k, v in AJ.items()}, ensure_ascii=False).replace('</', '<\\/')
+        jd = {k: v[lang] for k, v in AJ.items()}
+        jd['srv'] = [[x[lang]['t'], x[lang]['short']] for x in SERVIZI]   # cartelli dei servizi sul fondale, come sul sito
+        js = _json.dumps(jd, ensure_ascii=False).replace('</', '<\\/')
         man = f'abyss-{lang}.webmanifest'
         with open(os.path.join(OUT, man), 'w', encoding='utf-8') as f:
             _json.dump({'name': 'ABYSS · Anfibiasub', 'short_name': 'ABYSS', 'start_url': path, 'display': 'fullscreen', 'orientation': 'landscape', 'lang': lang,

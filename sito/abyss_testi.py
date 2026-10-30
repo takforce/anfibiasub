@@ -216,6 +216,8 @@ J = {
                'chiave': ['Messingschlüssel', 'Zwischen den Amphorenscherben ein großer Messingschlüssel. Daran hängt ein kleines Schild mit dem Schlüsselsymbol und einer Ziffer.', 'Schlüssel → 4'],
                'cofanetto': ['Schatulle des Kapitäns', 'Die Schatulle des Kapitäns. Darin, in Wachstuch gewickelt, eine Silbermedaille und ein Brief: „Wer dieses Wrack findet: Das Meer gibt nur dem zurück, der zu suchen weiß.“', '']},
     },
+    # cartelli dei servizi sul fondale (i servizi vengono da contenuti.SERVIZI, aggiunti dal build)
+    'srv_head': {'it': 'LAVORI SUBACQUEI', 'en': 'UNDERWATER WORKS', 'es': 'TRABAJOS SUBACUÁTICOS', 'de': 'UNTERWASSERARBEITEN'},
     # pagina del giornale di bordo (disegnata nel gioco)
     'logpage': {
         'it': ['14 marzo — mare grosso da libeccio.', 'Il cargo imbarca acqua a prua.', 'Ho lasciato lo scafandro nella', 'stiva, sotto la botola.', '', 'Il cofanetto l\'ho portato fuori:', 'troppo prezioso per affondare', 'con la nave. È sotto l\'arco', 'di pietra, dove il fondale', 'precipita nel blu.', 'Dalla poppa: rotta {deg}°,', 'circa {m} metri.', 'il blu'],

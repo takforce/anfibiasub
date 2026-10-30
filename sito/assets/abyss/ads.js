@@ -173,3 +173,52 @@ export function buildStatues(scene, world, tex, spots, makeHelmet) {
   }
   return list;
 }
+
+// ---------- F. Cartelli dei servizi sul fondale, lontani dal relitto (testi come sul sito, nella lingua della pagina) ----------
+function wrap(g, text, maxW) {
+  const words = String(text).split(/\s+/), lines = []; let line = '';
+  for (const w of words) { const t = line ? line + ' ' + w : w; if (g.measureText(t).width > maxW && line) { lines.push(line); line = w; } else line = t; }
+  if (line) lines.push(line);
+  return lines;
+}
+export async function buildServiceSigns(scene, world, tex, spots, services, head) {
+  if (!services.length || !spots.length) return [];
+  try { await document.fonts.load('800 40px Montserrat'); await document.fonts.load('600 20px Montserrat'); } catch (_) { /* font di riserva */ }
+  const logo = await new Promise((r) => { const im = new Image(); im.onload = () => r(im); im.onerror = () => r(null); im.src = '/img/logo-casco.png'; });
+  const steel = new THREE.MeshStandardMaterial({ color: 0x8f9a9f, metalness: 0.9, roughness: 0.5 });
+  const baseM = new THREE.MeshStandardMaterial({ map: tex.rock.map, color: 0x9a9a90, roughness: 1 });
+  const list = [];
+  spots.forEach((p, i) => {
+    const sv = services[i % services.length];
+    const t = canvasTex(1024, 640, (g, w, h) => {
+      g.fillStyle = NAVY; g.fillRect(0, 0, w, h);
+      g.strokeStyle = 'rgba(220,239,245,.5)'; g.lineWidth = 6; g.strokeRect(22, 22, w - 44, h - 44);
+      // intestazione: logo + ANFIBIASUB + tipo di lavori
+      if (logo) { g.save(); g.beginPath(); g.arc(112, 112, 58, 0, 7); g.clip(); g.drawImage(logo, 54, 54, 116, 116); g.restore(); g.strokeStyle = CYAN; g.lineWidth = 4; g.beginPath(); g.arc(112, 112, 58, 0, 7); g.stroke(); }
+      wordmark(g, 196, 120, 56);
+      g.fillStyle = 'rgba(220,239,245,.7)'; g.font = '600 24px Montserrat, Arial'; g.textAlign = 'left'; g.fillText(head, 198, 156);
+      g.fillStyle = CYAN; g.fillRect(60, 200, w - 120, 4);
+      // servizio
+      g.fillStyle = ICE; g.font = '800 64px Montserrat, Arial';
+      const title = wrap(g, sv[0].toUpperCase(), w - 120).slice(0, 2);
+      title.forEach((l, k) => g.fillText(l, 60, 282 + k * 70));
+      g.fillStyle = 'rgba(220,239,245,.82)'; g.font = '600 30px Montserrat, Arial';
+      const y0 = 282 + title.length * 70 + 4;
+      wrap(g, sv[1], w - 120).slice(0, 3).forEach((l, k) => g.fillText(l, 60, y0 + k * 40));
+      g.fillStyle = CYAN; g.font = '600 30px Montserrat, Arial'; g.fillText('www.anfibiasub.it', 60, h - 50);
+      grime(g, w, h, 2.5);
+    });
+    const face = new THREE.MeshStandardMaterial({ map: t, roughness: 0.85, metalness: 0.05, color: 0xb8c2c6 });
+    const g = new THREE.Group();
+    const panel = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.5, 0.05), [steel, steel, steel, steel, face, steel]); panel.position.y = 1.75; panel.rotation.x = -0.08; g.add(panel);
+    for (const s of [-1, 1]) { const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 2.1, 8), steel); leg.position.set(s * 1.05, 1.05, -0.06); g.add(leg); }
+    const base = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.28, 0.7), baseM); base.position.y = 0.12; g.add(base);
+    const y = heightAt(p.x, p.z);
+    g.position.set(p.x, y - 0.06, p.z);
+    g.rotation.y = p.rot ?? Math.atan2(-p.x, -p.z);     // rivolto verso il relitto
+    g.traverse((o) => { if (o.isMesh) o.castShadow = o.receiveShadow = true; });
+    scene.add(g); list.push(g);
+    world.colliders.push({ c: new THREE.Vector3(p.x, y + 1.2, p.z), s: new THREE.Vector3(1.35, 1.3, 0.35), rot: g.rotation.y });
+  });
+  return list;
+}

@@ -43,7 +43,7 @@ export const CFG = {
     { x: -14, z: -20, L: 4.5 }, { x: 26, z: -22, L: 3 }, { x: -36, z: 30, L: 5 }, { x: 46, z: 2, L: 2.8 }, { x: -44, z: -12, L: 3.6 }, { x: 18, z: 52, L: 4 },
   ],
   // aereo ultraleggero affondato vicino al relitto
-  plane: { x: -4, z: 19, rot: 0.9, tiktok: null },   // tiktok: nome del file ufficiale del simbolo in abyss/tex/ (es. 'tiktok.png')
+  plane: { x: -4, z: 19, rot: 0.9, tiktok: 'tiktok.png' },   // tiktok: nome del file ufficiale del simbolo in abyss/tex/ (es. 'tiktok.png')
   // ponte di sabbia con il cancello della Missione 2, sul bordo del mondo (angolo da est, distanza dal centro)
   gate: { ang: -0.14, r: 74, len: 15 },   // il ponte parte a 74 m dal centro, è lungo 15 m; il cancello è in fondo
 

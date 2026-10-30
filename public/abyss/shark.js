@@ -3,7 +3,7 @@
 // fessure branchiali, occhi; colori a controombreggiatura (dorso grigio-blu, ventre bianco); nuoto ondulato nel vertex shader.
 import * as THREE from '../vendor/three/three.module.min.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
-import { CFG, onBridge } from './config.js?v=197ca967';
+import { CFG, onBridge } from './config.js?v=fedb544f';
 
 const L = 3.1;                 // lunghezza (m)
 const TOP = new THREE.Color(0x3d4c58), BELLY = new THREE.Color(0xe4e8ea), FIN = new THREE.Color(0x34424d);

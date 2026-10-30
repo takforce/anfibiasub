@@ -17,7 +17,7 @@ export const CFG = {
   // luoghi intorno al relitto (lontani 50-60 m)
   places: {
     grotta: { x: -52, z: 18, name: 'la grotta' },
-    peschereccio: { x: 34, z: 40, name: 'il peschereccio capovolto' },
+    peschereccio: { x: 34, z: 40, name: 'l\'elicottero affondato' },
     anfore: { x: 6, z: -52, name: 'il campo di anfore' },
     arco: { x: -50, z: 57, name: 'l\'arco di roccia' },
   },
@@ -51,7 +51,7 @@ export const CFG = {
     {
       id: 'targhetta', name: 'Targhetta di bordo', symbol: 'ancora', digit: 1, place: 'peschereccio',
       img: '/img/abyss/targhetta.webp',
-      found: 'Sotto lo scafo del peschereccio capovolto, una targhetta del cargo strappata da una paratia. Accanto all\'ancora incisa c\'è un numero.',
+      found: 'Tra i rottami dell\'elicottero affondato, una targhetta del cargo strappata da una paratia. Accanto all\'ancora incisa c\'è un numero.',
       clue: 'Ancora → 1',
     },
     {

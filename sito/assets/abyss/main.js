@@ -7,7 +7,7 @@ import { makeTextures, logbookPage } from './textures.js';
 import { buildWorld, collideWorld } from './world.js';
 import { buildWreck, makeHelmet } from './wreck.js';
 import { buildArtifacts } from './artifacts.js';
-import { buildLandmarks } from './landmarks.js';
+import { buildLandmarks, modelsReady } from './landmarks.js';
 import { buildFish } from './fish.js';
 import { buildShark } from './shark.js';
 import { buildAds, buildStatues, buildServiceSigns } from './ads.js';
@@ -517,7 +517,7 @@ const sediment = (() => {
 
 // ---------------- ciclo principale ----------------
 const clock = new THREE.Clock();
-const fogShallow = new THREE.Color(0x2a7d98), fogDeep = new THREE.Color(0x03101b), tmpC = new THREE.Color();
+const fogShallow = new THREE.Color(0x1e6e9f), fogDeep = new THREE.Color(0x03101b), tmpC = new THREE.Color();
 const fwd = new THREE.Vector3(), right = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0), acc = new THREE.Vector3(), before = new THREE.Vector3();
 let breath = 0, lastBreathPhase = -1;
 
@@ -747,7 +747,7 @@ renderer.render(scene, camera);
 torch.intensity = 0;
 document.addEventListener('visibilitychange', () => { if (document.hidden && canPause()) pause(); });
 requestAnimationFrame(tick);
-Promise.allSettled([adsReady, signsReady, ...photos]).then(() => {
+Promise.allSettled([adsReady, signsReady, ...photos, ...modelsReady]).then(() => {
   const inChamber = (o) => { for (let p = o; p; p = p.parent) if (p.name === 'chamber') return true; return false; };
   addCaustics(scene, inChamber);
   renderer.compile(scene, camera); ready();

@@ -39,6 +39,8 @@ function causticTex(size = 256) {
 
 export const CAUSTIC = { uCaTex: { value: null }, uCaTime: { value: 0 }, uCaStr: { value: 0.5 }, uCaCol: { value: new THREE.Color(0xbff3ff) } };
 
+export function causticTexture() { if (!CAUSTIC.uCaTex.value) CAUSTIC.uCaTex.value = causticTex(); return CAUSTIC.uCaTex.value; }
+
 // applica le caustiche a tutti i MeshStandardMaterial della scena (fondale, rocce, relitto, oggetti)
 export function addCaustics(scene, skip = () => false) {
   if (!CAUSTIC.uCaTex.value) CAUSTIC.uCaTex.value = causticTex();

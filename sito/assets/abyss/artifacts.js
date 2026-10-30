@@ -84,7 +84,7 @@ export function buildArtifacts(scene, wreck, tex, spots) {
   // bussola: in fondo alla grotta, mezza sepolta
   place(def('bussola'), makeCompass(brass), spots.bussola, 0.5);
   { const a = list[list.length - 1]; const m = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 10).scale(1.3, 0.4, 0.9), sandM); m.position.copy(a.home.pos).add(new THREE.Vector3(0.1, 0.0, 0.06)); scene.add(m); a.extra.push(m); }
-  // targhetta: sotto la murata del peschereccio capovolto
+  // targhetta: accanto all'elicottero affondato
   place(def('targhetta'), makePlate(brass, wreck.materials.rust), spots.targhetta, 0.7);
   // chiave: tra le anfore, coperta in parte da un coccio
   place(def('chiave'), makeKey(brass), spots.chiave, 0.45);

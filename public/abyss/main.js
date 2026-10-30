@@ -1,18 +1,18 @@
 // ABYSS — Il relitto dimenticato. Motore principale e macchina a stati.
 import * as THREE from '../vendor/three/three.module.min.js';
-import { CFG, CODE, bearing } from './config.js?v=f4621fa7';
-import { t as tr, L as TX } from './i18n.js?v=f4621fa7';
-import { addCaustics, makeBeam, CAUSTIC } from './look.js?v=f4621fa7';
-import { makeTextures, logbookPage } from './textures.js?v=f4621fa7';
-import { buildWorld, collideWorld } from './world.js?v=f4621fa7';
-import { buildWreck, makeHelmet } from './wreck.js?v=f4621fa7';
-import { buildArtifacts } from './artifacts.js?v=f4621fa7';
-import { buildLandmarks } from './landmarks.js?v=f4621fa7';
-import { buildFish } from './fish.js?v=f4621fa7';
-import { buildShark } from './shark.js?v=f4621fa7';
-import { buildAds, buildStatues, buildServiceSigns } from './ads.js?v=f4621fa7';
-import { createControls } from './controls.js?v=f4621fa7';
-import { createAudio } from './audio.js?v=f4621fa7';
+import { CFG, CODE, bearing } from './config.js?v=efbb9fac';
+import { t as tr, L as TX } from './i18n.js?v=efbb9fac';
+import { addCaustics, makeBeam, CAUSTIC } from './look.js?v=efbb9fac';
+import { makeTextures, logbookPage } from './textures.js?v=efbb9fac';
+import { buildWorld, collideWorld } from './world.js?v=efbb9fac';
+import { buildWreck, makeHelmet } from './wreck.js?v=efbb9fac';
+import { buildArtifacts } from './artifacts.js?v=efbb9fac';
+import { buildLandmarks, modelsReady } from './landmarks.js?v=efbb9fac';
+import { buildFish } from './fish.js?v=efbb9fac';
+import { buildShark } from './shark.js?v=efbb9fac';
+import { buildAds, buildStatues, buildServiceSigns } from './ads.js?v=efbb9fac';
+import { createControls } from './controls.js?v=efbb9fac';
+import { createAudio } from './audio.js?v=efbb9fac';
 
 const $ = (s) => document.querySelector(s);
 const root = $('#abyss');
@@ -517,7 +517,7 @@ const sediment = (() => {
 
 // ---------------- ciclo principale ----------------
 const clock = new THREE.Clock();
-const fogShallow = new THREE.Color(0x2a7d98), fogDeep = new THREE.Color(0x03101b), tmpC = new THREE.Color();
+const fogShallow = new THREE.Color(0x1e6e9f), fogDeep = new THREE.Color(0x03101b), tmpC = new THREE.Color();
 const fwd = new THREE.Vector3(), right = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0), acc = new THREE.Vector3(), before = new THREE.Vector3();
 let breath = 0, lastBreathPhase = -1;
 
@@ -747,7 +747,7 @@ renderer.render(scene, camera);
 torch.intensity = 0;
 document.addEventListener('visibilitychange', () => { if (document.hidden && canPause()) pause(); });
 requestAnimationFrame(tick);
-Promise.allSettled([adsReady, signsReady, ...photos]).then(() => {
+Promise.allSettled([adsReady, signsReady, ...photos, ...modelsReady]).then(() => {
   const inChamber = (o) => { for (let p = o; p; p = p.parent) if (p.name === 'chamber') return true; return false; };
   addCaustics(scene, inChamber);
   renderer.compile(scene, camera); ready();

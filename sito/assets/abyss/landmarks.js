@@ -1,9 +1,13 @@
-// Luoghi dei reperti, lontani dal relitto: grotta, peschereccio capovolto, campo di anfore, arco di roccia.
+// Luoghi dei reperti, lontani dal relitto: grotta, elicottero affondato, campo di anfore, arco di roccia.
 // Restituisce i punti in cui appoggiare i reperti (spots).
 import * as THREE from '../vendor/three/three.module.min.js';
 import { heightAt } from './world.js';
 import { rng } from './noise.js';
 import { CFG } from './config.js';
+import { GLTFLoader } from '../vendor/three/GLTFLoader.js';
+
+const loader = new GLTFLoader();
+export const modelsReady = [];   // modelli 3D in caricamento: il gioco parte quando sono pronti
 
 const rand = rng(53);
 const R = (a, b) => a + (b - a) * rand();
@@ -37,38 +41,33 @@ export function buildLandmarks(scene, world, tex) {
     spots.bussola = { pos: new THREE.Vector3(x - 1.0, b - 0.02, z + 0.7), rot: new THREE.Euler(0.3, 0.5, 0.1) };
   }
 
-  // ---------------- PESCHERECCIO CAPOVOLTO ----------------
+  // ---------------- ELICOTTERO AFFONDATO (al posto del vecchio peschereccio) ----------------
+  // modello 3D vero (fotogrammetria di un relitto reale): "Helicopter Wreck" di divertom80, Sketchfab, licenza CC BY 4.0
   {
     const { x, z } = P.peschereccio, b = heightAt(x, z), yaw = 2.1;
-    const g = new THREE.Group(); g.position.set(x, b + 0.15, z); g.rotation.set(0, yaw, 0); scene.add(g);
-    const hull = new THREE.Group(); hull.rotation.x = Math.PI - 0.22; hull.position.y = 0.32; g.add(hull);   // capovolto e sollevato da un lato
-    // scafo a guscio (gozzo di 7 m)
-    const LN = 7, N = 28, M = 14, pos = [], uv = [], idx = [];
-    for (let i = 0; i <= N; i++) {
-      const t = i / N, xx = (t - 0.5) * LN, k = 1 - Math.pow(Math.abs(t - 0.5) * 2, 2.2);
-      const bw = 1.25 * Math.pow(Math.max(0.02, k), 0.55), dp = 1.05 * Math.pow(Math.max(0.05, k), 0.25);
-      for (let j = 0; j <= M; j++) {
-        const a = Math.PI * (j / M);                // mezzo cerchio: da murata a murata passando per la chiglia
-        pos.push(xx, -Math.sin(a) * dp + 0.4 * (Math.abs(t - 0.5) * 2) ** 2, Math.cos(a) * bw);
-        uv.push(t * 4, j / M * 2);
-      }
-    }
-    for (let i = 0; i < N; i++) for (let j = 0; j < M; j++) { const a = i * (M + 1) + j, c = a + M + 1; idx.push(a, c, a + 1, c, c + 1, a + 1); }
-    const sg = new THREE.BufferGeometry();
-    sg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); sg.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-    sg.setIndex(idx); sg.computeVertexNormals();
-    const shell = new THREE.Mesh(sg, wood); shell.castShadow = shell.receiveShadow = true; hull.add(shell);
-    const keel = new THREE.Mesh(new THREE.BoxGeometry(LN * 0.92, 0.14, 0.12), world.rustMat || wood); keel.position.y = -1.08; hull.add(keel);
-    const rud = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.8, 0.5), wood); rud.position.set(-LN / 2 - 0.05, -0.5, 0); hull.add(rud);
-    // banchi (visibili guardando sotto)
-    for (const bx of [-1.6, 0.2, 1.8]) { const bn = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.05, 2.1), wood); bn.position.set(bx, -0.25, 0); hull.add(bn); }
-    rock(x + Math.cos(yaw + Math.PI / 2) * 1.6, b + 0.1, z - Math.sin(yaw + Math.PI / 2) * 1.6, 0.9, 0.55, 1.1, yaw);   // lo scoglio che tiene sollevato lo scafo
-    world.colliders.push({ c: new THREE.Vector3(x, b + 0.6, z), s: new THREE.Vector3(3.5, 0.75, 1.15), rot: yaw });
-    for (let i = 0; i < 8; i++) { const a = R(0, 6.3), d = R(5, 9); rock(x + Math.cos(a) * d, b, z + Math.sin(a) * d, R(0.6, 1.6), R(0.5, 1.2), R(0.6, 1.6)); }
-    // la targhetta: sotto la murata sollevata
-    const sideV = new THREE.Vector3(Math.cos(yaw + Math.PI / 2), 0, -Math.sin(yaw + Math.PI / 2));
-    const fw = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
-    const sp = new THREE.Vector3(x, 0, z).addScaledVector(sideV, 1.0).addScaledVector(fw, 0.8); sp.y = heightAt(sp.x, sp.z) + 0.12;
+    const g = new THREE.Group(); g.position.set(x, b - 0.05, z); g.rotation.set(0.03, yaw, -0.06); scene.add(g);   // un po' adagiato sul fianco
+    const S = 0.137;   // il modello è lungo ~91 unità: così è lungo 12,5 m
+    // il modello ha l'asse in diagonale: lo giro in modo che la cabina guardi verso -x e la coda verso +x,
+    // e lo sposto in modo che il centro della cabina (in basso) cada nell'origine del gruppo
+    const inner = new THREE.Group(); inner.rotation.y = -0.778; inner.scale.setScalar(S); g.add(inner);
+    const off = new THREE.Vector3(-14, 6.85, 23).applyEuler(inner.rotation).multiplyScalar(S);
+    inner.position.copy(off).negate();
+    modelsReady.push(loader.loadAsync(new URL('./models/heli.gltf?v=1', import.meta.url).href).then((gl) => {
+      gl.scene.traverse((o) => {
+        if (!o.isMesh) return;
+        const old = o.material;
+        o.material = new THREE.MeshStandardMaterial({ map: old.map, roughness: 0.95, metalness: 0.1, side: THREE.DoubleSide });
+        o.castShadow = o.receiveShadow = true;
+      });
+      inner.add(gl.scene);
+    }).catch(() => {}));
+    // ingombri: cabina e trave di coda
+    const box = (lx, ly, hx, hy, hz) => world.colliders.push({ c: g.localToWorld(new THREE.Vector3(lx, ly, 0.2)), s: new THREE.Vector3(hx, hy, hz), rot: yaw });
+    g.updateMatrixWorld(true);
+    box(-0.55, 0.95, 2.55, 0.95, 0.85); box(5.7, 2.0, 3.7, 0.4, 0.35);
+    for (let i = 0; i < 8; i++) { const a = R(0, 6.3), d = R(7, 11); rock(x + Math.cos(a) * d, b, z + Math.sin(a) * d, R(0.6, 1.6), R(0.5, 1.2), R(0.6, 1.6)); }
+    // la targhetta: sulla sabbia accanto al portellone della cabina, mezza nascosta dal rottame
+    const sp = g.localToWorld(new THREE.Vector3(-0.8, 0, -1.35)); sp.y = heightAt(sp.x, sp.z) + 0.12;
     spots.targhetta = { pos: sp, rot: new THREE.Euler(-0.15, yaw + 0.4, 0.1) };
   }
 

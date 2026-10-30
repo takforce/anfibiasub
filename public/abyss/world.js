@@ -1,8 +1,9 @@
 // Ambiente: fondale, rocce, gorgonie, cima d'ormeggio, superficie, raggi, particelle, bolle, pesci
 import * as THREE from '../vendor/three/three.module.min.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
-import { fbm2, fbm3, noise2, rng } from './noise.js?v=f4621fa7';
-import { CFG } from './config.js?v=f4621fa7';
+import { fbm2, fbm3, noise2, rng } from './noise.js?v=efbb9fac';
+import { CFG } from './config.js?v=efbb9fac';
+import { causticTexture } from './look.js?v=efbb9fac';
 
 export function heightAt(x, z) {
   let h = CFG.seabed + (fbm2(x * 0.022 + 10, z * 0.022 + 4) - 0.5) * 5 + (fbm2(x * 0.11, z * 0.11) - 0.5) * 1.1;
@@ -153,22 +154,35 @@ export function buildWorld(scene, tex, q, avoid) {
   }
 
   // ---------------- superficie vista da sotto (finestra di Snell) ----------------
+  // come il video della superficie del sito: onde chiare e luminose dentro il cerchio di luce sopra il sub,
+  // riflesso blu scuro fuori; il reticolo delle onde è lo stesso delle caustiche sul fondo
   {
     const mat = new THREE.ShaderMaterial({
       side: THREE.DoubleSide, transparent: false,
-      uniforms: { uTime: { value: 0 }, uCam: { value: new THREE.Vector3() }, uDeep: { value: new THREE.Color(0x0b3047) }, uSky: { value: new THREE.Color(0xcff3ff) }, uFog: { value: new THREE.Color() }, uDensity: { value: 0.03 } },
+      uniforms: { uTime: { value: 0 }, uCam: { value: new THREE.Vector3() }, uDeep: { value: new THREE.Color(0x0a3550) }, uSky: { value: new THREE.Color(0xc8f4ff) }, uMid: { value: new THREE.Color(0x1689cf) },
+        uFog: { value: new THREE.Color() }, uDensity: { value: 0.03 }, uTex: { value: causticTexture() } },
       vertexShader: `varying vec3 vW; void main(){ vec4 w = modelMatrix*vec4(position,1.); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w; }`,
-      fragmentShader: `uniform float uTime; uniform vec3 uCam, uDeep, uSky, uFog; uniform float uDensity; varying vec3 vW;
-        float wv(vec2 p){ return sin(p.x*.9+uTime*1.3)*.5+sin(p.y*1.3-uTime*1.1)*.5+sin((p.x+p.y)*2.1+uTime*1.9)*.35+sin((p.x-p.y)*3.3-uTime*2.3)*.2; }
+      fragmentShader: `uniform float uTime; uniform vec3 uCam, uDeep, uSky, uMid, uFog; uniform float uDensity; uniform sampler2D uTex; varying vec3 vW;
         void main(){
           vec3 d = normalize(vW-uCam);
-          vec2 p = vW.xz*.6; float w = wv(p); float w2 = wv(p*2.7+5.);
-          float c = d.y + w*.035 + w2*.015;
-          float win = smoothstep(.62,.72,c);
-          vec3 col = mix(uDeep*.8, uSky*(1.15+w*.18+w2*.08), win);
-          col += uSky*.25*pow(max(0., w2), 6.)*win;
+          vec2 p = vW.xz*.16;
+          vec2 wob = vec2(sin(p.y*3.1+uTime*.9)+sin(p.x*5.3-uTime*.7), cos(p.x*2.7+uTime*.8)+cos(p.y*4.9+uTime*.6))*.03;
+          float c1 = texture2D(uTex, p + vec2(uTime*.021, uTime*.014) + wob).r;
+          float c2 = texture2D(uTex, p*1.43 + vec2(-uTime*.017, uTime*.023) - wob).r;
+          float c3 = texture2D(uTex, p*.31 + vec2(uTime*.006, -uTime*.008)).r;
+          float c4 = texture2D(uTex, p*2.9 + vec2(uTime*.04, uTime*.03) + wob*2.).r;
+          float net = min(c1, c2)*1.1 + c1*c2*.6 + c4*.35;                       // creste delle onde, luminose
+          float tilt = (c1 - c2)*.05 + (c3 - .3)*.04;                  // le onde spostano il bordo della finestra
+          float c = d.y + tilt;
+          float win = smoothstep(.6, .8, c);
+          vec3 sunD = normalize(vec3(.22, 1., .12));
+          float sun = pow(max(0., dot(d, sunD)), 28.)*1.6 + pow(max(0., dot(d, sunD)), 4.)*.35;
+          vec3 inside = mix(uMid, uSky, clamp(net*.5 + sun*.7, 0., 1.)) * (.8 + c3*.35) + uSky*sun*.45;
+          vec3 outside = uDeep*(.75 + net*.35);                         // riflesso totale: blu scuro con onde appena visibili
+          vec3 col = mix(outside, inside, win);
+          col = mix(col, uMid*1.1, smoothstep(.45, .62, c)*(1.-win)*.6); // alone azzurro sul bordo della finestra
           float f = 1.-exp(-pow(uDensity*length(vW-uCam),2.));
-          gl_FragColor = vec4(mix(col, uFog, f*(1.-win*.55)),1.);
+          gl_FragColor = vec4(mix(col, uFog, f*(1.-win*.7)),1.);
           #include <colorspace_fragment>
         }`,
     });

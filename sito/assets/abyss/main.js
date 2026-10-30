@@ -238,10 +238,9 @@ if (/iPhone|iPod/.test(navigator.userAgent) && !navigator.standalone) {
   const t = $('.ab-ios'); if (t) t.hidden = false;
   // Safari iPhone: la barra si riduce solo se la pagina scorre. Rendo la pagina un po' più alta dello schermo
   // (il gioco resta fisso): scorrendo verso l'alto la barra si riduce a una striscia e resta così durante il gioco.
+  // solo sulla schermata iniziale la pagina ha un po' di spazio da scorrere: scorrendo, Safari riduce da solo
+  // le proprie barre (non le tocchiamo noi) e il gioco si adatta subito alla nuova area (vedi resize).
   document.documentElement.classList.add('ios-scroll');
-  const hide = () => { if (scrollY < 2) window.scrollTo(0, 1); };
-  addEventListener('orientationchange', () => setTimeout(hide, 400));
-  setTimeout(hide, 300);
 }
 function goFullscreen() {
   const el = document.documentElement, f = el.requestFullscreen || el.webkitRequestFullscreen;
@@ -305,7 +304,7 @@ function interact() {
 
 function openLog() {
   const img = $('#ab-logimg');
-  const portrait = innerHeight > innerWidth;
+  const portrait = viewSize().h > viewSize().w;
   if (img.dataset.mode !== String(portrait)) { img.src = logbookPage(LOG.deg, LOG.m, portrait); img.dataset.mode = String(portrait); }
   setState('READING'); controls.enabled = false; openPanel('log');
 }
@@ -684,13 +683,35 @@ function tick() {
   requestAnimationFrame(tick);
 }
 
-function resize() {
-  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth, innerHeight, false);
-  world.particles.uniforms.uPR.value = renderer.getPixelRatio() * innerHeight / 900;
-  world.bubbles.mat.uniforms.uPR.value = renderer.getPixelRatio() * innerHeight / 900;
+// Dimensioni reali disponibili: su Safari iPhone l'altezza cambia quando le barre del browser
+// si riducono o si espandono. Uso visualViewport (se c'è) e aggiorno solo dimensioni e proiezione:
+// la scena non viene mai ricreata, quindi niente ricaricamenti né salti.
+let vw = 0, vh = 0, rq = 0;
+function viewSize() {
+  const v = window.visualViewport;
+  return { w: Math.round(v ? v.width : innerWidth), h: Math.round(v ? v.height : innerHeight) };
 }
-addEventListener('resize', resize);
+function resize() {
+  rq = 0;
+  const { w, h } = viewSize();
+  if (w === vw && h === vh) return;
+  vw = w; vh = h;
+  root.style.setProperty('--abh', h + 'px');            // altezza del contenitore = area visibile reale
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  renderer.setSize(w, h, false);
+  world.particles.uniforms.uPR.value = renderer.getPixelRatio() * h / 900;
+  world.bubbles.mat.uniforms.uPR.value = renderer.getPixelRatio() * h / 900;
+}
+const queueResize = () => { if (!rq) rq = requestAnimationFrame(resize); };
+addEventListener('resize', queueResize);
+addEventListener('orientationchange', () => { queueResize(); setTimeout(queueResize, 350); setTimeout(queueResize, 800); });
+if (window.visualViewport) { visualViewport.addEventListener('resize', queueResize); visualViewport.addEventListener('scroll', queueResize); }
+// durante l'immersione la pagina non deve scorrere né ingrandirsi; i pannelli con testo lungo restano scorrevoli
+document.addEventListener('touchmove', (e) => {
+  if (['INTRO', 'DIVE'].includes(S.state) || e.target.closest('.ab-box, .ab-logbox')) return;
+  e.preventDefault();
+}, { passive: false });
+['gesturestart', 'gesturechange'].forEach((ev) => document.addEventListener(ev, (e) => e.preventDefault(), { passive: false }));
 resize();
 updCount();
 

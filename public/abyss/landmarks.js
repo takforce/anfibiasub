@@ -1,9 +1,9 @@
 // Luoghi dei reperti, lontani dal relitto: grotta, peschereccio capovolto, campo di anfore, arco di roccia.
 // Restituisce i punti in cui appoggiare i reperti (spots).
 import * as THREE from '../vendor/three/three.module.min.js';
-import { heightAt } from './world.js?v=7f984fb7';
-import { rng } from './noise.js?v=7f984fb7';
-import { CFG } from './config.js?v=7f984fb7';
+import { heightAt } from './world.js?v=fde10d2c';
+import { rng } from './noise.js?v=fde10d2c';
+import { CFG } from './config.js?v=fde10d2c';
 
 const rand = rng(53);
 const R = (a, b) => a + (b - a) * rand();

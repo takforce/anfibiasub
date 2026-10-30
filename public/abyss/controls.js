@@ -73,7 +73,7 @@ export function createControls(canvas, root, on) {
       if ([...e.changedTouches].every((t) => t.target.closest('button'))) return;   // ✋ e torcia restano clic normali
       for (const t of e.changedTouches) {
         if (t.target.closest('button')) continue;
-        const s = t.clientX < innerWidth / 2 ? joy : lk;
+        const s = t.clientX < (window.visualViewport ? visualViewport.width : innerWidth) / 2 ? joy : lk;
         if (s.id !== null) continue;
         s.id = t.identifier; s.active = true; center(s); s.el.classList.add('on');
         const v = stickVal(s, t);

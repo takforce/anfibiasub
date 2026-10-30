@@ -7,7 +7,7 @@
 [hidden]{display:none!important}
 html,body{margin:0;height:100%;background:var(--night);color:var(--ice);font-family:Montserrat,system-ui,sans-serif;overflow:hidden;overscroll-behavior:none}
 button{font:inherit;color:inherit}
-.ab{position:fixed;inset:0;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+.ab{position:fixed;top:0;left:0;right:0;height:100vh;height:100dvh;height:var(--abh,100dvh);overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 #ab-c{position:absolute;inset:0;width:100%;height:100%;display:block}
 
 /* ---------- schermata iniziale ---------- */
@@ -267,6 +267,17 @@ button{font:inherit;color:inherit}
 
 /* iPhone Safari: pagina scorrevole di poco, così la barra degli indirizzi si riduce */
 html.ios-scroll,html.ios-scroll body{height:auto;overflow-y:auto;overflow-x:hidden}
-html.ios-scroll body{min-height:calc(100vh + 160px)}
-html.ios-scroll .ab{position:fixed;inset:0}
+html.ios-scroll body{min-height:calc(100lvh + 120px)}
 html.ios-scroll .ab{touch-action:pan-y}
+html.ios-scroll .ab[data-state]:not([data-state="INTRO"]):not([data-state="DIVE"]){touch-action:none}
+
+/* aree sicure dell'iPhone (notch / isola dinamica / barra home) per HUD, bussola e tasti */
+.ab-tl{top:calc(18px + env(safe-area-inset-top))}
+.ab-tr{top:calc(14px + env(safe-area-inset-top))}
+.ab-comp{top:calc(16px + env(safe-area-inset-top))}
+@media (pointer:coarse) and (orientation:landscape){
+  .ab-tl{top:calc(10px + env(safe-area-inset-top))}
+  .ab-tr{top:calc(8px + env(safe-area-inset-top))}
+  .ab-comp{top:calc(8px + env(safe-area-inset-top))}
+}
+.ab-intro-txt{padding-left:max(6vw, env(safe-area-inset-left))}

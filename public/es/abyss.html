@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ABYSS · El pecio olvidado · Anfibiasub</title>
+<meta name="description" content="ABYSS: exploración submarina en 3D de un pecio en el fondo del Mediterráneo. Un minijuego de Anfibiasub.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#050E1A">
+<link rel="alternate" hreflang="it" href="https://www.anfibiasub.it/abyss.html">
+<link rel="alternate" hreflang="en" href="https://www.anfibiasub.it/en/abyss.html">
+<link rel="alternate" hreflang="es" href="https://www.anfibiasub.it/es/abyss.html">
+<link rel="alternate" hreflang="de" href="https://www.anfibiasub.it/de/abyss.html">
+<link rel="manifest" href="/abyss-es.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ABYSS">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
+<meta property="og:title" content="ABYSS · El pecio olvidado · Anfibiasub">
+<meta property="og:image" content="https://www.anfibiasub.it/img/abyss/intro.webp?v=2d582f">
+<link rel="icon" href="/favicon.png?v=3" type="image/png">
+<link rel="stylesheet" href="/abyss/abyss.css?v=0b1daeda">
+</head>
+<body>
+<div id="abyss" class="ab" data-state="INTRO" data-api="/api/abyss/voto">
+<canvas id="ab-c" aria-label="Escena submarina 3D"></canvas>
+
+<section id="ab-intro" class="ab-intro" aria-labelledby="ab-title">
+  <div class="ab-intro-bg" aria-hidden="true"></div>
+  <div class="ab-motes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <a class="ab-back" href="/es/">← Volver al sitio</a>
+  <div class="ab-intro-txt">
+    <h1 id="ab-title" class="ab-logo">ABYSS</h1>
+    <p class="ab-sub">EL PECIO OLVIDADO</p>
+    <p class="ab-lead">«El fondo guarda un secreto. Solo quien sepa buscarlo podrá descubrirlo.»</p>
+    <button id="ab-start" class="ab-btn ab-btn-main" type="button" disabled>PREPARANDO LA INMERSIÓN…</button>
+    <p class="ab-sec">Un pecio olvidado, tres objetos por encontrar y un secreto escondido en las profundidades.</p>
+    <p class="ab-how ab-how-pc">Usa el ratón para orientar la linterna y la vista, W A S D para nadar.</p>
+    <p class="ab-how ab-how-touch">Juega con el móvil en horizontal: joystick izquierdo para nadar, derecho para mirar. Para bajar, mira hacia abajo y nada hacia delante.</p>
+    <p class="ab-how ab-ios" hidden>iPhone: gira el móvil y <b>desliza hacia arriba</b> para reducir la barra de Safari. Para pantalla completa real: <b>Compartir → Añadir a pantalla de inicio</b> y abre ABYSS desde el icono.</p>
+    <p id="ab-nowebgl" class="ab-sec" hidden>Tu navegador no admite gráficos 3D (WebGL): prueba con una versión reciente de Chrome, Safari, Firefox o Edge.</p>
+  </div>
+</section>
+
+<div class="ab-hud" aria-live="polite">
+  <div class="ab-tl"><span class="ab-mark">ABYSS</span><span id="ab-depth" class="ab-depth"><b>0,0</b> m</span>
+    <span class="ab-man" title="Manómetro"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" class="m-bg"/><path d="M17.5 82.5A46 46 0 1 1 82.5 82.5" class="m-arc"/><path d="M71 76A33 33 0 0 0 82.5 82.5" class="m-red"/><g class="m-ticks"></g><line x1="50" y1="50" x2="50" y2="14" class="ab-man-needle"/><circle cx="50" cy="50" r="5" class="m-hub"/></svg><span class="m-val"><b id="ab-bar">220</b> bar</span></span><span id="ab-obj" class="ab-obj"></span></div>
+  <div class="ab-comp" aria-hidden="true"><div class="ab-comp-win"><div class="ab-comp-strip"></div></div><span id="ab-hdg">000°</span></div>
+  <div class="ab-tr">
+    <button class="ab-ico ab-inv-btn" type="button" data-act="inv" aria-label="Inventario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h16v12H4z"/><path d="M9 8V5h6v3"/></svg><span id="ab-count">0/3</span></button>
+    <button class="ab-ico" type="button" data-act="audio" aria-label="Audio on/off"><svg class="snd-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg><svg class="snd-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg></button>
+    <button class="ab-ico ab-exit" type="button" data-act="exit" aria-label="Terminar y volver al sitio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Salir</span></button>
+    <button class="ab-ico" type="button" data-act="pause" aria-label="Pausa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+  </div>
+  <div class="ab-gauge" aria-hidden="true"><span class="ab-g-fill"></span><span class="ab-g-mark"></span><i style="top:0">0</i><i style="top:20%">10</i><i style="top:40%">20</i><i style="top:60%">30</i><i style="top:80%">40</i><i style="top:100%">50 m</i></div>
+  <div class="ab-cross" aria-hidden="true"></div>
+  <p id="ab-prompt" class="ab-prompt"></p>
+  <p id="ab-msg" class="ab-msg" role="status"></p>
+  <div id="ab-hint" class="ab-hint">
+    <p class="ab-how-pc"><b>Clic</b> en la pantalla para mirar con el ratón · <b>W A S D</b> nadar · <b>Espacio</b> subir · <b>C</b> bajar · <b>Shift</b> rápido · <b>F</b> linterna · <b>E</b> interactuar · <b>I</b> inventario · <b>Q</b> chorro de aire (contra el tiburón)</p>
+    <p class="ab-how-touch">Joystick izquierdo para nadar · joystick derecho para mirar</p>
+    <p>Sigue el cabo de amarre hasta el fondo. Arriba está la brújula: el norte es N.</p>
+  </div>
+</div>
+
+<div class="ab-touch" aria-hidden="true">
+  <div class="ab-joy ab-joy-l"><i></i></div>
+  <div class="ab-joy ab-joy-r"><i></i></div>
+  <div class="ab-tbtns">
+    <button type="button" class="ab-blast" data-blast aria-label="Chorro de aire (mantén pulsado)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="8" cy="15" r="3.2"/><circle cx="15.5" cy="9" r="4.2"/><circle cx="17" cy="18" r="2"/></svg></button>
+    <button type="button" class="ab-torch" data-act="torch" aria-label="Linterna"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6l-1 6h-4z"/><path d="M10 9h4v11a2 2 0 0 1-4 0z"/></svg></button>
+    <button type="button" class="ab-act" data-act="interact" aria-label="Interactuar">✋</button>
+  </div>
+</div>
+
+<div class="ab-rotate" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="6" width="24" height="42" rx="4"/><path d="M50 40a18 18 0 0 1-18 18M28 54l4 4-4 4"/></svg><p>Gira el móvil en horizontal</p></div>
+
+<div class="ab-panel" data-panel="inv" hidden role="dialog" aria-modal="true" aria-label="Inventario">
+  <div class="ab-box">
+    <h2>Objetos recuperados <span class="ab-count2"></span></h2>
+    <div class="ab-slots"><div class="ab-slot"></div><div class="ab-slot"></div><div class="ab-slot"></div></div>
+    <p class="ab-small ab-where">Notas del buzo: una <b>cueva</b> al oeste, un <b>pesquero volcado</b> al sureste, un <b>campo de ánforas</b> al norte. El pecio está en el centro.</p>
+    <div class="ab-row"><button class="ab-btn" type="button" data-act="log" data-logbtn hidden>Releer el cuaderno de bitácora</button><button class="ab-btn" type="button" data-act="close">Cerrar</button></div>
+  </div>
+</div>
+
+<div class="ab-panel" data-panel="lock" hidden role="dialog" aria-modal="true" aria-label="Mecanismo de la escotilla">
+  <div class="ab-box ab-lockbox">
+    <h2>El mecanismo de la escotilla</h2>
+    <p class="ab-small">Tres ruedas de latón, cada una con un símbolo grabado. Introduce la combinación.</p>
+    <div class="ab-dials">
+      <div class="ab-dial"><svg viewBox="0 0 64 64" aria-label="Rosa de los vientos"><g fill="#d4ac63"><path d="M32 4l4 24-4 4-4-4zM32 60l-4-24 4-4 4 4zM4 32l24-4 4 4-4 4zM60 32l-24 4-4-4 4-4z"/></g><circle cx="32" cy="32" r="19" fill="none" stroke="#d4ac63" stroke-width="2"/></svg><button type="button" data-act="dial-up" data-i="0" aria-label="Subir">▲</button><b>0</b><button type="button" data-act="dial-dn" data-i="0" aria-label="Bajar">▼</button></div>
+      <div class="ab-dial"><svg viewBox="0 0 64 64" aria-label="Ancla"><g fill="none" stroke="#d4ac63" stroke-width="4" stroke-linecap="round"><circle cx="32" cy="10" r="5"/><path d="M32 15v40M20 24h24M10 38a22 22 0 0 0 44 0"/></g></svg><button type="button" data-act="dial-up" data-i="1" aria-label="Subir">▲</button><b>0</b><button type="button" data-act="dial-dn" data-i="1" aria-label="Bajar">▼</button></div>
+      <div class="ab-dial"><svg viewBox="0 0 64 64" aria-label="Llave"><g fill="none" stroke="#d4ac63" stroke-width="4" stroke-linecap="round" transform="rotate(-45 32 32)"><circle cx="16" cy="32" r="9"/><path d="M25 32h32M48 32v9M55 32v7"/></g></svg><button type="button" data-act="dial-up" data-i="2" aria-label="Subir">▲</button><b>0</b><button type="button" data-act="dial-dn" data-i="2" aria-label="Bajar">▼</button></div>
+    </div>
+    <div class="ab-clues"><p>Pistas encontradas</p><ul data-clues></ul></div>
+    <p id="ab-lockfb" class="ab-fb" role="alert"></p>
+    <div class="ab-row"><button class="ab-btn" type="button" data-act="close">Atrás</button><button class="ab-btn ab-btn-main" type="button" data-act="confirm">CONFIRMAR</button></div>
+  </div>
+</div>
+
+<div class="ab-panel" data-panel="pause" hidden role="dialog" aria-modal="true" aria-label="Pausa">
+  <div class="ab-box">
+    <h2>Inmersión en pausa</h2>
+    <p class="ab-small ab-how-pc">W A S D nadar · Espacio subir · C bajar · Shift rápido · F linterna · E interactuar · I inventario · Q chorro de aire · Esc pausa</p>
+    <p class="ab-small ab-how-touch">Joystick izquierdo: nadar · joystick derecho: mirar · para bajar, mira hacia abajo y nada hacia delante · ✋ interactuar · burbujas: chorro de aire contra el tiburón</p>
+    <div class="ab-col">
+      <button class="ab-btn ab-btn-main" type="button" data-act="resume">CONTINUAR</button>
+      <button class="ab-btn" type="button" data-act="restart">Reiniciar la inmersión</button>
+      <a class="ab-btn" href="/es/">Volver al sitio</a>
+    </div>
+  </div>
+</div>
+
+<div class="ab-panel ab-logp" data-panel="log" hidden role="dialog" aria-modal="true" aria-label="Cuaderno de bitácora">
+  <div class="ab-box ab-logbox">
+    <h2>Cuaderno de bitácora del capitán</h2>
+    <img id="ab-logimg" alt="Página del cuaderno: el cofre está bajo el arco de piedra, al borde del talud. Desde la popa, rumbo y distancia indicados en la página.">
+    <button class="ab-btn ab-btn-main" type="button" data-act="close">ENTENDIDO</button>
+  </div>
+</div>
+
+<div class="ab-panel ab-dead" data-panel="dead" hidden role="alertdialog" aria-modal="true" aria-labelledby="ab-dead-t">
+  <div class="ab-box">
+    <p class="ab-sub" id="ab-dead-t">SIN AIRE</p>
+    <p class="ab-small" id="ab-dead-p"></p>
+    <div class="ab-col">
+      <button class="ab-btn ab-btn-main" type="button" data-act="restart">REINICIAR LA INMERSIÓN</button>
+      <a class="ab-btn" href="/es/">Volver al sitio</a>
+    </div>
+  </div>
+</div>
+
+<div class="ab-panel ab-end" data-panel="end" hidden role="dialog" aria-modal="true" aria-label="Misión completada">
+  <div class="ab-box">
+    <p class="ab-sub">MISIÓN COMPLETADA</p>
+    <h2>«El secreto del pecio por fin ha sido desvelado.»</h2>
+    <div class="ab-poll" id="ab-poll">
+      <p class="ab-ad-lab">¿TE HA GUSTADO?</p>
+      <div class="ab-row ab-poll-q"><button class="ab-btn ab-btn-main" type="button" data-poll="si">QUIERO OTRA MISIÓN</button><button class="ab-btn" type="button" data-poll="no">Con esto me basta</button></div>
+      <div class="ab-stars" role="radiogroup" aria-label="Valoración de 1 a 5"><button type="button" data-star="1" aria-label="1 estrella">★</button><button type="button" data-star="2" aria-label="2 estrellas">★</button><button type="button" data-star="3" aria-label="3 estrellas">★</button><button type="button" data-star="4" aria-label="4 estrellas">★</button><button type="button" data-star="5" aria-label="5 estrellas">★</button></div>
+      <textarea id="ab-poll-txt" maxlength="500" rows="2" placeholder="¿Alguna idea para la próxima misión? (opcional)"></textarea>
+      <button class="ab-btn" type="button" data-poll="send" disabled>Enviar</button>
+      <p class="ab-small ab-poll-msg" role="status"></p>
+    </div>
+    <p class="ab-small">La escafandra estaba en la cámara oculta; el cofre del capitán, bajo el arco de roca al borde del abismo.</p>
+    <ul class="ab-sum"><li>Objetos recuperados: 3/3</li><li>Enigma de la escotilla resuelto</li><li>Cuaderno de bitácora descifrado</li><li>Cofre del capitán encontrado</li></ul>
+    <div class="ab-ad">
+      <p class="ab-ad-lab">ESTO ERA UN JUEGO. NUESTRO TRABAJO ES REAL.</p>
+      <div class="ab-ad-logo"><img src="/img/logo-casco-96.png?v=a24802" alt="" width="64" height="64"><b>ANFIBIA<span>SUB</span></b></div>
+      <p class="ab-small">Desde el Puerto de Loano intervenimos donde el trabajo se hace bajo el agua, con buzos cualificados y cada intervención documentada.</p>
+      <ul class="ab-svc"><li>Limpieza de hélices y cascos</li><li>Sustitución de ánodos</li><li>Recuperaciones en el mar</li><li>Obras submarinas</li><li>Soldadura y metalmecánica</li><li>Foto y vídeo</li></ul>
+      <div class="ab-row"><a class="ab-btn ab-btn-main" href="/es/contacto.html">PIDE PRESUPUESTO</a><a class="ab-btn" href="/es/servicios.html">Nuestros servicios</a></div>
+    </div>
+    <div class="ab-row">
+      <button class="ab-btn" type="button" data-act="restart">Repetir inmersión</button>
+      <button class="ab-btn" type="button" data-act="continue">Seguir explorando</button>
+      <a class="ab-btn" href="/es/">Volver al sitio</a>
+    </div>
+  </div>
+</div>
+
+<div id="ab-veil" class="ab-veil" aria-hidden="true"></div>
+</div>
+
+<script type="application/json" id="ab-i18n">{"start": "EMPEZAR LA INMERSIÓN", "nowebgl": "WebGL no disponible", "obj1": "Encuentra los 3 objetos escondidos alrededor del pecio ({n}/3)", "obj2": "Abre la escotilla en la cubierta del pecio", "obj3": "Baja a la cámara oculta bajo la escotilla", "obj4": "Sigue el rumbo del cuaderno de bitácora", "obj5": "Misión completada", "slot": "Objeto {n}", "notfound": "Aún no encontrado", "noclues": "Ninguna pista todavía", "bearing": "Rumbo {deg}° desde la popa del carguero. Usa la brújula de arriba.", "descent": "DESCENDIENDO…", "started": "INMERSIÓN INICIADA", "casket_early": "Un cofre encajado entre las rocas. Aún no sabes qué es: quizá alguien dejó algo escrito.", "helmet": "Una antigua escafandra de latón con tres ojos de buey. El capitán la guardaba aquí bajo llave.", "need_clues": "Todavía no has encontrado todas las pistas.", "lock_wrong": "El mecanismo sigue bloqueado. Revisa las pistas.", "hatch_open": "La escotilla está abierta. Baja a la cámara oculta.", "hatch_seen": "Un antiguo mecanismo bloquea el acceso. Las pistas que encuentres podrían revelar la combinación.", "dead_shark_t": "EL TIBURÓN TE HA ATACADO", "dead_air_t": "SIN AIRE", "dead_shark_p": "La fosa más allá del talud es su territorio. La próxima vez, cuando se acerque, usa el chorro de aire de la botella.", "dead_air_p": "La botella está vacía. Vigila el manómetro: con 50 bar es hora de subir o de terminar rápido.", "sending": "Enviando…", "thanks_yes": "¡Gracias! Se lo decimos enseguida al equipo: la próxima misión está en preparación.", "thanks_no": "¡Gracias por jugar!", "send_fail": "No se pudo enviar. Inténtalo de nuevo en un momento.", "all_found": "Has recuperado todos los objetos. Vuelve al pecio: hay una escotilla en la cubierta.", "count": "OBJETOS RECUPERADOS: {n}/3", "shark_gone": "El tiburón se asusta y se marcha.", "reserve": "Reserva: 50 bar. Termina rápido.", "shark_touch": "¡Un tiburón! Mantén pulsado el botón AIRE cuando esté delante de ti.", "shark_pc": "¡Un tiburón! Mantén pulsada Q (chorro de aire) cuando esté delante de ti.", "p_take": "Recoger: {name}", "p_look": "Examinar", "p_book": "Leer el cuaderno de bitácora", "p_helmet": "Observar la escafandra", "p_hatch": "Examinar la escotilla", "compass": ["N", "NE", "E", "SE", "S", "SO", "O", "NO"], "decimal": ",", "art": {"bussola": ["Brújula antigua", "Una brújula de latón, enterrada al fondo de la cueva. En la esfera, bajo la rosa de los vientos, hay una cifra grabada.", "Rosa de los vientos → 3"], "targhetta": ["Placa de a bordo", "Bajo el casco del pesquero volcado, una placa del carguero arrancada de un mamparo. Junto al ancla grabada hay un número.", "Ancla → 1"], "chiave": ["Llave de latón", "Entre los restos de las ánforas, una gran llave de latón. Lleva atada una pequeña placa con el símbolo de la llave y una cifra.", "Llave → 4"], "cofanetto": ["Cofre del capitán", "El cofre del capitán. Dentro, envuelta en una tela encerada, hay una medalla de plata y una carta: «A quien encuentre este pecio: el mar solo devuelve a quien sabe buscar.»", ""]}, "logpage": ["14 de marzo — mar gruesa de lebeche.", "El carguero hace agua por proa.", "Dejé la escafandra en la", "bodega, bajo la escotilla.", "", "El cofre lo saqué fuera:", "demasiado valioso para hundirse", "con el barco. Está bajo el arco", "de piedra, donde el fondo", "cae hacia el azul.", "Desde la popa: rumbo {deg}°,", "unos {m} metros.", "el azul"]}</script>
+<script type="module" src="/abyss/main.js?v=0b1daeda"></script>
+</body>
+</html>

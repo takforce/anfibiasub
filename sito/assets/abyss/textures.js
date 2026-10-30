@@ -312,24 +312,26 @@ export function logbookTex() {
   });
 }
 // pagina grande leggibile, con la rotta vera calcolata dal gioco
-export function logbookPage(deg, meters, portrait) {
+export function logbookPage(deg, meters, portrait, text) {
   const c = document.createElement('canvas'); c.width = 1200; c.height = 820;
   const g = c.getContext('2d'); parchment(g, 1200, 820);
   g.strokeStyle = 'rgba(60,40,20,0.5)'; g.lineWidth = 3; g.beginPath(); g.moveTo(600, 30); g.lineTo(600, 790); g.stroke();
   const ink = '#2b1c0e';
-  g.fillStyle = ink; g.font = 'italic 34px Georgia, serif';
-  const lines = ['14 marzo — mare grosso da libeccio.', 'Il cargo imbarca acqua a prua.', 'Ho lasciato lo scafandro nella', 'stiva, sotto la botola.', '', 'Il cofanetto l\'ho portato fuori:', 'troppo prezioso per affondare', 'con la nave. È sotto l\'arco', 'di pietra, dove il fondale', 'precipita nel blu.'];
-  lines.forEach((t, i) => g.fillText(t, 60, 100 + i * 52));
-  g.font = 'italic bold 38px Georgia, serif';
-  g.fillText(`Dalla poppa: rotta ${Math.round(deg)}°,`, 60, 670);
-  g.fillText(`circa ${Math.round(meters / 5) * 5} metri.`, 60, 722);
+  g.fillStyle = ink;
+  // testo nella lingua della pagina (13 righe: 10 di diario, 2 con rotta e distanza, l'etichetta "il blu")
+  const T = text || ['', '', '', '', '', '', '', '', '', '', '{deg}', '{m}', ''];
+  const fill = (str, x, y, font, size) => { let sz = size; do { g.font = `${font} ${sz}px Georgia, serif`; sz -= 1; } while (g.measureText(str).width > 510 && sz > 18); g.fillText(str, x, y); };
+  T.slice(0, 10).forEach((t, i) => fill(t, 60, 100 + i * 52, 'italic', 34));
+  const v = (str) => str.replace('{deg}', Math.round(deg)).replace('{m}', Math.round(meters / 5) * 5);
+  fill(v(T[10]), 60, 670, 'italic bold', 38);
+  fill(v(T[11]), 60, 722, 'italic bold', 38);
   // schizzo dell'arco
   g.strokeStyle = ink; g.lineWidth = 4; g.lineJoin = 'round';
   g.beginPath(); g.moveTo(700, 560); g.lineTo(745, 330); g.lineTo(790, 320); g.lineTo(805, 560);
   g.moveTo(900, 560); g.lineTo(915, 315); g.lineTo(965, 325); g.lineTo(1010, 560);
   g.moveTo(735, 335); g.bezierCurveTo(800, 250, 900, 250, 975, 330); g.moveTo(745, 300); g.bezierCurveTo(820, 210, 900, 215, 985, 300); g.stroke();
   g.setLineDash([10, 10]); g.beginPath(); g.moveTo(640, 600); g.lineTo(1150, 600); g.lineTo(1150, 720); g.stroke(); g.setLineDash([]);
-  g.font = 'italic 26px Georgia, serif'; g.fillText('il blu', 1060, 760);
+  g.font = 'italic 26px Georgia, serif'; g.fillText(T[12] || '', 1060, 760);
   // X del cofanetto
   g.lineWidth = 6; g.strokeStyle = '#7a1d12'; g.beginPath(); g.moveTo(835, 520); g.lineTo(870, 555); g.moveTo(870, 520); g.lineTo(835, 555); g.stroke();
   // rosa con la rotta

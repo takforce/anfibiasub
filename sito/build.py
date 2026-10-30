@@ -52,13 +52,18 @@ BEACON = '<span class="beacon" aria-hidden="true"><span class="bc-ray"></span><s
 MENU = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>'
 
 
-# voce di menu del minigioco ABYSS (il gioco è solo in italiano)
+# voce di menu del minigioco ABYSS (pagina in ogni lingua del sito)
 # tasto del gioco nella pagina Utilità (solo cellulare): titolo, sottotitolo, pulsante
 GAME_CARD = {'it': ('Gioco 3D', 'Il relitto dimenticato', 'GIOCA'),
-             'en': ('3D game · in Italian', 'The forgotten wreck', 'PLAY'),
-             'es': ('Juego 3D · en italiano', 'El pecio olvidado', 'JUGAR'),
-             'de': ('3D-Spiel · auf Italienisch', 'Das vergessene Wrack', 'SPIELEN')}
-GAME_LABEL = {'it': 'ABYSS · il gioco 3D', 'en': 'ABYSS · 3D game (Italian)', 'es': 'ABYSS · juego 3D (en italiano)', 'de': 'ABYSS · 3D-Spiel (auf Italienisch)'}
+             'en': ('3D game', 'The forgotten wreck', 'PLAY'),
+             'es': ('Juego 3D', 'El pecio olvidado', 'JUGAR'),
+             'de': ('3D-Spiel', 'Das vergessene Wrack', 'SPIELEN')}
+GAME_LABEL = {'it': 'ABYSS · il gioco 3D', 'en': 'ABYSS · 3D game', 'es': 'ABYSS · juego 3D', 'de': 'ABYSS · 3D-Spiel'}
+
+
+def abyss_url(lang):
+    # pagina del gioco ABYSS nella lingua scelta
+    return '/abyss.html' if lang == 'it' else f'/{lang}/abyss.html'
 
 
 def url(key, lang, anchor=''):
@@ -95,7 +100,7 @@ def header(cur, lang, overlay):
         all_key, sub = subs[k]
         items = f'<a class="dd-all" href="{url(k, lang)}">{tx(lang, all_key)}</a>' + ''.join(f'<a href="{url(k, lang, a)}">{e(b)}</a>' for a, b in sub)
         if k == 'utilita':
-            items += f'<a class="dd-game" href="/abyss.html">{GAME_LABEL[lang]}</a>'
+            items += f'<a class="dd-game" href="{abyss_url(lang)}">{GAME_LABEL[lang]}</a>'
         links += (f'<div class="dd"><button class="dd-btn" type="button" aria-expanded="false" aria-haspopup="true"{cur_attr.replace("page", "true")}>{t}{CHEVRON}</button>'
                   f'<div class="dd-menu">{items}</div></div>')
     cur_l = ' aria-current="true"'
@@ -548,7 +553,7 @@ def utilita_html(lang):
     anc = table(['Ø mm', 'CP 1-1b', 'CR 1-1b', 'CP 2', 'CR 2', 'CP 3', 'CR 3', T('anchor_join'), 'Kenter'],
                 [(f'<b>{r[0]}</b>',) + tuple(fmt(x, lang) for x in r[1:]) for r in CATENE_ANCORE], T('anchor_cap'))
     live = f'''<section class="tool-sec" id="meteo"><h2 class="vh">{title['meteo'][lang]}</h2>
-<a class="game-card" href="/abyss.html"><span class="gc-k">{GAME_CARD[lang][0]}</span><strong class="gc-t">ABYSS</strong><span class="gc-s">{GAME_CARD[lang][1]}</span><span class="btn gc-b">{GAME_CARD[lang][2]} <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></a>
+<a class="game-card" href="{abyss_url(lang)}"><span class="gc-k">{GAME_CARD[lang][0]}</span><strong class="gc-t">ABYSS</strong><span class="gc-s">{GAME_CARD[lang][1]}</span><span class="btn gc-b">{GAME_CARD[lang][2]} <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></span></a>
 <div class="meteo" data-meteo data-lang="{lang}" data-title="{title['meteo'][lang]}"><div class="mb-frame"><div class="mb-art"></div></div></div>
 <div class="gb" data-giorni data-lang="{lang}" data-title="{GB_TITLE[lang]}"><div class="gb-frame"><div class="gb-art"></div></div></div>
 </section>
@@ -650,7 +655,7 @@ def extras_prod():
         f.write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
 
 
-# ---------------- ABYSS (minigioco 3D, solo italiano) ----------------
+# ---------------- ABYSS (minigioco 3D, in tutte le lingue del sito) ----------------
 def build_abyss():
     src = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'assets', 'abyss')
     files = sorted(f for f in os.listdir(src) if f.endswith(('.js', '.css')))
@@ -662,41 +667,55 @@ def build_abyss():
             t = open(d, encoding='utf-8').read()
             t = _re.sub(r"from '\./([\w-]+\.js)'", lambda m: f"from './{m.group(1)}?v={h}'", t)
             open(d, 'w', encoding='utf-8').write(bust(t))
-    body = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'abyss_pagina.html'), encoding='utf-8').read()
+    tpl = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'abyss_pagina.html'), encoding='utf-8').read()
+    from abyss_testi import H as AH, J as AJ
     # sondaggio di fine partita: online il sito sta su HostGator e l'API sull'area clienti
-    body = body.replace('{{API}}', 'https://clienti.anfibiasub.it/api/abyss/voto' if PROD else '/api/abyss/voto')
-    with open(os.path.join(OUT, 'abyss.webmanifest'), 'w', encoding='utf-8') as f:
-        _json.dump({'name': 'ABYSS · Anfibiasub', 'short_name': 'ABYSS', 'start_url': '/abyss.html', 'display': 'fullscreen', 'orientation': 'landscape',
-                    'background_color': '#050E1A', 'theme_color': '#050E1A', 'icons': [{'src': '/apple-touch-icon.png', 'sizes': '180x180', 'type': 'image/png'}]}, f, ensure_ascii=False)
+    api = 'https://clienti.anfibiasub.it/api/abyss/voto' if PROD else '/api/abyss/voto'
     robots = '' if PROD else '<meta name="robots" content="noindex, nofollow">\n'
-    doc = f'''<!doctype html>
-<html lang="it">
+    META = {'it': ('ABYSS · Il relitto dimenticato · Anfibiasub', 'ABYSS: esplorazione subacquea in 3D di un relitto sul fondale del Mediterraneo. Un minigioco di Anfibiasub.'),
+            'en': ('ABYSS · The forgotten wreck · Anfibiasub', 'ABYSS: a 3D underwater exploration of a wreck on the Mediterranean seabed. A mini game by Anfibiasub.'),
+            'es': ('ABYSS · El pecio olvidado · Anfibiasub', 'ABYSS: exploración submarina en 3D de un pecio en el fondo del Mediterráneo. Un minijuego de Anfibiasub.'),
+            'de': ('ABYSS · Das vergessene Wrack · Anfibiasub', 'ABYSS: 3D-Unterwassererkundung eines Wracks auf dem Grund des Mittelmeers. Ein Minispiel von Anfibiasub.')}
+    for lang in LANGS:
+        path = abyss_url(lang)
+        body = tpl.replace('{{API}}', api).replace('{{home}}', url('home', lang)).replace('{{contatti}}', url('contatti', lang)).replace('{{servizi}}', url('servizi', lang))
+        body = _re.sub(r'\{\{(\w+)\}\}', lambda m: AH[m.group(1)][lang], body)
+        js = _json.dumps({k: v[lang] for k, v in AJ.items()}, ensure_ascii=False).replace('</', '<\\/')
+        man = f'abyss-{lang}.webmanifest'
+        with open(os.path.join(OUT, man), 'w', encoding='utf-8') as f:
+            _json.dump({'name': 'ABYSS · Anfibiasub', 'short_name': 'ABYSS', 'start_url': path, 'display': 'fullscreen', 'orientation': 'landscape', 'lang': lang,
+                        'background_color': '#050E1A', 'theme_color': '#050E1A', 'icons': [{'src': '/apple-touch-icon.png', 'sizes': '180x180', 'type': 'image/png'}]}, f, ensure_ascii=False)
+        alts = ''.join(f'<link rel="alternate" hreflang="{l}" href="{SITE_URL}{abyss_url(l)}">\n' for l in LANGS)
+        doc = f'''<!doctype html>
+<html lang="{lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ABYSS · Il relitto dimenticato · Anfibiasub</title>
-<meta name="description" content="ABYSS: esplorazione subacquea in 3D di un relitto sul fondale del Mediterraneo. Un minigioco di Anfibiasub.">
+<title>{e(META[lang][0])}</title>
+<meta name="description" content="{e(META[lang][1])}">
 {robots}<meta name="theme-color" content="#050E1A">
-<link rel="manifest" href="/abyss.webmanifest">
+{alts}<link rel="manifest" href="/{man}">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ABYSS">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
-<meta property="og:title" content="ABYSS · Il relitto dimenticato">
+<meta property="og:title" content="{e(META[lang][0])}">
 <meta property="og:image" content="{SITE_URL}/img/abyss/intro.webp">
 <link rel="icon" href="/favicon.png?v=3" type="image/png">
 <link rel="stylesheet" href="/abyss/abyss.css?v={h}">
 </head>
 <body>
 {body}
+<script type="application/json" id="ab-i18n">{js}</script>
 <script type="module" src="/abyss/main.js?v={h}"></script>
 </body>
 </html>
 '''
-    with open(os.path.join(OUT, 'abyss.html'), 'w', encoding='utf-8') as f:
-        f.write(bust(doc))
-
+        out = os.path.join(OUT, path.lstrip('/'))
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        with open(out, 'w', encoding='utf-8') as f:
+            f.write(bust(doc))
 
 if __name__ == '__main__':
     if PROD and os.path.isdir(OUT):

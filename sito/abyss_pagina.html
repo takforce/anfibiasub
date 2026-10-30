@@ -1,41 +1,41 @@
 <div id="abyss" class="ab" data-state="INTRO" data-api="{{API}}">
-<canvas id="ab-c" aria-label="Scena subacquea 3D"></canvas>
+<canvas id="ab-c" aria-label="{{canvas}}"></canvas>
 
 <section id="ab-intro" class="ab-intro" aria-labelledby="ab-title">
   <div class="ab-intro-bg" aria-hidden="true"></div>
   <div class="ab-motes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-  <a class="ab-back" href="/">← Torna al sito</a>
+  <a class="ab-back" href="{{home}}">{{back}}</a>
   <div class="ab-intro-txt">
     <h1 id="ab-title" class="ab-logo">ABYSS</h1>
-    <p class="ab-sub">IL RELITTO DIMENTICATO</p>
-    <p class="ab-lead">«Il fondale custodisce un segreto. Solo chi saprà cercarlo potrà scoprirlo.»</p>
-    <button id="ab-start" class="ab-btn ab-btn-main" type="button" disabled>PREPARAZIONE DELL'IMMERSIONE…</button>
-    <p class="ab-sec">Un relitto dimenticato, tre reperti da ritrovare e un segreto nascosto negli abissi.</p>
-    <p class="ab-how ab-how-pc">Usa il mouse per orientare la torcia e la visuale, W A S D per nuotare.</p>
-    <p class="ab-how ab-how-touch">Gioca con il telefono in orizzontale: joystick sinistro per nuotare, destro per guardare. Per scendere guarda in basso e nuota avanti.</p>
-    <p class="ab-how ab-ios" hidden>iPhone: gira il telefono e <b>scorri lo schermo verso l'alto</b> per ridurre la barra di Safari. Per lo schermo intero vero: <b>Condividi → Aggiungi alla schermata Home</b> e apri ABYSS dall'icona.</p>
-    <p id="ab-nowebgl" class="ab-sec" hidden>Il tuo browser non supporta la grafica 3D (WebGL): prova con una versione recente di Chrome, Safari, Firefox o Edge.</p>
+    <p class="ab-sub">{{sub}}</p>
+    <p class="ab-lead">{{lead}}</p>
+    <button id="ab-start" class="ab-btn ab-btn-main" type="button" disabled>{{loading}}</button>
+    <p class="ab-sec">{{sec}}</p>
+    <p class="ab-how ab-how-pc">{{how_pc}}</p>
+    <p class="ab-how ab-how-touch">{{how_touch}}</p>
+    <p class="ab-how ab-ios" hidden>{{ios}}</p>
+    <p id="ab-nowebgl" class="ab-sec" hidden>{{nowebgl}}</p>
   </div>
 </section>
 
 <div class="ab-hud" aria-live="polite">
   <div class="ab-tl"><span class="ab-mark">ABYSS</span><span id="ab-depth" class="ab-depth"><b>0,0</b> m</span>
-    <span class="ab-man" title="Manometro"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" class="m-bg"/><path d="M17.5 82.5A46 46 0 1 1 82.5 82.5" class="m-arc"/><path d="M71 76A33 33 0 0 0 82.5 82.5" class="m-red"/><g class="m-ticks"></g><line x1="50" y1="50" x2="50" y2="14" class="ab-man-needle"/><circle cx="50" cy="50" r="5" class="m-hub"/></svg><span class="m-val"><b id="ab-bar">220</b> bar</span></span><span id="ab-obj" class="ab-obj"></span></div>
+    <span class="ab-man" title="{{gauge}}"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" class="m-bg"/><path d="M17.5 82.5A46 46 0 1 1 82.5 82.5" class="m-arc"/><path d="M71 76A33 33 0 0 0 82.5 82.5" class="m-red"/><g class="m-ticks"></g><line x1="50" y1="50" x2="50" y2="14" class="ab-man-needle"/><circle cx="50" cy="50" r="5" class="m-hub"/></svg><span class="m-val"><b id="ab-bar">220</b> bar</span></span><span id="ab-obj" class="ab-obj"></span></div>
   <div class="ab-comp" aria-hidden="true"><div class="ab-comp-win"><div class="ab-comp-strip"></div></div><span id="ab-hdg">000°</span></div>
   <div class="ab-tr">
-    <button class="ab-ico ab-inv-btn" type="button" data-act="inv" aria-label="Inventario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h16v12H4z"/><path d="M9 8V5h6v3"/></svg><span id="ab-count">0/3</span></button>
+    <button class="ab-ico ab-inv-btn" type="button" data-act="inv" aria-label="{{inv}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h16v12H4z"/><path d="M9 8V5h6v3"/></svg><span id="ab-count">0/3</span></button>
     <button class="ab-ico" type="button" data-act="audio" aria-label="Audio on/off"><svg class="snd-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg><svg class="snd-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg></button>
-    <button class="ab-ico ab-exit" type="button" data-act="exit" aria-label="Termina e torna al sito"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Termina</span></button>
-    <button class="ab-ico" type="button" data-act="pause" aria-label="Pausa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
+    <button class="ab-ico ab-exit" type="button" data-act="exit" aria-label="{{exit_l}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>{{exit}}</span></button>
+    <button class="ab-ico" type="button" data-act="pause" aria-label="{{pause_l}}"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></button>
   </div>
   <div class="ab-gauge" aria-hidden="true"><span class="ab-g-fill"></span><span class="ab-g-mark"></span><i style="top:0">0</i><i style="top:20%">10</i><i style="top:40%">20</i><i style="top:60%">30</i><i style="top:80%">40</i><i style="top:100%">50 m</i></div>
   <div class="ab-cross" aria-hidden="true"></div>
   <p id="ab-prompt" class="ab-prompt"></p>
   <p id="ab-msg" class="ab-msg" role="status"></p>
   <div id="ab-hint" class="ab-hint">
-    <p class="ab-how-pc"><b>Clic</b> sullo schermo per guidare la visuale col mouse · <b>W A S D</b> nuoto · <b>Spazio</b> sali · <b>C</b> scendi · <b>Shift</b> veloce · <b>F</b> torcia · <b>E</b> interagisci · <b>I</b> inventario · <b>Q</b> getto d'aria (contro lo squalo)</p>
-    <p class="ab-how-touch">Joystick sinistro per nuotare · joystick destro per guardare</p>
-    <p>Segui la cima d'ormeggio verso il fondale. In alto c'è la bussola: il nord è N.</p>
+    <p class="ab-how-pc">{{hint_pc}}</p>
+    <p class="ab-how-touch">{{hint_touch}}</p>
+    <p>{{hint_line}}</p>
   </div>
 </div>
 
@@ -43,95 +43,95 @@
   <div class="ab-joy ab-joy-l"><i></i></div>
   <div class="ab-joy ab-joy-r"><i></i></div>
   <div class="ab-tbtns">
-    <button type="button" class="ab-blast" data-blast aria-label="Getto d'aria (tieni premuto)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="8" cy="15" r="3.2"/><circle cx="15.5" cy="9" r="4.2"/><circle cx="17" cy="18" r="2"/></svg></button>
-    <button type="button" class="ab-torch" data-act="torch" aria-label="Torcia"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6l-1 6h-4z"/><path d="M10 9h4v11a2 2 0 0 1-4 0z"/></svg></button>
-    <button type="button" class="ab-act" data-act="interact" aria-label="Interagisci">✋</button>
+    <button type="button" class="ab-blast" data-blast aria-label="{{blast_l}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="8" cy="15" r="3.2"/><circle cx="15.5" cy="9" r="4.2"/><circle cx="17" cy="18" r="2"/></svg></button>
+    <button type="button" class="ab-torch" data-act="torch" aria-label="{{torch_l}}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6l-1 6h-4z"/><path d="M10 9h4v11a2 2 0 0 1-4 0z"/></svg></button>
+    <button type="button" class="ab-act" data-act="interact" aria-label="{{act_l}}">✋</button>
   </div>
 </div>
 
-<div class="ab-rotate" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="6" width="24" height="42" rx="4"/><path d="M50 40a18 18 0 0 1-18 18M28 54l4 4-4 4"/></svg><p>Ruota il telefono in orizzontale</p></div>
+<div class="ab-rotate" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="6" width="24" height="42" rx="4"/><path d="M50 40a18 18 0 0 1-18 18M28 54l4 4-4 4"/></svg><p>{{rotate}}</p></div>
 
-<div class="ab-panel" data-panel="inv" hidden role="dialog" aria-modal="true" aria-label="Inventario">
+<div class="ab-panel" data-panel="inv" hidden role="dialog" aria-modal="true" aria-label="{{inv}}">
   <div class="ab-box">
-    <h2>Reperti recuperati <span class="ab-count2"></span></h2>
+    <h2>{{inv_t}} <span class="ab-count2"></span></h2>
     <div class="ab-slots"><div class="ab-slot"></div><div class="ab-slot"></div><div class="ab-slot"></div></div>
-    <p class="ab-small ab-where">Appunti del sub: una <b>grotta</b> a ovest, un <b>peschereccio capovolto</b> a sud-est, un <b>campo di anfore</b> a nord. Il relitto è al centro.</p>
-    <div class="ab-row"><button class="ab-btn" type="button" data-act="log" data-logbtn hidden>Rileggi il giornale di bordo</button><button class="ab-btn" type="button" data-act="close">Chiudi</button></div>
+    <p class="ab-small ab-where">{{where}}</p>
+    <div class="ab-row"><button class="ab-btn" type="button" data-act="log" data-logbtn hidden>{{reread}}</button><button class="ab-btn" type="button" data-act="close">{{close}}</button></div>
   </div>
 </div>
 
-<div class="ab-panel" data-panel="lock" hidden role="dialog" aria-modal="true" aria-label="Meccanismo della botola">
+<div class="ab-panel" data-panel="lock" hidden role="dialog" aria-modal="true" aria-label="{{lock_l}}">
   <div class="ab-box ab-lockbox">
-    <h2>Il meccanismo della botola</h2>
-    <p class="ab-small">Tre ghiere in ottone, ognuna con un simbolo inciso. Imposta la combinazione.</p>
+    <h2>{{lock_t}}</h2>
+    <p class="ab-small">{{lock_p}}</p>
     <div class="ab-dials">
-      <div class="ab-dial"><svg viewBox="0 0 64 64" aria-label="Rosa dei venti"><g fill="#d4ac63"><path d="M32 4l4 24-4 4-4-4zM32 60l-4-24 4-4 4 4zM4 32l24-4 4 4-4 4zM60 32l-24 4-4-4 4-4z"/></g><circle cx="32" cy="32" r="19" fill="none" stroke="#d4ac63" stroke-width="2"/></svg><button type="button" data-act="dial-up" data-i="0" aria-label="Aumenta">▲</button><b>0</b><button type="button" data-act="dial-dn" data-i="0" aria-label="Diminuisci">▼</button></div>
-      <div class="ab-dial"><svg viewBox="0 0 64 64" aria-label="Ancora"><g fill="none" stroke="#d4ac63" stroke-width="4" stroke-linecap="round"><circle cx="32" cy="10" r="5"/><path d="M32 15v40M20 24h24M10 38a22 22 0 0 0 44 0"/></g></svg><button type="button" data-act="dial-up" data-i="1" aria-label="Aumenta">▲</button><b>0</b><button type="button" data-act="dial-dn" data-i="1" aria-label="Diminuisci">▼</button></div>
-      <div class="ab-dial"><svg viewBox="0 0 64 64" aria-label="Chiave"><g fill="none" stroke="#d4ac63" stroke-width="4" stroke-linecap="round" transform="rotate(-45 32 32)"><circle cx="16" cy="32" r="9"/><path d="M25 32h32M48 32v9M55 32v7"/></g></svg><button type="button" data-act="dial-up" data-i="2" aria-label="Aumenta">▲</button><b>0</b><button type="button" data-act="dial-dn" data-i="2" aria-label="Diminuisci">▼</button></div>
+      <div class="ab-dial"><svg viewBox="0 0 64 64" aria-label="{{sym_rosa}}"><g fill="#d4ac63"><path d="M32 4l4 24-4 4-4-4zM32 60l-4-24 4-4 4 4zM4 32l24-4 4 4-4 4zM60 32l-24 4-4-4 4-4z"/></g><circle cx="32" cy="32" r="19" fill="none" stroke="#d4ac63" stroke-width="2"/></svg><button type="button" data-act="dial-up" data-i="0" aria-label="{{up}}">▲</button><b>0</b><button type="button" data-act="dial-dn" data-i="0" aria-label="{{down}}">▼</button></div>
+      <div class="ab-dial"><svg viewBox="0 0 64 64" aria-label="{{sym_ancora}}"><g fill="none" stroke="#d4ac63" stroke-width="4" stroke-linecap="round"><circle cx="32" cy="10" r="5"/><path d="M32 15v40M20 24h24M10 38a22 22 0 0 0 44 0"/></g></svg><button type="button" data-act="dial-up" data-i="1" aria-label="{{up}}">▲</button><b>0</b><button type="button" data-act="dial-dn" data-i="1" aria-label="{{down}}">▼</button></div>
+      <div class="ab-dial"><svg viewBox="0 0 64 64" aria-label="{{sym_chiave}}"><g fill="none" stroke="#d4ac63" stroke-width="4" stroke-linecap="round" transform="rotate(-45 32 32)"><circle cx="16" cy="32" r="9"/><path d="M25 32h32M48 32v9M55 32v7"/></g></svg><button type="button" data-act="dial-up" data-i="2" aria-label="{{up}}">▲</button><b>0</b><button type="button" data-act="dial-dn" data-i="2" aria-label="{{down}}">▼</button></div>
     </div>
-    <div class="ab-clues"><p>Indizi raccolti</p><ul data-clues></ul></div>
+    <div class="ab-clues"><p>{{clues}}</p><ul data-clues></ul></div>
     <p id="ab-lockfb" class="ab-fb" role="alert"></p>
-    <div class="ab-row"><button class="ab-btn" type="button" data-act="close">Indietro</button><button class="ab-btn ab-btn-main" type="button" data-act="confirm">CONFERMA</button></div>
+    <div class="ab-row"><button class="ab-btn" type="button" data-act="close">{{backbtn}}</button><button class="ab-btn ab-btn-main" type="button" data-act="confirm">{{confirm}}</button></div>
   </div>
 </div>
 
-<div class="ab-panel" data-panel="pause" hidden role="dialog" aria-modal="true" aria-label="Pausa">
+<div class="ab-panel" data-panel="pause" hidden role="dialog" aria-modal="true" aria-label="{{pause_l}}">
   <div class="ab-box">
-    <h2>Immersione in pausa</h2>
-    <p class="ab-small ab-how-pc">W A S D nuoto · Spazio sali · C scendi · Shift veloce · F torcia · E interagisci · I inventario · Q getto d'aria · Esc pausa</p>
-    <p class="ab-small ab-how-touch">Joystick sinistro: nuoto · joystick destro: sguardo · per scendere guarda in basso e nuota avanti · ✋ interagisci · bolle: getto d'aria contro lo squalo</p>
+    <h2>{{pause_t}}</h2>
+    <p class="ab-small ab-how-pc">{{pause_pc}}</p>
+    <p class="ab-small ab-how-touch">{{pause_touch}}</p>
     <div class="ab-col">
-      <button class="ab-btn ab-btn-main" type="button" data-act="resume">RIPRENDI</button>
-      <button class="ab-btn" type="button" data-act="restart">Ricomincia l'immersione</button>
-      <a class="ab-btn" href="/">Torna al sito</a>
+      <button class="ab-btn ab-btn-main" type="button" data-act="resume">{{resume}}</button>
+      <button class="ab-btn" type="button" data-act="restart">{{restart_s}}</button>
+      <a class="ab-btn" href="{{home}}">{{tosite}}</a>
     </div>
   </div>
 </div>
 
-<div class="ab-panel ab-logp" data-panel="log" hidden role="dialog" aria-modal="true" aria-label="Giornale di bordo">
+<div class="ab-panel ab-logp" data-panel="log" hidden role="dialog" aria-modal="true" aria-label="{{log_l}}">
   <div class="ab-box ab-logbox">
-    <h2>Giornale di bordo del capitano</h2>
-    <img id="ab-logimg" alt="Pagina del giornale di bordo: il cofanetto è sotto l'arco di pietra, sul bordo della scarpata. Dalla poppa, rotta e distanza indicate sulla pagina.">
-    <button class="ab-btn ab-btn-main" type="button" data-act="close">HO CAPITO</button>
+    <h2>{{log_t}}</h2>
+    <img id="ab-logimg" alt="{{log_alt}}">
+    <button class="ab-btn ab-btn-main" type="button" data-act="close">{{gotit}}</button>
   </div>
 </div>
 
 <div class="ab-panel ab-dead" data-panel="dead" hidden role="alertdialog" aria-modal="true" aria-labelledby="ab-dead-t">
   <div class="ab-box">
-    <p class="ab-sub" id="ab-dead-t">ARIA FINITA</p>
+    <p class="ab-sub" id="ab-dead-t">{{dead_air}}</p>
     <p class="ab-small" id="ab-dead-p"></p>
     <div class="ab-col">
-      <button class="ab-btn ab-btn-main" type="button" data-act="restart">RICOMINCIA L'IMMERSIONE</button>
-      <a class="ab-btn" href="/">Torna al sito</a>
+      <button class="ab-btn ab-btn-main" type="button" data-act="restart">{{restart_b}}</button>
+      <a class="ab-btn" href="{{home}}">{{tosite}}</a>
     </div>
   </div>
 </div>
 
-<div class="ab-panel ab-end" data-panel="end" hidden role="dialog" aria-modal="true" aria-label="Missione completata">
+<div class="ab-panel ab-end" data-panel="end" hidden role="dialog" aria-modal="true" aria-label="{{end_l}}">
   <div class="ab-box">
-    <p class="ab-sub">MISSIONE COMPLETATA</p>
-    <h2>«Il segreto del relitto è stato finalmente svelato.»</h2>
+    <p class="ab-sub">{{end_k}}</p>
+    <h2>{{end_h}}</h2>
     <div class="ab-poll" id="ab-poll">
-      <p class="ab-ad-lab">TI È PIACIUTO?</p>
-      <div class="ab-row ab-poll-q"><button class="ab-btn ab-btn-main" type="button" data-poll="si">VOGLIO UN'ALTRA MISSIONE</button><button class="ab-btn" type="button" data-poll="no">Mi basta così</button></div>
-      <div class="ab-stars" role="radiogroup" aria-label="Voto da 1 a 5"><button type="button" data-star="1" aria-label="1 stella">★</button><button type="button" data-star="2" aria-label="2 stelle">★</button><button type="button" data-star="3" aria-label="3 stelle">★</button><button type="button" data-star="4" aria-label="4 stelle">★</button><button type="button" data-star="5" aria-label="5 stelle">★</button></div>
-      <textarea id="ab-poll-txt" maxlength="500" rows="2" placeholder="Un suggerimento per la prossima missione? (facoltativo)"></textarea>
-      <button class="ab-btn" type="button" data-poll="send" disabled>Invia</button>
+      <p class="ab-ad-lab">{{poll_k}}</p>
+      <div class="ab-row ab-poll-q"><button class="ab-btn ab-btn-main" type="button" data-poll="si">{{poll_yes}}</button><button class="ab-btn" type="button" data-poll="no">{{poll_no}}</button></div>
+      <div class="ab-stars" role="radiogroup" aria-label="{{stars_l}}"><button type="button" data-star="1" aria-label="{{star1}}">★</button><button type="button" data-star="2" aria-label="2 {{starN}}">★</button><button type="button" data-star="3" aria-label="3 {{starN}}">★</button><button type="button" data-star="4" aria-label="4 {{starN}}">★</button><button type="button" data-star="5" aria-label="5 {{starN}}">★</button></div>
+      <textarea id="ab-poll-txt" maxlength="500" rows="2" placeholder="{{poll_ph}}"></textarea>
+      <button class="ab-btn" type="button" data-poll="send" disabled>{{send}}</button>
       <p class="ab-small ab-poll-msg" role="status"></p>
     </div>
-    <p class="ab-small">Lo scafandro del palombaro era nella camera nascosta; il cofanetto del capitano, sotto l'arco di roccia sul bordo dell'abisso.</p>
-    <ul class="ab-sum"><li>Reperti recuperati: 3/3</li><li>Enigma della botola risolto</li><li>Giornale di bordo decifrato</li><li>Cofanetto del capitano ritrovato</li></ul>
+    <p class="ab-small">{{end_p}}</p>
+    <ul class="ab-sum"><li>{{sum1}}</li><li>{{sum2}}</li><li>{{sum3}}</li><li>{{sum4}}</li></ul>
     <div class="ab-ad">
-      <p class="ab-ad-lab">QUESTO ERA UN GIOCO. IL NOSTRO LAVORO È VERO.</p>
+      <p class="ab-ad-lab">{{ad_k}}</p>
       <div class="ab-ad-logo"><img src="/img/logo-casco-96.png" alt="" width="64" height="64"><b>ANFIBIA<span>SUB</span></b></div>
-      <p class="ab-small">Dal Porto di Loano interveniamo dove il lavoro si fa sott'acqua, con operatori qualificati e ogni intervento documentato.</p>
-      <ul class="ab-svc"><li>Pulizia eliche e carene</li><li>Sostituzione anodi</li><li>Recuperi in mare</li><li>Lavori edili subacquei</li><li>Saldature e metalmeccanica</li><li>Foto e videoriprese</li></ul>
-      <div class="ab-row"><a class="ab-btn ab-btn-main" href="/contatti.html">RICHIEDI UN PREVENTIVO</a><a class="ab-btn" href="/servizi.html">I nostri servizi</a></div>
+      <p class="ab-small">{{ad_p}}</p>
+      <ul class="ab-svc"><li>{{svc1}}</li><li>{{svc2}}</li><li>{{svc3}}</li><li>{{svc4}}</li><li>{{svc5}}</li><li>{{svc6}}</li></ul>
+      <div class="ab-row"><a class="ab-btn ab-btn-main" href="{{contatti}}">{{quote}}</a><a class="ab-btn" href="{{servizi}}">{{services}}</a></div>
     </div>
     <div class="ab-row">
-      <button class="ab-btn" type="button" data-act="restart">Ripeti immersione</button>
-      <button class="ab-btn" type="button" data-act="continue">Continua a esplorare</button>
-      <a class="ab-btn" href="/">Torna al sito</a>
+      <button class="ab-btn" type="button" data-act="restart">{{again}}</button>
+      <button class="ab-btn" type="button" data-act="continue">{{explore}}</button>
+      <a class="ab-btn" href="{{home}}">{{tosite}}</a>
     </div>
   </div>
 </div>

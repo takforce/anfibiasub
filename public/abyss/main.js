@@ -1,16 +1,17 @@
 // ABYSS — Il relitto dimenticato. Motore principale e macchina a stati.
 import * as THREE from '../vendor/three/three.module.min.js';
-import { CFG, CODE, bearing } from './config.js?v=fde10d2c';
-import { makeTextures, logbookPage } from './textures.js?v=fde10d2c';
-import { buildWorld, collideWorld } from './world.js?v=fde10d2c';
-import { buildWreck, makeHelmet } from './wreck.js?v=fde10d2c';
-import { buildArtifacts } from './artifacts.js?v=fde10d2c';
-import { buildLandmarks } from './landmarks.js?v=fde10d2c';
-import { buildFish } from './fish.js?v=fde10d2c';
-import { buildShark } from './shark.js?v=fde10d2c';
-import { buildAds, buildStatues } from './ads.js?v=fde10d2c';
-import { createControls } from './controls.js?v=fde10d2c';
-import { createAudio } from './audio.js?v=fde10d2c';
+import { CFG, CODE, bearing } from './config.js?v=0b1daeda';
+import { t as tr, L as TX } from './i18n.js?v=0b1daeda';
+import { makeTextures, logbookPage } from './textures.js?v=0b1daeda';
+import { buildWorld, collideWorld } from './world.js?v=0b1daeda';
+import { buildWreck, makeHelmet } from './wreck.js?v=0b1daeda';
+import { buildArtifacts } from './artifacts.js?v=0b1daeda';
+import { buildLandmarks } from './landmarks.js?v=0b1daeda';
+import { buildFish } from './fish.js?v=0b1daeda';
+import { buildShark } from './shark.js?v=0b1daeda';
+import { buildAds, buildStatues } from './ads.js?v=0b1daeda';
+import { createControls } from './controls.js?v=0b1daeda';
+import { createAudio } from './audio.js?v=0b1daeda';
 
 const $ = (s) => document.querySelector(s);
 const root = $('#abyss');
@@ -29,7 +30,7 @@ let renderer;
 try {
   renderer = new THREE.WebGLRenderer({ canvas, antialias: !mobile, powerPreference: 'high-performance' });
 } catch (e) {
-  $('#ab-start').textContent = 'WebGL non disponibile';
+  $('#ab-start').textContent = tr('nowebgl');
   $('#ab-nowebgl').hidden = false;
   throw e;
 }
@@ -140,15 +141,15 @@ const ui = {
 };
 // bussola da polso: striscia con i punti cardinali (2 px per grado, ripetuta)
 {
-  const lab = { 0: 'N', 45: 'NE', 90: 'E', 135: 'SE', 180: 'S', 225: 'SO', 270: 'O', 315: 'NO' };
+  const cl = TX.compass || ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+  const lab = { 0: cl[0], 45: cl[1], 90: cl[2], 135: cl[3], 180: cl[4], 225: cl[5], 270: cl[6], 315: cl[7] };
   let h = '';
   for (let k = -1; k <= 1; k++) for (let d = 0; d < 360; d += 15) h += `<i style="left:${(d + k * 360) * 2}px"${lab[d] ? ' class="c"' : ''}>${lab[d] || ''}</i>`;
   ui.strip.innerHTML = h;
 }
 function objective() {
-  const txt = S.phase === 1 ? (S.found.length < 3 ? `Trova i 3 reperti nascosti intorno al relitto (${S.found.length}/3)` : 'Apri la botola sul ponte del relitto')
-    : S.phase === 2 ? 'Scendi nella camera nascosta sotto la botola'
-      : S.phase === 3 ? 'Segui la rotta del giornale di bordo' : 'Missione completata';
+  const txt = S.phase === 1 ? (S.found.length < 3 ? tr('obj1', { n: S.found.length }) : tr('obj2'))
+    : S.phase === 2 ? tr('obj3') : S.phase === 3 ? tr('obj4') : tr('obj5');
   ui.obj.textContent = txt;
 }
 let msgTimer = 0;
@@ -162,12 +163,12 @@ function updCount() {
   root.querySelectorAll('.ab-slot').forEach((el, i) => {
     const a = CFG.artifacts[i], f = S.found.includes(a.id);
     el.classList.toggle('full', f);
-    el.innerHTML = f ? `<img src="${a.img}" alt=""><b>${a.name}</b><span>${a.clue}</span>` : `<i></i><b>Reperto ${i + 1}</b><span>Non ancora trovato</span>`;
+    el.innerHTML = f ? `<img src="${a.img}" alt=""><b>${a.name}</b><span>${a.clue}</span>` : `<i></i><b>${tr('slot', { n: i + 1 })}</b><span>${tr('notfound')}</span>`;
   });
   root.querySelectorAll('[data-logbtn]').forEach((el) => { el.hidden = S.phase < 3; });
   objective();
   root.querySelectorAll('[data-clues]').forEach((el) => {
-    el.innerHTML = S.found.length ? CFG.artifacts.filter((a) => S.found.includes(a.id)).map((a) => `<li>${a.clue}</li>`).join('') : '<li>Nessun indizio raccolto</li>';
+    el.innerHTML = S.found.length ? CFG.artifacts.filter((a) => S.found.includes(a.id)).map((a) => `<li>${a.clue}</li>`).join('') : `<li>${tr('noclues')}</li>`;
   });
 }
 
@@ -182,7 +183,7 @@ function closePanel() {
   const was = S.panel; S.panel = null;
   if (was === 'pause') resume();
   else if (was === 'inv' || was === 'log') {
-    if (was === 'log' && S.phase === 2) { S.phase = 3; updCount(); toast(`Rotta ${Math.round(LOG.deg)}° dalla poppa del cargo. Usa la bussola in alto.`, 6000); }
+    if (was === 'log' && S.phase === 2) { S.phase = 3; updCount(); toast(tr('bearing', { deg: Math.round(LOG.deg) }), 6000); }
     if (S.state === 'READING') setState('EXPLORATION');
     controls.enabled = true; relock();
   }
@@ -230,7 +231,7 @@ function toggleTorch(force) {
 // ---------------- avvio ----------------
 function ready() {
   ui.start.disabled = false;
-  ui.start.textContent = 'INIZIA L\'IMMERSIONE';
+  ui.start.textContent = tr('start');
   root.classList.add('is-ready');
 }
 // iPhone: Safari non permette di nascondere la barra degli indirizzi; da icona sulla Home il gioco va a schermo intero
@@ -266,7 +267,7 @@ function startDescent() {
   setState('DESCENT');
   controls.enabled = true;
   root.classList.add('is-playing');
-  toast('DISCESA IN CORSO…', 3200, 'big');
+  toast(tr('descent'), 3200, 'big');
   S.hintT = 0;
   ui.hint.classList.add('on');
   setTimeout(() => ui.hint.classList.remove('on'), 16000);
@@ -291,13 +292,13 @@ function target() {
 function interact() {
   const k = target(); if (!k) return;
   if (k.kind === 'art') {
-    if (k.a.final && S.phase < 3) { toast('Un cofanetto incastrato tra le rocce. Non sai ancora cosa sia: forse qualcuno ha lasciato scritto qualcosa.', 5000); audio.clunk(); return; }
+    if (k.a.final && S.phase < 3) { toast(tr('casket_early'), 5000); audio.clunk(); return; }
     pickup(k.a);
   } else if (k.kind === 'book') openLog();
-  else if (k.kind === 'helmet') toast('Un antico scafandro da palombaro in ottone, con tre oblò. Il capitano lo custodiva qui sotto chiave.', 4500);
+  else if (k.kind === 'helmet') toast(tr('helmet'), 4500);
   else if (k.kind === 'hatch') {
     if (wreck.hatch.userData.open) return;
-    if (S.found.length < 3) { toast('Non hai ancora raccolto tutti gli indizi.'); audio.clunk(); return; }
+    if (S.found.length < 3) { toast(tr('need_clues')); audio.clunk(); return; }
     setState('LOCK_PUZZLE'); controls.enabled = false; drawDials(); openPanel('lock');
   }
 }
@@ -305,7 +306,7 @@ function interact() {
 function openLog() {
   const img = $('#ab-logimg');
   const portrait = viewSize().h > viewSize().w;
-  if (img.dataset.mode !== String(portrait)) { img.src = logbookPage(LOG.deg, LOG.m, portrait); img.dataset.mode = String(portrait); }
+  if (img.dataset.mode !== String(portrait)) { img.src = logbookPage(LOG.deg, LOG.m, portrait, TX.logpage); img.dataset.mode = String(portrait); }
   setState('READING'); controls.enabled = false; openPanel('log');
 }
 
@@ -338,7 +339,7 @@ function confirmCode() {
   } else {
     audio.clunk();
     const p = $('.ab-lockbox'); p.classList.remove('shake'); void p.offsetWidth; p.classList.add('shake');
-    $('#ab-lockfb').textContent = 'Il meccanismo resta bloccato. Ricontrolla gli indizi.';
+    $('#ab-lockfb').textContent = tr('lock_wrong');
   }
 }
 function closePanelSilently() { root.querySelectorAll('.ab-panel').forEach((p) => { p.hidden = true; }); S.panel = null; }
@@ -392,7 +393,7 @@ function openHatch() {
       if (t > 9.2) {
         S.seq = null; S.phase = 2; wreck.setOpen(true); updCount();
         continueExploring();
-        toast('La botola è aperta. Scendi nella camera nascosta.', 5000);
+        toast(tr('hatch_open'), 5000);
       }
     },
   };
@@ -404,10 +405,8 @@ function die(reason) {
   setState('DEAD'); S.seq = null; S.inspect = null;
   controls.enabled = false; controls.reset(); controls.release(); audio.hissOff();
   root.classList.add('is-dead');
-  $('#ab-dead-t').textContent = reason === 'squalo' ? 'LO SQUALO TI HA ATTACCATO' : 'ARIA FINITA';
-  $('#ab-dead-p').textContent = reason === 'squalo'
-    ? 'Il fossato oltre la scarpata è il suo territorio. La prossima volta, quando si avvicina, usa il getto d\'aria della bombola.'
-    : 'La bombola è vuota. Tieni d\'occhio il manometro: con 50 bar è ora di risalire o di finire in fretta.';
+  $('#ab-dead-t').textContent = reason === 'squalo' ? tr('dead_shark_t') : tr('dead_air_t');
+  $('#ab-dead-p').textContent = reason === 'squalo' ? tr('dead_shark_p') : tr('dead_air_p');
   setTimeout(() => openPanel('dead'), reason === 'squalo' ? 900 : 400);
 }
 
@@ -461,13 +460,13 @@ function restart() {
       return;
     }
     if (b.dataset.poll === 'send' && poll.altra !== null) {
-      send.disabled = true; msg.textContent = 'Invio in corso…';
+      send.disabled = true; msg.textContent = tr('sending');
       try {
         const r = await fetch(root.dataset.api, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...poll, commento: $('#ab-poll-txt').value }) });
         if (!r.ok) throw new Error(r.status);
         box.classList.add('sent');
-        msg.textContent = poll.altra ? 'Grazie! Lo diciamo subito al team: la prossima missione è in preparazione.' : 'Grazie per aver giocato!';
-      } catch (_) { send.disabled = false; msg.textContent = 'Invio non riuscito. Riprova tra poco.'; }
+        msg.textContent = poll.altra ? tr('thanks_yes') : tr('thanks_no');
+      } catch (_) { send.disabled = false; msg.textContent = tr('send_fail'); }
     }
   });
 }
@@ -569,8 +568,8 @@ function tick() {
     if (!it.a.final && it.t > 3.0) {
       o.visible = false; scene.attach(o); S.inspect = null;
       setState(S.reached ? 'EXPLORATION' : 'DESCENT'); controls.enabled = true;
-      if (S.found.length === 3) setTimeout(() => toast('Hai recuperato tutti i reperti. Torna al relitto: c\'è una botola sul ponte.', 5200), 6800);
-      else setTimeout(() => toast(`REPERTI RECUPERATI: ${S.found.length}/3`, 2600), 6800);
+      if (S.found.length === 3) setTimeout(() => toast(tr('all_found'), 5200), 6800);
+      else setTimeout(() => toast(tr('count', { n: S.found.length }), 2600), 6800);
     }
   }
 
@@ -588,13 +587,13 @@ function tick() {
   scene.environmentIntensity = 0.4 * lit + 0.05;
   world.surface.uniforms.uTime.value = t; world.surface.uniforms.uCam.value.copy(camera.position);
   world.surface.uniforms.uFog.value.copy(tmpC); world.surface.uniforms.uDensity.value = scene.fog.density * 0.9;
-  ui.depth.textContent = depth.toFixed(1).replace('.', ',');
+  ui.depth.textContent = depth.toFixed(1).replace('.', TX.decimal || ',');
   ui.gauge.style.setProperty('--d', Math.min(1, depth / 50).toFixed(4));
   { const hd = ((Math.atan2(fwd.x, -fwd.z) * 180 / Math.PI) + 360) % 360; ui.strip.style.transform = `translateX(${-hd * 2}px)`; ui.hdg.textContent = String(Math.round(hd) % 360).padStart(3, '0') + '°'; }
   audio.depth(depth);
 
   if (playing && !S.reached && depth > 23) {
-    S.reached = true; setState('EXPLORATION'); toast('IMMERSIONE INIZIATA', 3200, 'big');
+    S.reached = true; setState('EXPLORATION'); toast(tr('started'), 3200, 'big');
   }
   if (!S.torchTouched && !S.torch && depth > CFG.torch.autoOnDepth && playing) toggleTorch(true);
 
@@ -629,14 +628,14 @@ function tick() {
   }
   if (playing && !S.hatchSeen) {
     const hw = wreck.hatchWorld(); _v.subVectors(hw, camera.position); const dist = _v.length();
-    if (S.torch && dist < 9 && _v.normalize().dot(fwd) > 0.9) { S.hatchSeen = true; toast('Un antico meccanismo blocca l\'accesso. Gli indizi raccolti potrebbero rivelare la combinazione.', 6000); }
+    if (S.torch && dist < 9 && _v.normalize().dot(fwd) > 0.9) { S.hatchSeen = true; toast(tr('hatch_seen'), 6000); }
   }
 
   // --- suggerimento di interazione ---
   if (playing) {
     const k = target();
     if (k) {
-      const what = k.kind === 'art' ? (k.a.final && S.phase < 3 ? 'Esamina' : `Raccogli: ${k.a.name}`) : k.kind === 'book' ? 'Leggi il giornale di bordo' : k.kind === 'helmet' ? 'Osserva lo scafandro' : (wreck.hatch.userData.open ? '' : 'Esamina la botola');
+      const what = k.kind === 'art' ? (k.a.final && S.phase < 3 ? tr('p_look') : tr('p_take', { name: k.a.name })) : k.kind === 'book' ? tr('p_book') : k.kind === 'helmet' ? tr('p_helmet') : (wreck.hatch.userData.open ? '' : tr('p_hatch'));
       ui.prompt.innerHTML = what ? `<kbd>${controls.touch ? '✋' : 'E'}</kbd> ${what}` : '';
       root.classList.toggle('can-act', !!what);
     } else { ui.prompt.innerHTML = ''; root.classList.remove('can-act'); }
@@ -652,9 +651,9 @@ function tick() {
       S.air -= AIR.blast * dt; audio.hissOn();
       const o = camera.position.clone().addScaledVector(fwd, 0.5);
       world.bubbles.burst(o, 4, 0.25);
-      if (shark.blast(camera.position, fwd)) { toast('Lo squalo si spaventa e se ne va.', 3500); }
+      if (shark.blast(camera.position, fwd)) { toast(tr('shark_gone'), 3500); }
     } else audio.hissOff();
-    if (!S.reserveSaid && S.air < AIR.reserve) { S.reserveSaid = true; toast('Riserva: 50 bar. Finisci in fretta.', 4500); }
+    if (!S.reserveSaid && S.air < AIR.reserve) { S.reserveSaid = true; toast(tr('reserve'), 4500); }
     if (S.air <= 0) { S.air = 0; die('aria'); }
   } else if (S.state !== 'DEAD') audio.hissOff();
   ui.bar.textContent = Math.ceil(S.air);
@@ -663,7 +662,7 @@ function tick() {
 
   // --- squalo del fossato ---
   if (S.state !== 'DEAD') shark.update(dt, t, P.pos, {
-    warn() { audio.danger(); toast(controls.touch ? 'Uno squalo! Tieni premuto il tasto ARIA quando è davanti a te.' : 'Uno squalo! Tieni premuto Q (getto d\'aria) quando è davanti a te.', 5000); },
+    warn() { audio.danger(); toast(controls.touch ? tr('shark_touch') : tr('shark_pc'), 5000); },
     charge() { audio.danger(); },
     hit() { audio.hit(); die('squalo'); },
   });

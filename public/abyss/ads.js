@@ -1,7 +1,7 @@
 // Presenza di Anfibiasub nel mondo di gioco: elementi realistici di un vero cantiere subacqueo,
 // niente cartelloni pubblicitari. Il marchio compare come comparirebbe su attrezzatura vera.
 import * as THREE from '../vendor/three/three.module.min.js';
-import { heightAt } from './world.js?v=fde10d2c';
+import { heightAt } from './world.js?v=0b1daeda';
 
 const NAVY = '#071D30', CYAN = '#3CC6F5', ICE = '#DCEFF5';
 

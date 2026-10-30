@@ -5,6 +5,7 @@
 // - mano con l'erogatore (getto d'aria) e fiocina, visti in prima persona, con l'arpione che vola
 import * as THREE from '../vendor/three/three.module.min.js';
 import { heightAt } from './world.js';
+import { GLTFLoader } from '../vendor/three/GLTFLoader.js';
 
 const NAVY = '#071D30', CYAN = '#3CC6F5', ICE = '#DCEFF5';
 
@@ -89,68 +90,29 @@ export function buildLiftBags(scene, tex, spots, extra) {
 }
 
 // ======================================================================================
-// AEREO AFFONDATO vicino al relitto: ultraleggero ad ala alta (tipo STOL), giallo con l'ala rossa,
-// come quello della foto di Ivano; su un'ala ANFIBIASUB con il logo, sull'altra Tak4Fly
+// AEREO AFFONDATO vicino al relitto: ultraleggero ad ala alta (modello vero), giallo come quello di Ivano;
+// su un'ala ANFIBIASUB con il logo, sull'altra Tak4Fly con il simbolo di TikTok
 // ======================================================================================
 export async function buildPlane(scene, world, tex, P) {
   try { await document.fonts.load('800 40px Montserrat'); } catch (_) { /* font di riserva */ }
   const logo = await loadImg('/img/logo-casco.png');
   const tiktok = P.tiktok ? await loadImg(new URL('./tex/' + P.tiktok, import.meta.url).href) : null;
-  // sporco del mare: base bianca (il colore lo dà il materiale) con macchie di alghe e sedimento
-  const dirt = canvasTex(512, 512, (c, w, h) => {
-    c.fillStyle = '#fff'; c.fillRect(0, 0, w, h);
-    for (let i = 0; i < 900; i++) { const g = Math.random(); c.fillStyle = g < 0.5 ? `rgba(90,110,90,${Math.random() * 0.12})` : `rgba(120,105,80,${Math.random() * 0.12})`; c.beginPath(); c.arc(Math.random() * w, Math.random() * h, 2 + Math.random() * 18, 0, 7); c.fill(); }
-    for (let i = 0; i < 40; i++) { c.fillStyle = `rgba(60,50,40,${0.1 + Math.random() * 0.15})`; c.fillRect(Math.random() * w, Math.random() * h, 1 + Math.random() * 3, 20 + Math.random() * 80); }
-  });
-  dirt.wrapS = dirt.wrapT = THREE.RepeatWrapping;
-  const yellow = new THREE.MeshStandardMaterial({ map: dirt, color: 0xe2b416, roughness: 0.55, metalness: 0.05 });
-  const red = new THREE.MeshStandardMaterial({ map: dirt, color: 0xc4301f, roughness: 0.55, metalness: 0.05 });
-  const black = new THREE.MeshStandardMaterial({ color: 0x1b1d1f, roughness: 0.75 });
-  const glass = new THREE.MeshStandardMaterial({ color: 0x0b161b, metalness: 0.3, roughness: 0.12, transparent: true, opacity: 0.7, side: THREE.DoubleSide });
-  const g = new THREE.Group();   // muso verso +z, origine sotto la fusoliera a terra
-
-  // cabina: profilo laterale estruso sulla larghezza (1 m), spigoli arrotondati
-  const prof = new THREE.Shape();
-  prof.moveTo(1.85, 0.45); prof.lineTo(1.9, 1.05); prof.lineTo(1.25, 1.62); prof.lineTo(-0.35, 1.62); prof.lineTo(-1.05, 1.3); prof.lineTo(-1.05, 0.62); prof.lineTo(0.1, 0.38); prof.closePath();
-  const cab = new THREE.Mesh(new THREE.ExtrudeGeometry(prof, { depth: 0.9, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.06, bevelSegments: 3 }).translate(0, 0, -0.45).rotateY(-Math.PI / 2), yellow);
-  g.add(cab);
-  // finestrini laterali e parabrezza
-  const win = new THREE.Shape(); win.moveTo(1.2, 1.05); win.lineTo(1.18, 1.52); win.lineTo(-0.25, 1.52); win.lineTo(-0.75, 1.25); win.lineTo(-0.75, 1.05); win.closePath();
-  for (const s of [-1, 1]) { const w = new THREE.Mesh(new THREE.ShapeGeometry(win).rotateY(-Math.PI / 2), glass); w.position.x = s * 0.515; g.add(w); }
-  const ws = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.8), glass); ws.position.set(0, 1.34, 1.58); ws.rotation.x = -0.74; g.add(ws);
-  // fascia rossa in basso sui fianchi (come nella foto)
-  const stripe = new THREE.Mesh(new THREE.BoxGeometry(1.04, 0.14, 2.7), red); stripe.position.set(0, 0.6, 0.35); g.add(stripe);
-  // cofano motore, ogiva, elica bipala
-  const cowl = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.44, 0.55, 20).rotateX(Math.PI / 2), yellow); cowl.position.set(0, 0.8, 2.15); cowl.scale.set(1, 0.9, 1); g.add(cowl);
-  const spin = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.3, 14).rotateX(Math.PI / 2), black); spin.position.set(0, 0.82, 2.55); g.add(spin);
-  for (const a of [0.5, 0.5 + Math.PI]) {
-    const bl = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.85, 0.03).translate(0, 0.45, 0), black);
-    bl.position.set(0, 0.82, 2.5); bl.rotation.set(0, 0, a); bl.rotation.x = 0.15; g.add(bl);
-  }
-  // trave di coda rastremata
-  const boom = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.38, 3.1, 14).rotateX(-Math.PI / 2), yellow); boom.position.set(0, 1.15, -2.55); boom.scale.set(1, 1.15, 1); g.add(boom);
-  // impennaggi: stabilizzatore e deriva, con la punta rossa
-  const stab = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.06, 0.75), yellow); stab.position.set(0, 1.18, -3.85); g.add(stab);
-  const fs = new THREE.Shape(); fs.moveTo(0.2, 0); fs.lineTo(-0.85, 0); fs.lineTo(-0.7, 1.05); fs.lineTo(-0.25, 1.1); fs.closePath();
-  const fin = new THREE.Mesh(new THREE.ExtrudeGeometry(fs, { depth: 0.06, bevelEnabled: false }).rotateY(-Math.PI / 2).translate(0.03, 1.2, -3.55), yellow); g.add(fin);
-  const finTip = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.25, 0.5), red); finTip.position.set(0, 2.18, -4.15); g.add(finTip);
-
-  // ala alta: rossa sopra e sul bordo d'attacco, gialla sotto
-  const wing = new THREE.Mesh(new THREE.BoxGeometry(9.0, 0.14, 1.45), [red, red, red, yellow, red, yellow]); wing.position.set(0, 1.74, 0.45); g.add(wing);
-  for (const s of [-1, 1]) { const tip = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 1.45, 10).rotateX(Math.PI / 2), red); tip.position.set(s * 4.5, 1.74, 0.45); g.add(tip); }
-  // montanti a V
-  const strut = (a, b) => { const d = new THREE.Vector3().subVectors(b, a); const m = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, d.length(), 8), yellow); m.position.copy(a).addScaledVector(d, 0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); g.add(m); };
-  for (const s of [-1, 1]) { strut(new THREE.Vector3(s * 0.5, 0.5, 0.5), new THREE.Vector3(s * 2.7, 1.67, 0.85)); strut(new THREE.Vector3(s * 0.5, 0.5, 0.3), new THREE.Vector3(s * 2.7, 1.67, 0.05)); }
-  // carrello triciclo con ruote grandi da pista erbosa
-  const tire = new THREE.CylinderGeometry(0.3, 0.3, 0.24, 20).rotateZ(Math.PI / 2);
-  for (const s of [-1, 1]) {
-    const w = new THREE.Mesh(tire, black); w.position.set(s * 1.0, 0.3, 0.05); g.add(w);
-    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.26, 12).rotateZ(Math.PI / 2), yellow); hub.position.copy(w.position); g.add(hub);
-    strut(new THREE.Vector3(s * 0.45, 0.45, 0.25), new THREE.Vector3(s * 0.9, 0.3, 0.05));
-    strut(new THREE.Vector3(s * 0.45, 0.45, -0.25), new THREE.Vector3(s * 0.9, 0.3, 0.05));
-  }
-  const nw = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.18, 18).rotateZ(Math.PI / 2), black); nw.position.set(0, 0.24, 1.95); g.add(nw);
-  strut(new THREE.Vector3(0, 0.55, 2.0), new THREE.Vector3(0, 0.24, 1.95));
+  // il modello vero: "Super Guepard 912" di helijah (Sketchfab, CC BY 4.0), ripitturato giallo come l'aereo di Ivano.
+  // Nel file il muso guarda -x e le ali stanno lungo z: lo giro in modo che il muso guardi +z e lo centro sull'origine.
+  const g = new THREE.Group();
+  const inner = new THREE.Group(); inner.rotation.y = Math.PI / 2; inner.position.set(4.9, 0, 3); g.add(inner);
+  const gl = await new GLTFLoader().loadAsync(new URL('./models/guepard.gltf?v=1', import.meta.url).href);
+  gl.scene.traverse((o) => { if (o.isMesh) { const m = o.material; if (m.map) { m.roughness = 0.6; m.metalness = 0.1; } } });
+  inner.add(gl.scene);
+  g.updateMatrixWorld(true);
+  // dove sta la superficie superiore delle ali (per appoggiarci sopra le scritte)
+  const ray = new THREE.Raycaster(), hits = (x) => {
+    const ys = [];
+    for (let z = -2; z <= 2; z += 0.05) { ray.set(new THREE.Vector3(x, 10, z), new THREE.Vector3(0, -1, 0)); const h = ray.intersectObject(gl.scene, true)[0]; if (h && h.point.y > 1.5) ys.push([z, h.point.y]); }
+    if (!ys.length) return { z: 0, y: 2.3 };
+    return { z: (ys[0][0] + ys[ys.length - 1][0]) / 2, y: Math.max(...ys.map((v) => v[1])) };
+  };
+  const wingTop = { '-1': hits(-2.6), '1': hits(2.6) };
 
   // scritte sopra l'ala (decalcomanie sbiadite dal mare): a sinistra ANFIBIASUB, a destra Tak4Fly
   const decal = (draw) => {
@@ -182,20 +144,21 @@ export async function buildPlane(scene, world, tex, P) {
     c.fillStyle = ICE; c.fillText('Tak', x0, y); c.fillStyle = CYAN; c.fillText('4', x0 + a, y); c.fillStyle = ICE; c.fillText('Fly', x0 + a + b, y);
   });
   for (const [s, m] of [[-1, leftM], [1, rightM]]) {
-    const p = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 1.06), m);
-    p.rotation.x = -Math.PI / 2; p.position.set(s * 2.55, 1.815, 0.45);
-    // il testo si legge guardando l'ala da dietro, dal bordo d'uscita verso il muso
-    p.rotation.z = Math.PI; g.add(p);
+    const w = wingTop[String(s)];
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(3.1, 0.92), m);
+    p.rotation.x = -Math.PI / 2; p.rotation.z = Math.PI;   // il testo si legge guardando l'ala da dietro, verso il muso
+    p.position.set(s * 2.6, w.y + 0.015, w.z); g.add(p);
   }
 
-  // adagiato sul fondo: ruote affondate nella sabbia, il carrello destro ceduto, muso un po' giù
+  // adagiato sul fondo: ruote affondate nella sabbia, un po' inclinato
   const x = P.x, z = P.z, b = heightAt(x, z);
-  g.position.set(x, b - 0.18, z); g.rotation.set(0.05, P.rot, -0.06);
+  g.position.set(x, b - 0.15, z); g.rotation.set(0.04, P.rot, -0.05);
   shade(g); scene.add(g);
   g.updateMatrixWorld(true);
   const col = (lx, ly, lz, sx, sy, sz) => world.colliders.push({ c: g.localToWorld(new THREE.Vector3(lx, ly, lz)), s: new THREE.Vector3(sx, sy, sz), rot: P.rot });
-  col(0, 1.0, 0.5, 0.65, 0.75, 1.7); col(0, 1.15, -2.6, 0.35, 0.4, 1.6);
-  for (const s of [-1, 1]) for (const d of [1.4, 3.4]) col(s * d, 1.74, 0.45, 1.05, 0.15, 0.8);
+  const wz = (wingTop['-1'].z + wingTop['1'].z) / 2, wy = (wingTop['-1'].y + wingTop['1'].y) / 2;
+  col(0, 1.0, 0, 0.6, 0.95, 3.0);
+  for (const s of [-1, 1]) for (const d of [1.4, 3.6]) col(s * d, wy - 0.05, wz, 1.15, 0.15, 0.75);
   return g;
 }
 
@@ -403,3 +366,47 @@ export function createSpear(scene) {
   return S;
 }
 
+
+// ======================================================================================
+// MODELLI VERI SUL FONDALE (Sketchfab, CC BY 4.0): idrovolante Albatross vicino alle anfore, auto affondata,
+// gorgonie, ancora, cannone, cassa; tartaruga che nuota intorno al relitto
+// ======================================================================================
+export async function buildDeco(scene, world, D) {
+  const loader = new GLTFLoader();
+  const load = (n) => loader.loadAsync(new URL(`./models/${n}.gltf?v=1`, import.meta.url).href);
+  const out = { update: () => {} };
+  // oggetto appoggiato: c = centro del modello nel file (x, y del fondo, z), s = scala, sink = quanto affonda nella sabbia
+  const place = (gl, d) => {
+    const g = new THREE.Group(), inner = gl;
+    inner.position.set(-d.c[0] * d.s, -d.c[1] * d.s, -d.c[2] * d.s); inner.scale.setScalar(d.s);
+    g.add(inner);
+    g.position.set(d.x, heightAt(d.x, d.z) - (d.sink || 0), d.z); g.rotation.set(d.rx || 0, d.rot || 0, d.rz || 0);
+    inner.traverse((o) => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; const m = o.material; if (m) { m.side = THREE.DoubleSide; if (m.map) m.map.anisotropy = 4; } } });
+    scene.add(g);
+    if (d.col) world.colliders.push({ c: new THREE.Vector3(d.x, heightAt(d.x, d.z) + d.col[1], d.z), s: new THREE.Vector3(d.col[0], d.col[1], d.col[2]), rot: d.rot || 0 });
+    return g;
+  };
+  const jobs = [];
+  for (const d of D.items) jobs.push(load(d.m).then((gl) => {
+    if (d.copies) { for (const c of d.copies) place(gl.scene.clone(true), { ...d, ...c }); } else place(gl.scene, d);
+  }).catch((e) => console.warn('ABYSS modello', d.m, e && e.message)));
+  // tartaruga: nuota in cerchio intorno al relitto, sale e scende piano
+  jobs.push(load('turtle').then((gl) => {
+    const g = new THREE.Group(); gl.scene.scale.setScalar(1.1); gl.scene.position.set(0, -0.15, 0); g.add(gl.scene);
+    gl.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } });
+    scene.add(g);
+    const mixer = gl.animations.length ? new THREE.AnimationMixer(gl.scene) : null;
+    if (mixer) { const a = mixer.clipAction(gl.animations[0]); a.timeScale = 0.35; a.play(); }
+    const T = D.turtle; let ang = 0;
+    out.update = (dt, t) => {
+      if (mixer) mixer.update(dt);
+      ang += dt * T.speed / T.r;
+      const x = T.x + Math.cos(ang) * T.r, z = T.z + Math.sin(ang) * T.r * 0.8;
+      const y = Math.max(heightAt(x, z) + 2, T.y + Math.sin(t * 0.13) * 2.5);
+      g.position.set(x, y, z);
+      g.rotation.set(Math.sin(t * 0.13) * 0.1, Math.atan2(-Math.sin(ang), Math.cos(ang) * 0.8) + 0, Math.sin(t * 0.7) * 0.05);
+    };
+  }).catch(() => {}));
+  await Promise.all(jobs);
+  return out;
+}

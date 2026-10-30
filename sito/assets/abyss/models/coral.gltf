@@ -1,0 +1,633 @@
+{
+  "asset": {
+    "generator": "glTF-Transform v4.5.1",
+    "version": "2.0",
+    "extras": {
+      "author": "Valery.Li (https://sketchfab.com/Valery.Li)",
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "source": "https://sketchfab.com/3d-models/fan-coral-med-f438cf7717284f9ea70b8fbff89dc836",
+      "title": "Fan Coral Med"
+    }
+  },
+  "accessors": [
+    {
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 19662,
+      "bufferView": 0,
+      "byteOffset": 0
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 19674,
+      "bufferView": 0,
+      "byteOffset": 39324
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 19614,
+      "bufferView": 0,
+      "byteOffset": 78672
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 19629,
+      "bufferView": 0,
+      "byteOffset": 117900
+    },
+    {
+      "type": "VEC2",
+      "componentType": 5126,
+      "count": 6251,
+      "bufferView": 1,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC4",
+      "componentType": 5121,
+      "count": 6251,
+      "normalized": true,
+      "bufferView": 1,
+      "byteOffset": 8
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5122,
+      "count": 6251,
+      "normalized": true,
+      "bufferView": 1,
+      "byteOffset": 12
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5122,
+      "count": 6251,
+      "max": [
+        24426,
+        32767,
+        14697
+      ],
+      "min": [
+        -24426,
+        -32767,
+        -14697
+      ],
+      "normalized": true,
+      "bufferView": 1,
+      "byteOffset": 20
+    },
+    {
+      "type": "VEC2",
+      "componentType": 5126,
+      "count": 6291,
+      "bufferView": 2,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC4",
+      "componentType": 5121,
+      "count": 6291,
+      "normalized": true,
+      "bufferView": 2,
+      "byteOffset": 8
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5122,
+      "count": 6291,
+      "normalized": true,
+      "bufferView": 2,
+      "byteOffset": 12
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5122,
+      "count": 6291,
+      "max": [
+        24927,
+        32767,
+        14913
+      ],
+      "min": [
+        -24927,
+        -32767,
+        -14913
+      ],
+      "normalized": true,
+      "bufferView": 2,
+      "byteOffset": 20
+    },
+    {
+      "type": "VEC2",
+      "componentType": 5126,
+      "count": 6313,
+      "bufferView": 3,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC4",
+      "componentType": 5121,
+      "count": 6313,
+      "normalized": true,
+      "bufferView": 3,
+      "byteOffset": 8
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5122,
+      "count": 6313,
+      "normalized": true,
+      "bufferView": 3,
+      "byteOffset": 12
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5122,
+      "count": 6313,
+      "max": [
+        32767,
+        28335,
+        25523
+      ],
+      "min": [
+        -32767,
+        -28335,
+        -25523
+      ],
+      "normalized": true,
+      "bufferView": 3,
+      "byteOffset": 20
+    },
+    {
+      "type": "VEC2",
+      "componentType": 5126,
+      "count": 6246,
+      "bufferView": 4,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5122,
+      "count": 6246,
+      "normalized": true,
+      "bufferView": 4,
+      "byteOffset": 8
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5122,
+      "count": 6246,
+      "max": [
+        32767,
+        28227,
+        14621
+      ],
+      "min": [
+        -32767,
+        -28227,
+        -14621
+      ],
+      "normalized": true,
+      "bufferView": 4,
+      "byteOffset": 16
+    },
+    {
+      "type": "VEC4",
+      "componentType": 5121,
+      "count": 6246,
+      "normalized": true,
+      "bufferView": 4,
+      "byteOffset": 24
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 157160,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 157160,
+      "byteLength": 175028,
+      "byteStride": 28,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 332188,
+      "byteLength": 176148,
+      "byteStride": 28,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 508336,
+      "byteLength": 176764,
+      "byteStride": 28,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 685100,
+      "byteLength": 174888,
+      "byteStride": 28,
+      "target": 34962
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "textures": [
+    {
+      "source": 0,
+      "sampler": 0
+    },
+    {
+      "source": 1,
+      "sampler": 0
+    },
+    {
+      "source": 2,
+      "sampler": 0
+    },
+    {
+      "source": 3,
+      "sampler": 0
+    },
+    {
+      "source": 4,
+      "sampler": 0
+    },
+    {
+      "source": 5,
+      "sampler": 0
+    },
+    {
+      "source": 6,
+      "sampler": 0
+    },
+    {
+      "source": 7,
+      "sampler": 0
+    },
+    {
+      "source": 8,
+      "sampler": 0
+    }
+  ],
+  "images": [
+    {
+      "mimeType": "image/jpeg",
+      "uri": "coral_0.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "uri": "coral_1.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "uri": "coral_2.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "uri": "coral_3.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "uri": "coral_4.jpg"
+    },
+    {
+      "mimeType": "image/png",
+      "uri": "coral_5.png"
+    },
+    {
+      "mimeType": "image/png",
+      "uri": "coral_6.png"
+    },
+    {
+      "mimeType": "image/png",
+      "uri": "coral_7.png"
+    },
+    {
+      "mimeType": "image/png",
+      "uri": "coral_8.png"
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "coral.bin",
+      "byteLength": 859988
+    }
+  ],
+  "materials": [
+    {
+      "name": "FanCoralSkin_Orange_Mat",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "roughnessFactor": 0.9568627450980391,
+        "metallicFactor": 0,
+        "baseColorTexture": {
+          "index": 0
+        }
+      },
+      "normalTexture": {
+        "index": 1
+      },
+      "extensions": {
+        "KHR_materials_ior": {
+          "ior": 1000
+        },
+        "KHR_materials_specular": {
+          "specularTexture": {
+            "index": 5
+          },
+          "specularColorTexture": {
+            "index": 5
+          }
+        }
+      }
+    },
+    {
+      "name": "FanCoralSkin_Violet_Mat",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "roughnessFactor": 0.9568627450980391,
+        "metallicFactor": 0,
+        "baseColorTexture": {
+          "index": 2
+        }
+      },
+      "normalTexture": {
+        "index": 1
+      },
+      "extensions": {
+        "KHR_materials_ior": {
+          "ior": 1000
+        },
+        "KHR_materials_specular": {
+          "specularTexture": {
+            "index": 6
+          },
+          "specularColorTexture": {
+            "index": 6
+          }
+        }
+      }
+    },
+    {
+      "name": "FanCoralSkin_White_Mat",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "roughnessFactor": 0.9568627450980391,
+        "metallicFactor": 0,
+        "baseColorTexture": {
+          "index": 3
+        }
+      },
+      "normalTexture": {
+        "index": 1
+      },
+      "extensions": {
+        "KHR_materials_ior": {
+          "ior": 1000
+        },
+        "KHR_materials_specular": {
+          "specularTexture": {
+            "index": 7
+          },
+          "specularColorTexture": {
+            "index": 7
+          }
+        }
+      }
+    },
+    {
+      "name": "FanCoralSkin_Yellow_Mat",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "roughnessFactor": 0.9568627450980391,
+        "metallicFactor": 0,
+        "baseColorTexture": {
+          "index": 4
+        }
+      },
+      "normalTexture": {
+        "index": 1
+      },
+      "extensions": {
+        "KHR_materials_ior": {
+          "ior": 1000
+        },
+        "KHR_materials_specular": {
+          "specularTexture": {
+            "index": 8
+          },
+          "specularColorTexture": {
+            "index": 8
+          }
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "LOD0_FanCoralSkin_Orange_Mat_0",
+      "primitives": [
+        {
+          "attributes": {
+            "TEXCOORD_0": 4,
+            "COLOR_0": 5,
+            "NORMAL": 6,
+            "POSITION": 7
+          },
+          "mode": 4,
+          "material": 0,
+          "indices": 0
+        }
+      ]
+    },
+    {
+      "name": "LOD0_FanCoralSkin_Violet_Mat_0",
+      "primitives": [
+        {
+          "attributes": {
+            "TEXCOORD_0": 8,
+            "COLOR_0": 9,
+            "NORMAL": 10,
+            "POSITION": 11
+          },
+          "mode": 4,
+          "material": 1,
+          "indices": 1
+        }
+      ]
+    },
+    {
+      "name": "LOD0_FanCoralSkin_White_Mat_0",
+      "primitives": [
+        {
+          "attributes": {
+            "TEXCOORD_0": 12,
+            "COLOR_0": 13,
+            "NORMAL": 14,
+            "POSITION": 15
+          },
+          "mode": 4,
+          "material": 2,
+          "indices": 2
+        }
+      ]
+    },
+    {
+      "name": "LOD0_FanCoralSkin_Yellow_Mat_0",
+      "primitives": [
+        {
+          "attributes": {
+            "TEXCOORD_0": 16,
+            "NORMAL": 17,
+            "POSITION": 18,
+            "COLOR_0": 19
+          },
+          "mode": 4,
+          "material": 3,
+          "indices": 3
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "Sketchfab_model",
+      "rotation": [
+        1,
+        0,
+        0,
+        -2.220446049250313e-16
+      ],
+      "children": [
+        1
+      ]
+    },
+    {
+      "name": "FanCoral_Cluster_Med.fbx",
+      "rotation": [
+        0.7071067811865475,
+        0,
+        0,
+        0.7071067811865476
+      ],
+      "scale": [
+        0.009999999776482582,
+        0.009999999776482582,
+        0.009999999776482582
+      ],
+      "children": [
+        2
+      ]
+    },
+    {
+      "name": "RootNode",
+      "children": [
+        3
+      ]
+    },
+    {
+      "name": "FanCoral_Cluster_Med",
+      "children": [
+        4
+      ]
+    },
+    {
+      "name": "LOD0",
+      "children": [
+        5,
+        6,
+        7,
+        8
+      ]
+    },
+    {
+      "name": "LOD0_FanCoralSkin_Orange_Mat_0",
+      "translation": [
+        -0.4075474739074707,
+        0.30861639976501465,
+        2.9550259814132005
+      ],
+      "scale": [
+        6.604902029037476,
+        6.604902029037476,
+        6.604902029037476
+      ],
+      "mesh": 0
+    },
+    {
+      "name": "LOD0_FanCoralSkin_Violet_Mat_0",
+      "translation": [
+        1.7077268362045288,
+        0.1498875617980957,
+        2.8697348833084106
+      ],
+      "scale": [
+        6.380167484283447,
+        6.380167484283447,
+        6.380167484283447
+      ],
+      "mesh": 1
+    },
+    {
+      "name": "LOD0_FanCoralSkin_White_Mat_0",
+      "translation": [
+        -1.703354001045227,
+        -1.4763981103897095,
+        3.449783771764487
+      ],
+      "scale": [
+        4.442705512046814,
+        4.442705512046814,
+        4.442705512046814
+      ],
+      "mesh": 2
+    },
+    {
+      "name": "LOD0_FanCoralSkin_Yellow_Mat_0",
+      "translation": [
+        -1.3413372039794922,
+        -0.13617587089538574,
+        2.252626552246511
+      ],
+      "scale": [
+        5.078080654144287,
+        5.078080654144287,
+        5.078080654144287
+      ],
+      "mesh": 3
+    }
+  ],
+  "scenes": [
+    {
+      "name": "Sketchfab_Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "scene": 0,
+  "extensionsUsed": [
+    "KHR_materials_ior",
+    "KHR_materials_specular",
+    "KHR_mesh_quantization"
+  ],
+  "extensionsRequired": [
+    "KHR_mesh_quantization"
+  ]
+}

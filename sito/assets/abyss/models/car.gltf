@@ -1,0 +1,286 @@
+{
+  "asset": {
+    "generator": "glTF-Transform v4.5.1",
+    "version": "2.0",
+    "extras": {
+      "author": "garyle802 (https://sketchfab.com/Gary.Lefebvre1)",
+      "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+      "source": "https://sketchfab.com/3d-models/ford-granada-sunken-car-2c72fccaf2d04416ac5e834e6e242aaa",
+      "title": "Ford Granada sunken car"
+    }
+  },
+  "accessors": [
+    {
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 45423,
+      "bufferView": 0,
+      "byteOffset": 0
+    },
+    {
+      "type": "SCALAR",
+      "componentType": 5123,
+      "count": 27051,
+      "bufferView": 0,
+      "byteOffset": 90848
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5122,
+      "count": 7168,
+      "normalized": true,
+      "bufferView": 1,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5122,
+      "count": 7168,
+      "max": [
+        32767,
+        23626,
+        18014
+      ],
+      "min": [
+        -32767,
+        -23626,
+        -18014
+      ],
+      "normalized": true,
+      "bufferView": 1,
+      "byteOffset": 8
+    },
+    {
+      "type": "VEC2",
+      "componentType": 5123,
+      "count": 7168,
+      "normalized": true,
+      "bufferView": 1,
+      "byteOffset": 16
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5122,
+      "count": 4749,
+      "normalized": true,
+      "bufferView": 2,
+      "byteOffset": 0
+    },
+    {
+      "type": "VEC3",
+      "componentType": 5122,
+      "count": 4749,
+      "max": [
+        32107,
+        32767,
+        27463
+      ],
+      "min": [
+        -32107,
+        -32767,
+        -27463
+      ],
+      "normalized": true,
+      "bufferView": 2,
+      "byteOffset": 8
+    },
+    {
+      "type": "VEC2",
+      "componentType": 5123,
+      "count": 4749,
+      "normalized": true,
+      "bufferView": 2,
+      "byteOffset": 16
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 144952,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 144952,
+      "byteLength": 143360,
+      "byteStride": 20,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 288312,
+      "byteLength": 94980,
+      "byteStride": 20,
+      "target": 34962
+    }
+  ],
+  "samplers": [
+    {
+      "magFilter": 9729,
+      "minFilter": 9987,
+      "wrapS": 10497,
+      "wrapT": 10497
+    }
+  ],
+  "textures": [
+    {
+      "source": 0,
+      "sampler": 0
+    },
+    {
+      "source": 1,
+      "sampler": 0
+    },
+    {
+      "source": 2,
+      "sampler": 0
+    }
+  ],
+  "images": [
+    {
+      "mimeType": "image/jpeg",
+      "uri": "car_0.jpg"
+    },
+    {
+      "mimeType": "image/jpeg",
+      "uri": "car_1.jpg"
+    },
+    {
+      "mimeType": "image/png",
+      "uri": "car_2.png"
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "car.bin",
+      "byteLength": 383292
+    }
+  ],
+  "materials": [
+    {
+      "name": "Ford_Granada",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicRoughnessTexture": {
+          "index": 1
+        }
+      },
+      "emissiveFactor": [
+        1,
+        1,
+        1
+      ],
+      "emissiveTexture": {
+        "index": 0
+      },
+      "extensions": {
+        "KHR_materials_specular": {
+          "specularTexture": {
+            "index": 2
+          }
+        }
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Object_0",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 2,
+            "POSITION": 3,
+            "TEXCOORD_0": 4
+          },
+          "mode": 4,
+          "material": 0,
+          "indices": 0
+        }
+      ]
+    },
+    {
+      "name": "Object_1",
+      "primitives": [
+        {
+          "attributes": {
+            "NORMAL": 5,
+            "POSITION": 6,
+            "TEXCOORD_0": 7
+          },
+          "mode": 4,
+          "material": 0,
+          "indices": 1
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "Sketchfab_model",
+      "rotation": [
+        0.8840109639346595,
+        0,
+        0,
+        -0.4674661652390621
+      ],
+      "children": [
+        1
+      ]
+    },
+    {
+      "name": "Ford Granada.obj.cleaner.materialmerger.gles",
+      "children": [
+        2,
+        3
+      ]
+    },
+    {
+      "name": "Object_2",
+      "translation": [
+        -12.5693199634552,
+        15.08912968635559,
+        4.418644666671753
+      ],
+      "scale": [
+        18.282257795333862,
+        18.282257795333862,
+        18.282257795333862
+      ],
+      "mesh": 0
+    },
+    {
+      "name": "Object_3",
+      "translation": [
+        -19.293716430664062,
+        16.59967017173767,
+        4.420652389526367
+      ],
+      "scale": [
+        12.978220224380493,
+        12.978220224380493,
+        12.978220224380493
+      ],
+      "mesh": 1
+    }
+  ],
+  "scenes": [
+    {
+      "name": "Sketchfab_Scene",
+      "nodes": [
+        0
+      ]
+    }
+  ],
+  "scene": 0,
+  "extensionsUsed": [
+    "KHR_materials_specular",
+    "KHR_mesh_quantization"
+  ],
+  "extensionsRequired": [
+    "KHR_mesh_quantization"
+  ]
+}

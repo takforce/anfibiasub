@@ -11,7 +11,7 @@ import { buildLandmarks, modelsReady } from './landmarks.js';
 import { buildFish } from './fish.js';
 import { buildShark } from './shark.js';
 import { buildAds, buildStatues, buildServiceSigns } from './ads.js';
-import { buildLiftBags, buildPlane, buildGate, buildViewModels, createSpear } from './extras.js';
+import { buildLiftBags, buildPlane, buildGate, buildViewModels, createSpear, buildDeco } from './extras.js';
 import { createControls } from './controls.js';
 import { createAudio } from './audio.js';
 
@@ -114,6 +114,7 @@ const avoid = (x, z, r) => {
   for (const st of CFG.statues) if (Math.hypot(x - st.x, z - st.z) < 3 + r) return true;
   for (const sg of CFG.serviceSigns) if (Math.hypot(x - sg.x, z - sg.z) < 3 + r) return true;
   for (const lb of CFG.liftBags) if (Math.hypot(x - lb.x, z - lb.z) < 1.5 + r) return true;
+  for (const d of CFG.deco.items) for (const c of d.copies || [d]) if (Math.hypot(x - c.x, z - c.z) < (d.m === 'albatross' ? 11 : d.m === 'car' ? 4 : 2) + r) return true;
   if (Math.hypot(x - CFG.plane.x, z - CFG.plane.z) < 6 + r) return true;
   { const gx = Math.cos(CFG.gate.ang) * CFG.gate.r, gz = Math.sin(CFG.gate.ang) * CFG.gate.r; if (Math.hypot(x - gx, z - gz) < 4 + r) return true;
     const along = x * Math.cos(CFG.gate.ang) + z * Math.sin(CFG.gate.ang), across = -x * Math.sin(CFG.gate.ang) + z * Math.cos(CFG.gate.ang);
@@ -139,6 +140,7 @@ const adsReady = buildAds(scene, wreck, tex, CFG.ads);
 let bags = null;
 const bagsReady = adsReady.then((o) => { bags = buildLiftBags(scene, tex, CFG.liftBags, o && o.pallone); });
 const planeReady = buildPlane(scene, world, tex, CFG.plane);
+const decoReady = buildDeco(scene, world, CFG.deco).then((d) => { world.updaters.push((dt, t) => d.update(dt, t)); });
 const gateReady = buildGate(scene, world, tex, CFG.gate, { title: tr('gate_t'), sub: tr('gate_s') });
 // in prima persona: mano con l'erogatore (getto d'aria) e fiocina; arpione
 const VM = buildViewModels(camera);
@@ -803,7 +805,7 @@ renderer.render(scene, camera);
 torch.intensity = 0;
 document.addEventListener('visibilitychange', () => { if (document.hidden && canPause()) pause(); });
 requestAnimationFrame(tick);
-Promise.allSettled([adsReady, signsReady, bagsReady, planeReady, gateReady, ...photos, ...modelsReady]).then(() => {
+Promise.allSettled([adsReady, signsReady, bagsReady, planeReady, gateReady, shark.ready, decoReady, ...photos, ...modelsReady]).then(() => {
   const inChamber = (o) => { for (let p = o; p; p = p.parent) if (p.name === 'chamber') return true; return false; };
   addCaustics(scene, inChamber);
   renderer.compile(scene, camera); ready();

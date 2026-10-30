@@ -4,6 +4,7 @@
 import * as THREE from '../vendor/three/three.module.min.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
 import { CFG, onBridge } from './config.js';
+import { GLTFLoader } from '../vendor/three/GLTFLoader.js';
 
 const L = 3.1;                 // lunghezza (m)
 const TOP = new THREE.Color(0x3d4c58), BELLY = new THREE.Color(0xe4e8ea), FIN = new THREE.Color(0x34424d);
@@ -122,6 +123,19 @@ export function buildShark(scene) {
   const mesh = new THREE.Mesh(sharkGeometry(), mat);
   mesh.castShadow = true;
   const group = new THREE.Group(); group.add(mesh); scene.add(group);
+  // modello vero animato: "Great White Shark" di Mateus Schwaab (Mehrus), Sketchfab, CC BY 4.0.
+  // Nel file il muso guarda -z: lo giro (muso verso +z come lo squalo disegnato) e lo centro. Finché non è caricato resta quello disegnato.
+  const anim = { mixer: null, swim: null, bite: null, biting: 0 };
+  const ready = new GLTFLoader().loadAsync(new URL('./models/shark.gltf?v=1', import.meta.url).href).then((gl) => {
+    const inner = new THREE.Group(); inner.rotation.y = Math.PI; inner.scale.setScalar(1.12);
+    inner.position.set(-0.26 * 1.12, -0.45 * 1.12, -74.04 * 1.12);
+    gl.scene.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } });
+    inner.add(gl.scene); group.add(inner); mesh.visible = false;
+    anim.mixer = new THREE.AnimationMixer(gl.scene);
+    const clip = (n) => gl.animations.find((a) => a.name.endsWith(n));
+    anim.swim = anim.mixer.clipAction(clip('|Swim') || gl.animations[0]); anim.swim.play();
+    const b = clip('|Bite'); if (b) { anim.bite = anim.mixer.clipAction(b); anim.bite.setLoop(THREE.LoopOnce, 1); anim.bite.clampWhenFinished = false; }
+  }).catch(() => {});
 
   // ---------- comportamento ----------
   // idle: pattuglia lontano nel blu; circle: gira intorno al sub; charge: attacca; flee: scappa; cooldown dopo la fuga.
@@ -132,10 +146,11 @@ export function buildShark(scene) {
     S.vel.lerp(des, Math.min(1, dt * turn));
     S.pos.addScaledVector(S.vel, dt);
   };
-  function reset() { S.mode = 'idle'; S.t = 0; S.cool = 0; S.pos.set(0, CFG.seabed - 14, CFG.limit + 20); S.vel.set(1, 0, 0); }
+  function reset() { anim.biting = 0; S.mode = 'idle'; S.t = 0; S.cool = 0; S.pos.set(0, CFG.seabed - 14, CFG.limit + 20); S.vel.set(1, 0, 0); }
 
   function update(dt, t, player, ev) {
     time.value = t; S.t += dt; if (S.cool > 0) S.cool -= dt;
+    if (anim.mixer) { anim.swim.timeScale = 0.6 + swim.value * 0.7; anim.mixer.update(dt); }
     const pr = Math.hypot(player.x, player.z);
     const outside = pr > CFG.cliff && !onBridge(player.x, player.z);
     if (S.mode === 'idle') {
@@ -157,7 +172,7 @@ export function buildShark(scene) {
       tmp.set(player.x + Math.cos(a) * r, player.y - 0.4 + Math.sin(S.t) * 0.8, player.z + Math.sin(a) * r);
       steer(tmp, 5, 1.3, dt); swim.value = 1.2;
       if (!outside && pr < CFG.cliff - 3) { S.mode = 'leave'; S.t = 0; }
-      else if (S.t > 6.5) { S.mode = 'charge'; S.t = 0; S.go = false; ev.charge(); }
+      else if (S.t > 6.5) { S.mode = 'charge'; S.t = 0; S.go = false; anim.biting = 0; ev.charge(); }
     } else if (S.mode === 'charge') {
       // attacco sempre frontale: se non è davanti al sub, prima si porta davanti, poi carica dritto verso di lui
       fw.set(ev.dir ? ev.dir.x : 0, 0, ev.dir ? ev.dir.z : -1); if (fw.lengthSq() < 1e-4) fw.set(0, 0, -1); fw.normalize();
@@ -166,7 +181,8 @@ export function buildShark(scene) {
       if (!S.go && front > 0.8) S.go = true;
       if (S.go) { steer(player, 6.2, 2.4, dt); swim.value = 1.9; }
       else { des.set(player.x + fw.x * 10, player.y - 0.3, player.z + fw.z * 10); steer(des, 8, 2, dt); swim.value = 1.9; }
-      if (S.go && front > 0.3 && S.pos.distanceTo(player) < 1.25) { S.mode = 'leave'; S.t = 0; ev.hit(); }
+      if (S.go && anim.bite && S.pos.distanceTo(player) < 4 && !anim.biting) { anim.biting = 1; anim.bite.reset().play(); }
+      if (S.go && front > 0.3 && S.pos.distanceTo(player) < 1.25) { S.mode = 'leave'; S.t = 0; anim.biting = 0; ev.hit(); }
       else if (!outside && pr < CFG.cliff - 6 && S.t > 2) { S.mode = 'leave'; S.t = 0; }
     } else if (S.mode === 'flee' || S.mode === 'leave') {
       const out = tmp.set(S.pos.x, 0, S.pos.z).normalize();
@@ -194,5 +210,5 @@ export function buildShark(scene) {
     if (S.mode === 'flee') return false;
     tmp.set(S.pos.x, 0, S.pos.z).normalize(); S.mode = 'flee'; S.t = 0; S.cool = 120; S.vel.copy(tmp).multiplyScalar(7); return true;
   }
-  return { group, update, blast, scare, reset, state: S };
+  return { group, update, blast, scare, reset, state: S, ready };
 }

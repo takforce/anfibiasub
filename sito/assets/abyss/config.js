@@ -47,6 +47,21 @@ export const CFG = {
   // ponte di sabbia con il cancello della Missione 2, sul bordo del mondo (angolo da est, distanza dal centro)
   gate: { ang: -0.14, r: 74, len: 15 },   // il ponte parte a 74 m dal centro, è lungo 15 m; il cancello è in fondo
 
+  // modelli veri sul fondale (Sketchfab, CC BY 4.0). c = centro del modello nel file (x, fondo, z), s = scala, sink = quanto affonda
+  deco: {
+    items: [
+      { m: 'albatross', x: -16, z: -63, rot: 0.6, c: [3.32, 0.04, 0.98], s: 0.45, sink: 1.6, col: [7, 1.2, 4] },   // idrovolante vicino alle anfore
+      { m: 'car', x: 31, z: -7, rot: 2.2, c: [-13.15, -11.27, -16.23], s: 0.17, sink: 1.45, col: [2.2, 0.8, 1.1] },
+      { m: 'anchor', x: -28, z: -14, rot: 0.4, c: [0, -0.01, 0], s: 0.6, sink: 0.2, col: [0.9, 1.5, 0.9] },
+      { m: 'cannon', x: 15, z: -59, rot: 1.1, c: [0, -0.37, 0], s: 1.1, sink: 0.15, col: [0.5, 0.45, 1.1] },
+      { m: 'chest', x: -3, z: -57, rot: -0.5, rz: 0.12, c: [0, 0, 0], s: 0.95, sink: 0.18, col: [0.5, 0.4, 0.35] },
+      { m: 'coral', c: [0, 0, 0], s: 22, sink: 0.05, copies: [
+        { x: -46, z: 14, rot: 0.3 }, { x: -47, z: 24, rot: 2.1 }, { x: -44, z: 52, rot: 1.2 }, { x: -56, z: 61, rot: 4 },
+        { x: -20, z: -30, rot: 0.8 }, { x: 37, z: 33, rot: 2.6 }, { x: 1, z: -43, rot: 5.1 }, { x: 22, z: 30, rot: 3.3 } ] },
+    ],
+    turtle: { x: 0, z: 0, r: 22, y: -23, speed: 0.55 },
+  },
+
   // ordine delle ghiere sulla botola = ordine delle cifre del codice
   dials: ['rosa', 'ancora', 'chiave'],
 

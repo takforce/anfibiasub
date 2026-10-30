@@ -1,19 +1,19 @@
 // ABYSS — Il relitto dimenticato. Motore principale e macchina a stati.
 import * as THREE from '../vendor/three/three.module.min.js';
-import { CFG, CODE, bearing } from './config.js?v=fedb544f';
-import { t as tr, L as TX } from './i18n.js?v=fedb544f';
-import { addCaustics, makeBeam, CAUSTIC } from './look.js?v=fedb544f';
-import { makeTextures, logbookPage } from './textures.js?v=fedb544f';
-import { buildWorld, collideWorld } from './world.js?v=fedb544f';
-import { buildWreck, makeHelmet } from './wreck.js?v=fedb544f';
-import { buildArtifacts } from './artifacts.js?v=fedb544f';
-import { buildLandmarks, modelsReady } from './landmarks.js?v=fedb544f';
-import { buildFish } from './fish.js?v=fedb544f';
-import { buildShark } from './shark.js?v=fedb544f';
-import { buildAds, buildStatues, buildServiceSigns } from './ads.js?v=fedb544f';
-import { buildLiftBags, buildPlane, buildGate, buildViewModels, createSpear } from './extras.js?v=fedb544f';
-import { createControls } from './controls.js?v=fedb544f';
-import { createAudio } from './audio.js?v=fedb544f';
+import { CFG, CODE, bearing } from './config.js?v=4ecb67b8';
+import { t as tr, L as TX } from './i18n.js?v=4ecb67b8';
+import { addCaustics, makeBeam, CAUSTIC } from './look.js?v=4ecb67b8';
+import { makeTextures, logbookPage } from './textures.js?v=4ecb67b8';
+import { buildWorld, collideWorld } from './world.js?v=4ecb67b8';
+import { buildWreck, makeHelmet } from './wreck.js?v=4ecb67b8';
+import { buildArtifacts } from './artifacts.js?v=4ecb67b8';
+import { buildLandmarks, modelsReady } from './landmarks.js?v=4ecb67b8';
+import { buildFish } from './fish.js?v=4ecb67b8';
+import { buildShark } from './shark.js?v=4ecb67b8';
+import { buildAds, buildStatues, buildServiceSigns } from './ads.js?v=4ecb67b8';
+import { buildLiftBags, buildPlane, buildGate, buildViewModels, createSpear, buildDeco } from './extras.js?v=4ecb67b8';
+import { createControls } from './controls.js?v=4ecb67b8';
+import { createAudio } from './audio.js?v=4ecb67b8';
 
 const $ = (s) => document.querySelector(s);
 const root = $('#abyss');
@@ -114,6 +114,7 @@ const avoid = (x, z, r) => {
   for (const st of CFG.statues) if (Math.hypot(x - st.x, z - st.z) < 3 + r) return true;
   for (const sg of CFG.serviceSigns) if (Math.hypot(x - sg.x, z - sg.z) < 3 + r) return true;
   for (const lb of CFG.liftBags) if (Math.hypot(x - lb.x, z - lb.z) < 1.5 + r) return true;
+  for (const d of CFG.deco.items) for (const c of d.copies || [d]) if (Math.hypot(x - c.x, z - c.z) < (d.m === 'albatross' ? 11 : d.m === 'car' ? 4 : 2) + r) return true;
   if (Math.hypot(x - CFG.plane.x, z - CFG.plane.z) < 6 + r) return true;
   { const gx = Math.cos(CFG.gate.ang) * CFG.gate.r, gz = Math.sin(CFG.gate.ang) * CFG.gate.r; if (Math.hypot(x - gx, z - gz) < 4 + r) return true;
     const along = x * Math.cos(CFG.gate.ang) + z * Math.sin(CFG.gate.ang), across = -x * Math.sin(CFG.gate.ang) + z * Math.cos(CFG.gate.ang);
@@ -139,6 +140,7 @@ const adsReady = buildAds(scene, wreck, tex, CFG.ads);
 let bags = null;
 const bagsReady = adsReady.then((o) => { bags = buildLiftBags(scene, tex, CFG.liftBags, o && o.pallone); });
 const planeReady = buildPlane(scene, world, tex, CFG.plane);
+const decoReady = buildDeco(scene, world, CFG.deco).then((d) => { world.updaters.push((dt, t) => d.update(dt, t)); });
 const gateReady = buildGate(scene, world, tex, CFG.gate, { title: tr('gate_t'), sub: tr('gate_s') });
 // in prima persona: mano con l'erogatore (getto d'aria) e fiocina; arpione
 const VM = buildViewModels(camera);
@@ -803,7 +805,7 @@ renderer.render(scene, camera);
 torch.intensity = 0;
 document.addEventListener('visibilitychange', () => { if (document.hidden && canPause()) pause(); });
 requestAnimationFrame(tick);
-Promise.allSettled([adsReady, signsReady, bagsReady, planeReady, gateReady, ...photos, ...modelsReady]).then(() => {
+Promise.allSettled([adsReady, signsReady, bagsReady, planeReady, gateReady, shark.ready, decoReady, ...photos, ...modelsReady]).then(() => {
   const inChamber = (o) => { for (let p = o; p; p = p.parent) if (p.name === 'chamber') return true; return false; };
   addCaustics(scene, inChamber);
   renderer.compile(scene, camera); ready();

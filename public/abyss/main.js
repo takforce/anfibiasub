@@ -1,17 +1,18 @@
 // ABYSS — Il relitto dimenticato. Motore principale e macchina a stati.
 import * as THREE from '../vendor/three/three.module.min.js';
-import { CFG, CODE, bearing } from './config.js?v=db909cb4';
-import { t as tr, L as TX } from './i18n.js?v=db909cb4';
-import { makeTextures, logbookPage } from './textures.js?v=db909cb4';
-import { buildWorld, collideWorld } from './world.js?v=db909cb4';
-import { buildWreck, makeHelmet } from './wreck.js?v=db909cb4';
-import { buildArtifacts } from './artifacts.js?v=db909cb4';
-import { buildLandmarks } from './landmarks.js?v=db909cb4';
-import { buildFish } from './fish.js?v=db909cb4';
-import { buildShark } from './shark.js?v=db909cb4';
-import { buildAds, buildStatues, buildServiceSigns } from './ads.js?v=db909cb4';
-import { createControls } from './controls.js?v=db909cb4';
-import { createAudio } from './audio.js?v=db909cb4';
+import { CFG, CODE, bearing } from './config.js?v=191c2b3d';
+import { t as tr, L as TX } from './i18n.js?v=191c2b3d';
+import { addCaustics, makeBeam, CAUSTIC } from './look.js?v=191c2b3d';
+import { makeTextures, logbookPage } from './textures.js?v=191c2b3d';
+import { buildWorld, collideWorld } from './world.js?v=191c2b3d';
+import { buildWreck, makeHelmet } from './wreck.js?v=191c2b3d';
+import { buildArtifacts } from './artifacts.js?v=191c2b3d';
+import { buildLandmarks } from './landmarks.js?v=191c2b3d';
+import { buildFish } from './fish.js?v=191c2b3d';
+import { buildShark } from './shark.js?v=191c2b3d';
+import { buildAds, buildStatues, buildServiceSigns } from './ads.js?v=191c2b3d';
+import { createControls } from './controls.js?v=191c2b3d';
+import { createAudio } from './audio.js?v=191c2b3d';
 
 const $ = (s) => document.querySelector(s);
 const root = $('#abyss');
@@ -74,6 +75,18 @@ torch.shadow.camera.near = 0.3; torch.shadow.camera.far = CFG.torch.range;
 torch.shadow.bias = -0.0008; torch.shadow.normalBias = 0.03;
 scene.add(torch, torch.target);
 const TORCH_I = 10;
+// fascio della torcia visibile nell'acqua
+const beam = makeBeam(CFG.torch.angle, CFG.torch.range);
+camera.add(beam); beam.position.set(0.18, -0.15, 0);
+// pellicola: vignettatura e grana leggera da videocamera subacquea (solo CSS, nessun costo per la grafica 3D)
+{
+  const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'); const im = g.createImageData(128, 128);
+  for (let i = 0; i < im.data.length; i += 4) { const v = Math.random() * 255; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; }
+  g.putImageData(im, 0, 0);
+  const f = document.createElement('div'); f.className = 'ab-film'; f.setAttribute('aria-hidden', 'true');
+  f.style.setProperty('--grain', `url(${c.toDataURL()})`);
+  canvas.after(f);
+}
 
 // ---------------- costruzione del mondo ----------------
 const tex = makeTextures(Q.tex, renderer.capabilities.getMaxAnisotropy());
@@ -110,7 +123,7 @@ const _sdir = new THREE.Vector3();
 const AIR = { max: 220, rate: 220 / (50 * 60), blast: 220 * 0.02, reserve: 50 };
 buildStatues(scene, world, tex, CFG.statues, makeHelmet);
 const adsReady = buildAds(scene, wreck, tex, CFG.ads);
-buildServiceSigns(scene, world, tex, CFG.serviceSigns, TX.srv || [], TX.srv_head || '');
+const signsReady = buildServiceSigns(scene, world, tex, CFG.serviceSigns, TX.srv || [], TX.srv_head || '');
 // rotta e distanza scritte nel giornale di bordo: calcolate dalla posizione vera di poppa e arco
 const LOG = (() => { const a = wreck.sternWorld(), b = arts.casket.home.pos; return { deg: bearing(a, b), m: Math.hypot(b.x - a.x, b.z - a.z) }; })();
 
@@ -589,6 +602,8 @@ function tick() {
   sun.intensity = 1.6 * lit * lit + 0.02;
   scene.environmentIntensity = 0.4 * lit + 0.05;
   world.surface.uniforms.uTime.value = t; world.surface.uniforms.uCam.value.copy(camera.position);
+  CAUSTIC.uCaTime.value = t; CAUSTIC.uCaStr.value = 0.9 * lit + 0.2;
+  beam.material.uniforms.uTime.value = t; beam.material.uniforms.uOn.value = torch.intensity / TORCH_I;
   world.surface.uniforms.uFog.value.copy(tmpC); world.surface.uniforms.uDensity.value = scene.fog.density * 0.9;
   ui.depth.textContent = depth.toFixed(1).replace('.', TX.decimal || ',');
   ui.gauge.style.setProperty('--d', Math.min(1, depth / 50).toFixed(4));
@@ -726,7 +741,11 @@ renderer.render(scene, camera);
 torch.intensity = 0;
 document.addEventListener('visibilitychange', () => { if (document.hidden && canPause()) pause(); });
 requestAnimationFrame(tick);
-adsReady.then(() => { renderer.compile(scene, camera); ready(); }, ready);
+Promise.allSettled([adsReady, signsReady]).then(() => {
+  const inChamber = (o) => { for (let p = o; p; p = p.parent) if (p.name === 'chamber') return true; return false; };
+  addCaustics(scene, inChamber);
+  renderer.compile(scene, camera); ready();
+});
 
 // per i test automatici (nessun effetto sul gioco)
 window.__abyss = { shark, die, fish, THREE, scene, S, P, CODE, LOG, wreck, arts, spots, camera, pickup, toast, openHatch, openLog, setPos: (x, y, z, yaw, pitch) => { P.pos.set(x, y, z); P.vel.set(0, 0, 0); if (yaw !== undefined) { P.yaw = P.tyaw = yaw; P.pitch = P.tpitch = pitch; } } };

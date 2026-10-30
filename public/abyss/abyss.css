@@ -292,3 +292,9 @@ html.ios-scroll .ab[data-state]:not([data-state="INTRO"]):not([data-state="DIVE"
   /* se c'è un messaggio, il suggerimento "✋" sale sopra */
   .ab:has(.ab-msg.on) .ab-prompt{bottom:calc(62px + env(safe-area-inset-bottom))}
 }
+
+/* ---------- pellicola: vignettatura + grana (sopra la scena 3D, sotto l'interfaccia) ---------- */
+.ab-film{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 75% 70% at 50% 50%,transparent 55%,rgba(1,6,12,.5) 100%)}
+.ab-film::after{content:"";position:absolute;inset:-64px;background-image:var(--grain);opacity:.06;mix-blend-mode:overlay;animation:ab-grain .5s steps(4) infinite}
+@keyframes ab-grain{0%{transform:translate(0,0)}25%{transform:translate(-37px,21px)}50%{transform:translate(19px,-43px)}75%{transform:translate(-11px,-17px)}100%{transform:translate(0,0)}}
+@media (prefers-reduced-motion:reduce){.ab-film::after{animation:none}}

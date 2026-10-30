@@ -203,7 +203,7 @@ export function buildWreck(scene, tex) {
   for (const m of [woodM, rustM]) { m.castShadow = m.receiveShadow = true; ship.add(m); }
 
   // ---- camera nascosta sotto la botola ----
-  const chamber = new THREE.Group();
+  const chamber = new THREE.Group(); chamber.name = 'chamber';   // dentro la camera niente caustiche (è sotto il ponte)
   {
     const w = 2.2, h = 2.3, y0 = HY - h;
     const wallM = new THREE.MeshStandardMaterial({ map: tex.wood.map, normalMap: tex.wood.normalMap, roughness: 1, side: THREE.DoubleSide, color: 0x9a8f80 });

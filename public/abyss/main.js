@@ -1,18 +1,19 @@
 // ABYSS — Il relitto dimenticato. Motore principale e macchina a stati.
 import * as THREE from '../vendor/three/three.module.min.js';
-import { CFG, CODE, bearing } from './config.js?v=efbb9fac';
-import { t as tr, L as TX } from './i18n.js?v=efbb9fac';
-import { addCaustics, makeBeam, CAUSTIC } from './look.js?v=efbb9fac';
-import { makeTextures, logbookPage } from './textures.js?v=efbb9fac';
-import { buildWorld, collideWorld } from './world.js?v=efbb9fac';
-import { buildWreck, makeHelmet } from './wreck.js?v=efbb9fac';
-import { buildArtifacts } from './artifacts.js?v=efbb9fac';
-import { buildLandmarks, modelsReady } from './landmarks.js?v=efbb9fac';
-import { buildFish } from './fish.js?v=efbb9fac';
-import { buildShark } from './shark.js?v=efbb9fac';
-import { buildAds, buildStatues, buildServiceSigns } from './ads.js?v=efbb9fac';
-import { createControls } from './controls.js?v=efbb9fac';
-import { createAudio } from './audio.js?v=efbb9fac';
+import { CFG, CODE, bearing } from './config.js?v=197ca967';
+import { t as tr, L as TX } from './i18n.js?v=197ca967';
+import { addCaustics, makeBeam, CAUSTIC } from './look.js?v=197ca967';
+import { makeTextures, logbookPage } from './textures.js?v=197ca967';
+import { buildWorld, collideWorld } from './world.js?v=197ca967';
+import { buildWreck, makeHelmet } from './wreck.js?v=197ca967';
+import { buildArtifacts } from './artifacts.js?v=197ca967';
+import { buildLandmarks, modelsReady } from './landmarks.js?v=197ca967';
+import { buildFish } from './fish.js?v=197ca967';
+import { buildShark } from './shark.js?v=197ca967';
+import { buildAds, buildStatues, buildServiceSigns } from './ads.js?v=197ca967';
+import { buildLiftBags, buildPlane, buildGate, buildViewModels, createSpear } from './extras.js?v=197ca967';
+import { createControls } from './controls.js?v=197ca967';
+import { createAudio } from './audio.js?v=197ca967';
 
 const $ = (s) => document.querySelector(s);
 const root = $('#abyss');
@@ -112,6 +113,11 @@ const avoid = (x, z, r) => {
   for (const k in CFG.places) { const p = CFG.places[k]; if (Math.hypot(x - p.x, z - p.z) < 13 + r) return true; }   // i luoghi hanno rocce proprie
   for (const st of CFG.statues) if (Math.hypot(x - st.x, z - st.z) < 3 + r) return true;
   for (const sg of CFG.serviceSigns) if (Math.hypot(x - sg.x, z - sg.z) < 3 + r) return true;
+  for (const lb of CFG.liftBags) if (Math.hypot(x - lb.x, z - lb.z) < 1.5 + r) return true;
+  if (Math.hypot(x - CFG.plane.x, z - CFG.plane.z) < 6 + r) return true;
+  { const gx = Math.cos(CFG.gate.ang) * CFG.gate.r, gz = Math.sin(CFG.gate.ang) * CFG.gate.r; if (Math.hypot(x - gx, z - gz) < 4 + r) return true;
+    const along = x * Math.cos(CFG.gate.ang) + z * Math.sin(CFG.gate.ang), across = -x * Math.sin(CFG.gate.ang) + z * Math.cos(CFG.gate.ang);
+    if (along > CFG.gate.r - 3 && Math.abs(across) < 4 + r) return true; }
   if (Math.hypot(x - CFG.ads.x, z - CFG.ads.z) < 3 + r || Math.hypot(x - CFG.ads.bx, z - CFG.ads.bz) < 2.5 + r) return true;
   const l = new THREE.Vector3(x, CFG.seabed, z).applyMatrix4(shipInv);
   if (l.x > -14 - r && l.x < 16 + r && Math.abs(l.z) < 5.5 + r) return true;            // impronta del relitto
@@ -124,11 +130,19 @@ const spots = buildLandmarks(scene, world, tex);
 const arts = buildArtifacts(scene, wreck, tex, spots);
 const fish = buildFish(scene, Q); world.updaters.push(fish);
 const shark = buildShark(scene);
-const _sdir = new THREE.Vector3();
+const _sdir = new THREE.Vector3(), _noz = new THREE.Vector3(), _bub = new THREE.Vector3(), _mz = new THREE.Vector3(), _sd = new THREE.Vector3();
 // aria: 220 bar per 50 minuti; il getto d'aria contro lo squalo consuma il 2% al secondo
 const AIR = { max: 220, rate: 220 / (50 * 60), blast: 220 * 0.02, reserve: 50 };
 buildStatues(scene, world, tex, CFG.statues, makeHelmet);
 const adsReady = buildAds(scene, wreck, tex, CFG.ads);
+// palloni di sollevamento (quello del cantiere + altri sparsi), aereo vicino al relitto, cancello della Missione 2
+let bags = null;
+const bagsReady = adsReady.then((o) => { bags = buildLiftBags(scene, tex, CFG.liftBags, o && o.pallone); });
+const planeReady = buildPlane(scene, world, tex, CFG.plane);
+const gateReady = buildGate(scene, world, tex, CFG.gate, { title: tr('gate_t'), sub: tr('gate_s') });
+// in prima persona: mano con l'erogatore (getto d'aria) e fiocina; arpione
+const VM = buildViewModels(camera);
+const spear = createSpear(scene);
 const signsReady = buildServiceSigns(scene, world, tex, CFG.serviceSigns, TX.srv || [], TX.srv_head || '');
 // rotta e distanza scritte nel giornale di bordo: calcolate dalla posizione vera di poppa e arco
 const LOG = (() => { const a = wreck.sternWorld(), b = arts.casket.home.pos; return { deg: bearing(a, b), m: Math.hypot(b.x - a.x, b.z - a.z) }; })();
@@ -149,6 +163,7 @@ const controls = createControls(canvas, root, {
     if (S.state === 'PAUSED') resume(); else if (canPause()) pause();
   },
   interact() { if (S.state === 'EXPLORATION' || S.state === 'DESCENT') interact(); },
+  fire() { fire(); },
   torch() { toggleTorch(); },
   inventory() { if (S.panel === 'inv') closePanel(); else if (canPause()) { openPanel('inv'); controls.enabled = false; } },
   unlocked() { if (!S.panel && canPause() && !S.seq) pause(); },
@@ -231,6 +246,7 @@ root.addEventListener('click', (e) => {
   else if (act === 'inv') { if (S.panel === 'inv') closePanel(); else if (canPause()) { openPanel('inv'); controls.enabled = false; } }
   else if (act === 'audio') { audio.setOn(!audio.on); root.classList.toggle('muted', !audio.on); }
   else if (act === 'torch') toggleTorch();
+  else if (act === 'fire') fire();
   else if (act === 'interact') interact();
   else if (act === 'restart') restart();
   else if (act === 'continue') continueExploring();
@@ -249,6 +265,25 @@ function toggleTorch(force) {
   root.classList.toggle('torch-on', v);
   audio.torch();
 }
+
+// ---------------- fiocina (dopo il cofanetto) ----------------
+function fire() {
+  if (!S.gun || S.state !== 'EXPLORATION' || VM.reload > 0 || spear.on) return;
+  camera.getWorldDirection(_sd);
+  VM.muzzle(_mz); spear.fire(_mz, _sd);
+  VM.setGunReady(false); VM.reload = 1.4; VM.recoil = 1;
+  audio.shot(); world.bubbles.burst(_mz, 10, 0.08);
+}
+// pallone colpito: esplode; entro 3 metri l'onda d'urto è mortale
+function explode(b) {
+  bags.pop(b);
+  const c = b.g.position.clone();
+  world.bubbles.burst(c, 260, 1.5); audio.boom(); S.shake = 1;
+  const d = camera.position.distanceTo(c);
+  if (d < 3) setTimeout(() => die('pallone'), 250);
+  else if (d < 12) S.shake = 1.4;
+}
+const segDist = (a, b, p) => { const ab = _bub.subVectors(b, a), l2 = ab.lengthSq(); const k = l2 > 0 ? Math.max(0, Math.min(1, _noz.subVectors(p, a).dot(ab) / l2)) : 0; return _noz.copy(a).addScaledVector(ab, k).distanceTo(p); };
 
 // ---------------- avvio ----------------
 function ready() {
@@ -312,7 +347,7 @@ function target() {
   return best;
 }
 function interact() {
-  const k = target(); if (!k) return;
+  const k = target(); if (!k) { fire(); return; }
   if (k.kind === 'art') {
     if (k.a.final && S.phase < 3) { toast(tr('casket_early'), 5000); audio.clunk(); return; }
     pickup(k.a);
@@ -427,13 +462,17 @@ function die(reason) {
   setState('DEAD'); S.seq = null; S.inspect = null;
   controls.enabled = false; controls.reset(); controls.release(); audio.hissOff();
   root.classList.add('is-dead');
-  $('#ab-dead-t').textContent = reason === 'squalo' ? tr('dead_shark_t') : tr('dead_air_t');
-  $('#ab-dead-p').textContent = reason === 'squalo' ? tr('dead_shark_p') : tr('dead_air_p');
+  const why = reason === 'squalo' ? 'shark' : reason === 'pallone' ? 'bag' : 'air';
+  $('#ab-dead-t').textContent = tr('dead_' + why + '_t');
+  $('#ab-dead-p').textContent = tr('dead_' + why + '_p');
   setTimeout(() => openPanel('dead'), reason === 'squalo' ? 900 : 400);
 }
 
 function finish() {
   setState('COMPLETED');
+  // premio: bombole ricaricate e una fiocina per continuare a esplorare
+  S.air = AIR.max; S.reserveSaid = false;
+  if (!S.gun) { S.gun = true; S.gunNew = true; root.classList.add('has-gun'); VM.setGunReady(true); VM.reload = 0; }
   controls.release();
   root.classList.add('is-done');
   openPanel('end');
@@ -447,6 +486,7 @@ function continueExploring() {
   const d = camera.getWorldDirection(new THREE.Vector3());
   P.yaw = P.tyaw = Math.atan2(-d.x, -d.z); P.pitch = P.tpitch = Math.asin(Math.max(-1, Math.min(1, d.y)));
   setState('EXPLORATION'); controls.enabled = true;
+  if (S.gunNew) { S.gunNew = false; setTimeout(() => toast(controls.touch ? tr('gun_touch') : tr('gun_pc'), 9000), 600); }
 }
 
 function restart() {
@@ -454,6 +494,7 @@ function restart() {
   root.classList.remove('is-done');
   S.found = []; S.phase = 1; S.hatchSeen = false; S.reached = false; S.seq = null; S.inspect = null;
   S.air = AIR.max; S.reserveSaid = false; shark.reset(); audio.hissOff(); root.classList.remove('is-dead');
+  S.gun = false; S.gunNew = false; root.classList.remove('has-gun'); spear.clear(); if (bags) bags.reset(); S.shake = 0;
   arts.reset(); wreck.setOpen(false);
   const { dials, latches } = wreck.hatch.userData;
   wreck.hatch.userData.open = false; wreck.hatch.rotation.z = 0; wreck.hatch.position.y = wreck.HY + 0.46;
@@ -673,8 +714,9 @@ function tick() {
     S.air -= AIR.rate * dt;
     if (controls.blast && playing && S.air > 0) {
       S.air -= AIR.blast * dt; audio.hissOn();
-      const o = camera.position.clone().addScaledVector(fwd, 0.5);
-      world.bubbles.burst(o, 4, 0.25);
+      // le bolle escono dall'erogatore tenuto in mano e partono in avanti
+      VM.nozzle(_noz);
+      for (let k = 0; k < 4; k++) world.bubbles.emit(_bub.copy(_noz).addScaledVector(fwd, 0.05 + Math.random() * (0.3 + VM.k * 0.6)), 1);
       if (shark.blast(camera.position, fwd)) { toast(tr('shark_gone'), 3500); }
     } else audio.hissOff();
     if (!S.reserveSaid && S.air < AIR.reserve) { S.reserveSaid = true; toast(tr('reserve'), 4500); }
@@ -692,6 +734,20 @@ function tick() {
     hit() { audio.hit(); die('squalo'); },
   });
   sediment.update(dt);
+
+  // --- mano con l'erogatore, fiocina, arpione, palloni ---
+  VM.update(dt, t, !!(controls.blast && playing && S.air > 0), !!S.gun, camera.aspect);
+  if (bags) bags.update(t);
+  spear.update(dt, (a, b) => {
+    const x = bags && bags.hit(a, b); if (x) { explode(x); return true; }
+    if (segDist(a, b, shark.group.position) < 1.3) { if (shark.scare()) toast(tr('shark_gone'), 3500); return true; }
+    return false;
+  });
+  if (S.shake > 0) {
+    S.shake = Math.max(0, S.shake - dt * 1.2);
+    const k = S.shake * S.shake * 0.12;
+    camera.position.x += (Math.random() - 0.5) * k; camera.position.y += (Math.random() - 0.5) * k; camera.position.z += (Math.random() - 0.5) * k;
+  }
 
   if (S.state !== 'INTRO' && S.state !== 'DIVE') renderer.render(scene, camera);
 
@@ -747,11 +803,11 @@ renderer.render(scene, camera);
 torch.intensity = 0;
 document.addEventListener('visibilitychange', () => { if (document.hidden && canPause()) pause(); });
 requestAnimationFrame(tick);
-Promise.allSettled([adsReady, signsReady, ...photos, ...modelsReady]).then(() => {
+Promise.allSettled([adsReady, signsReady, bagsReady, planeReady, gateReady, ...photos, ...modelsReady]).then(() => {
   const inChamber = (o) => { for (let p = o; p; p = p.parent) if (p.name === 'chamber') return true; return false; };
   addCaustics(scene, inChamber);
   renderer.compile(scene, camera); ready();
 });
 
 // per i test automatici (nessun effetto sul gioco)
-window.__abyss = { shark, die, fish, THREE, scene, S, P, CODE, LOG, wreck, arts, spots, camera, pickup, toast, openHatch, openLog, setPos: (x, y, z, yaw, pitch) => { P.pos.set(x, y, z); P.vel.set(0, 0, 0); if (yaw !== undefined) { P.yaw = P.tyaw = yaw; P.pitch = P.tpitch = pitch; } } };
+window.__abyss = { VM, spear, fire, controls, finish, get bags() { return bags; }, shark, die, fish, THREE, scene, S, P, CODE, LOG, wreck, arts, spots, camera, pickup, toast, openHatch, openLog, setPos: (x, y, z, yaw, pitch) => { P.pos.set(x, y, z); P.vel.set(0, 0, 0); if (yaw !== undefined) { P.yaw = P.tyaw = yaw; P.pitch = P.tpitch = pitch; } } };

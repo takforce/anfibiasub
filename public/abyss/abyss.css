@@ -81,6 +81,7 @@ button{font:inherit;color:inherit}
 .ab-tbtns button svg{width:24px;height:24px}
 .ab-tbtns button.on{background:rgba(60,198,245,.3)}
 .can-act .ab-act{border-color:var(--cyan);background:rgba(60,198,245,.28);box-shadow:0 0 18px rgba(60,198,245,.4)}
+.ab-tbtns .ab-fire{display:none}.has-gun .ab-tbtns .ab-fire{display:flex;color:#ffb35c}
 .torch-on .ab-torch{border-color:var(--brass2);color:var(--brass2)}
 
 @media (pointer:coarse){

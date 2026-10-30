@@ -1,0 +1,405 @@
+// Oggetti in più del mondo e del sub:
+// - palloni di sollevamento (anche esplosivi se colpiti dalla fiocina)
+// - aereo affondato vicino al relitto, con ANFIBIASUB su un'ala e Tak4Fly sull'altra
+// - ponte di sabbia sul bordo del mondo con cancello chiuso "Missione 2"
+// - mano con l'erogatore (getto d'aria) e fiocina, visti in prima persona, con l'arpione che vola
+import * as THREE from '../vendor/three/three.module.min.js';
+import { heightAt } from './world.js';
+
+const NAVY = '#071D30', CYAN = '#3CC6F5', ICE = '#DCEFF5';
+
+export function canvasTex(w, h, draw) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  return t;
+}
+function wordmark(g, x, y, size, align = 'left', a1 = ICE, a2 = CYAN) {
+  g.font = `800 ${size}px Montserrat, Arial, sans-serif`; g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+  const a = g.measureText('ANFIBIA').width, b = g.measureText('SUB').width;
+  const x0 = align === 'center' ? x - (a + b) / 2 : x;
+  g.fillStyle = a1; g.fillText('ANFIBIA', x0, y); g.fillStyle = a2; g.fillText('SUB', x0 + a, y);
+}
+function grime(g, w, h, k = 1, a = 0.18) {
+  for (let i = 0; i < w * h / 600 * k; i++) { g.fillStyle = `rgba(${40 + Math.random() * 40},${60 + Math.random() * 40},${50 + Math.random() * 30},${Math.random() * a})`; g.beginPath(); g.arc(Math.random() * w, Math.random() * h, 1 + Math.random() * 5, 0, 7); g.fill(); }
+}
+const loadImg = (src) => new Promise((r) => { const im = new Image(); im.onload = () => r(im); im.onerror = () => r(null); im.src = src; });
+const shade = (o) => o.traverse((m) => { if (m.isMesh) m.castShadow = m.receiveShadow = true; });
+
+// ======================================================================================
+// PALLONE DI SOLLEVAMENTO (giallo, ANFIBIASUB): il gruppo ha l'origine al centro del pallone
+// ======================================================================================
+let bagMat = null;
+export function makeLiftBag(tex, L = 3.2) {
+  if (!bagMat) {
+    const t2 = canvasTex(1024, 512, (g, w, h) => {
+      g.fillStyle = '#e3ad1a'; g.fillRect(0, 0, w, h);
+      g.font = '800 54px Montserrat, Arial'; g.textAlign = 'center';
+      for (let k = 0; k < 3; k++) { g.fillStyle = NAVY; g.fillText('ANFIBIASUB', k * 341 + 170, h * 0.55); }
+      g.fillStyle = 'rgba(0,0,0,.22)'; for (let k = 0; k < 8; k++) g.fillRect(k * 128, 0, 3, h);
+      grime(g, w, h, 0.5);
+    });
+    bagMat = new THREE.MeshStandardMaterial({ map: t2, roughness: 0.55 });
+  }
+  const g = new THREE.Group(), bagPart = new THREE.Group(); g.add(bagPart);
+  const bag = new THREE.Mesh(new THREE.SphereGeometry(0.75, 32, 20).scale(1, 1.35, 1), bagMat); bagPart.add(bag);
+  const cone = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.5, 24, 1, true), bagMat); cone.position.y = -1.1; cone.rotation.x = Math.PI; bagPart.add(cone);
+  const rope = new THREE.MeshStandardMaterial({ color: 0xd8d0b8, roughness: 1 });
+  for (const [dx, dz] of [[-0.3, -0.25], [0.3, -0.25], [-0.3, 0.25], [0.3, 0.25]]) {
+    const c = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, L, 5), rope);
+    c.position.set(dx / 2, -1.35 - L / 2, dz / 2); c.rotation.set(dz * 0.2, 0, -dx * 0.2); bagPart.add(c);
+  }
+  const crate = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.5, 0.6), new THREE.MeshStandardMaterial({ map: tex.rust.map, normalMap: tex.rust.normalMap, roughness: 0.9, metalness: 0.5 }));
+  crate.position.y = -1.35 - L - 0.25; g.add(crate);
+  g.userData = { bagPart, crate, L, h0: 1.35 + L + 0.5 };
+  shade(g);
+  return g;
+}
+
+// tutti i palloni del mondo (quello del cantiere + quelli sparsi); esplodono se colpiti dalla fiocina
+export function buildLiftBags(scene, tex, spots, extra) {
+  const list = [];
+  const add = (g) => { list.push({ g, alive: true, base: g.position.clone(), ph: Math.random() * 6 }); };
+  if (extra) add(extra);
+  for (const s of spots) {
+    const g = makeLiftBag(tex, s.L);
+    g.position.set(s.x, heightAt(s.x, s.z) + g.userData.h0, s.z); g.rotation.y = s.rot || 0;
+    scene.add(g); add(g);
+  }
+  const center = (b, out) => out.copy(b.g.position);
+  return {
+    list,
+    center,
+    update(t) { for (const b of list) if (b.alive) { b.g.position.y = b.base.y + Math.sin(t * 0.5 + b.ph) * 0.06; b.g.rotation.z = Math.sin(t * 0.33 + b.ph) * 0.03; } },
+    // il primo pallone vivo colpito da un segmento (a -> b)
+    hit(a, b) {
+      const ab = new THREE.Vector3().subVectors(b, a), len = ab.length(); if (len < 1e-6) return null; ab.divideScalar(len);
+      const c = new THREE.Vector3(), d = new THREE.Vector3();
+      for (const x of list) {
+        if (!x.alive) continue;
+        center(x, c); d.subVectors(c, a); const k = Math.max(0, Math.min(len, d.dot(ab)));
+        d.copy(a).addScaledVector(ab, k).sub(c); d.y /= 1.35;   // il pallone è un ellissoide alto
+        if (d.length() < 0.85) return x;
+      }
+      return null;
+    },
+    pop(x) { x.alive = false; x.g.userData.bagPart.visible = false; },
+    reset() { for (const x of list) { x.alive = true; x.g.userData.bagPart.visible = true; } },
+  };
+}
+
+// ======================================================================================
+// AEREO AFFONDATO vicino al relitto: ultraleggero ad ala alta (tipo STOL), giallo con l'ala rossa,
+// come quello della foto di Ivano; su un'ala ANFIBIASUB con il logo, sull'altra Tak4Fly
+// ======================================================================================
+export async function buildPlane(scene, world, tex, P) {
+  try { await document.fonts.load('800 40px Montserrat'); } catch (_) { /* font di riserva */ }
+  const logo = await loadImg('/img/logo-casco.png');
+  const tiktok = P.tiktok ? await loadImg(new URL('./tex/' + P.tiktok, import.meta.url).href) : null;
+  // sporco del mare: base bianca (il colore lo dà il materiale) con macchie di alghe e sedimento
+  const dirt = canvasTex(512, 512, (c, w, h) => {
+    c.fillStyle = '#fff'; c.fillRect(0, 0, w, h);
+    for (let i = 0; i < 900; i++) { const g = Math.random(); c.fillStyle = g < 0.5 ? `rgba(90,110,90,${Math.random() * 0.12})` : `rgba(120,105,80,${Math.random() * 0.12})`; c.beginPath(); c.arc(Math.random() * w, Math.random() * h, 2 + Math.random() * 18, 0, 7); c.fill(); }
+    for (let i = 0; i < 40; i++) { c.fillStyle = `rgba(60,50,40,${0.1 + Math.random() * 0.15})`; c.fillRect(Math.random() * w, Math.random() * h, 1 + Math.random() * 3, 20 + Math.random() * 80); }
+  });
+  dirt.wrapS = dirt.wrapT = THREE.RepeatWrapping;
+  const yellow = new THREE.MeshStandardMaterial({ map: dirt, color: 0xe2b416, roughness: 0.55, metalness: 0.05 });
+  const red = new THREE.MeshStandardMaterial({ map: dirt, color: 0xc4301f, roughness: 0.55, metalness: 0.05 });
+  const black = new THREE.MeshStandardMaterial({ color: 0x1b1d1f, roughness: 0.75 });
+  const glass = new THREE.MeshStandardMaterial({ color: 0x0b161b, metalness: 0.3, roughness: 0.12, transparent: true, opacity: 0.7, side: THREE.DoubleSide });
+  const g = new THREE.Group();   // muso verso +z, origine sotto la fusoliera a terra
+
+  // cabina: profilo laterale estruso sulla larghezza (1 m), spigoli arrotondati
+  const prof = new THREE.Shape();
+  prof.moveTo(1.85, 0.45); prof.lineTo(1.9, 1.05); prof.lineTo(1.25, 1.62); prof.lineTo(-0.35, 1.62); prof.lineTo(-1.05, 1.3); prof.lineTo(-1.05, 0.62); prof.lineTo(0.1, 0.38); prof.closePath();
+  const cab = new THREE.Mesh(new THREE.ExtrudeGeometry(prof, { depth: 0.9, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.06, bevelSegments: 3 }).translate(0, 0, -0.45).rotateY(-Math.PI / 2), yellow);
+  g.add(cab);
+  // finestrini laterali e parabrezza
+  const win = new THREE.Shape(); win.moveTo(1.2, 1.05); win.lineTo(1.18, 1.52); win.lineTo(-0.25, 1.52); win.lineTo(-0.75, 1.25); win.lineTo(-0.75, 1.05); win.closePath();
+  for (const s of [-1, 1]) { const w = new THREE.Mesh(new THREE.ShapeGeometry(win).rotateY(-Math.PI / 2), glass); w.position.x = s * 0.515; g.add(w); }
+  const ws = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.8), glass); ws.position.set(0, 1.34, 1.58); ws.rotation.x = -0.74; g.add(ws);
+  // fascia rossa in basso sui fianchi (come nella foto)
+  const stripe = new THREE.Mesh(new THREE.BoxGeometry(1.04, 0.14, 2.7), red); stripe.position.set(0, 0.6, 0.35); g.add(stripe);
+  // cofano motore, ogiva, elica bipala
+  const cowl = new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.44, 0.55, 20).rotateX(Math.PI / 2), yellow); cowl.position.set(0, 0.8, 2.15); cowl.scale.set(1, 0.9, 1); g.add(cowl);
+  const spin = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.3, 14).rotateX(Math.PI / 2), black); spin.position.set(0, 0.82, 2.55); g.add(spin);
+  for (const a of [0.5, 0.5 + Math.PI]) {
+    const bl = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.85, 0.03).translate(0, 0.45, 0), black);
+    bl.position.set(0, 0.82, 2.5); bl.rotation.set(0, 0, a); bl.rotation.x = 0.15; g.add(bl);
+  }
+  // trave di coda rastremata
+  const boom = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.38, 3.1, 14).rotateX(-Math.PI / 2), yellow); boom.position.set(0, 1.15, -2.55); boom.scale.set(1, 1.15, 1); g.add(boom);
+  // impennaggi: stabilizzatore e deriva, con la punta rossa
+  const stab = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.06, 0.75), yellow); stab.position.set(0, 1.18, -3.85); g.add(stab);
+  const fs = new THREE.Shape(); fs.moveTo(0.2, 0); fs.lineTo(-0.85, 0); fs.lineTo(-0.7, 1.05); fs.lineTo(-0.25, 1.1); fs.closePath();
+  const fin = new THREE.Mesh(new THREE.ExtrudeGeometry(fs, { depth: 0.06, bevelEnabled: false }).rotateY(-Math.PI / 2).translate(0.03, 1.2, -3.55), yellow); g.add(fin);
+  const finTip = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.25, 0.5), red); finTip.position.set(0, 2.18, -4.15); g.add(finTip);
+
+  // ala alta: rossa sopra e sul bordo d'attacco, gialla sotto
+  const wing = new THREE.Mesh(new THREE.BoxGeometry(9.0, 0.14, 1.45), [red, red, red, yellow, red, yellow]); wing.position.set(0, 1.74, 0.45); g.add(wing);
+  for (const s of [-1, 1]) { const tip = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 1.45, 10).rotateX(Math.PI / 2), red); tip.position.set(s * 4.5, 1.74, 0.45); g.add(tip); }
+  // montanti a V
+  const strut = (a, b) => { const d = new THREE.Vector3().subVectors(b, a); const m = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, d.length(), 8), yellow); m.position.copy(a).addScaledVector(d, 0.5); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); g.add(m); };
+  for (const s of [-1, 1]) { strut(new THREE.Vector3(s * 0.5, 0.5, 0.5), new THREE.Vector3(s * 2.7, 1.67, 0.85)); strut(new THREE.Vector3(s * 0.5, 0.5, 0.3), new THREE.Vector3(s * 2.7, 1.67, 0.05)); }
+  // carrello triciclo con ruote grandi da pista erbosa
+  const tire = new THREE.CylinderGeometry(0.3, 0.3, 0.24, 20).rotateZ(Math.PI / 2);
+  for (const s of [-1, 1]) {
+    const w = new THREE.Mesh(tire, black); w.position.set(s * 1.0, 0.3, 0.05); g.add(w);
+    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.26, 12).rotateZ(Math.PI / 2), yellow); hub.position.copy(w.position); g.add(hub);
+    strut(new THREE.Vector3(s * 0.45, 0.45, 0.25), new THREE.Vector3(s * 0.9, 0.3, 0.05));
+    strut(new THREE.Vector3(s * 0.45, 0.45, -0.25), new THREE.Vector3(s * 0.9, 0.3, 0.05));
+  }
+  const nw = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.18, 18).rotateZ(Math.PI / 2), black); nw.position.set(0, 0.24, 1.95); g.add(nw);
+  strut(new THREE.Vector3(0, 0.55, 2.0), new THREE.Vector3(0, 0.24, 1.95));
+
+  // scritte sopra l'ala (decalcomanie sbiadite dal mare): a sinistra ANFIBIASUB, a destra Tak4Fly
+  const decal = (draw) => {
+    const t = canvasTex(1024, 300, (c, w, h) => { draw(c, w, h); c.globalCompositeOperation = 'destination-out'; for (let i = 0; i < 600; i++) { c.fillStyle = `rgba(0,0,0,${Math.random() * 0.45})`; c.beginPath(); c.arc(Math.random() * w, Math.random() * h, 1 + Math.random() * 6, 0, 7); c.fill(); } });
+    return new THREE.MeshStandardMaterial({ map: t, transparent: true, roughness: 0.6, polygonOffset: true, polygonOffsetFactor: -2 });
+  };
+  const panelBg = (c, h) => { c.fillStyle = 'rgba(7,29,48,.88)'; c.beginPath(); c.roundRect(300, h / 2 - 82, 700, 164, 26); c.fill(); };
+  const badge = (c, h, drawIn) => { c.save(); c.translate(150, h / 2); c.beginPath(); c.arc(0, 0, 128, 0, 7); c.fillStyle = 'rgba(7,29,48,.9)'; c.fill(); drawIn(c); c.lineWidth = 9; c.strokeStyle = ICE; c.beginPath(); c.arc(0, 0, 128, 0, 7); c.stroke(); c.restore(); };
+  const leftM = decal((c, w, h) => {
+    badge(c, h, (cc) => { if (logo) { cc.save(); cc.beginPath(); cc.arc(0, 0, 122, 0, 7); cc.clip(); cc.drawImage(logo, -122, -122, 244, 244); cc.restore(); } });
+    panelBg(c, h); wordmark(c, 650, h / 2 + 36, 100, 'center');
+  });
+  const rightM = decal((c, w, h) => {
+    // simbolo di TikTok: si usa solo il file ufficiale messo da Ivano in abyss/tex/ (CFG.plane.tiktok), non lo disegno io;
+    // se manca, nel tondo resta un piccolo aereo
+    badge(c, h, (cc) => {
+      if (tiktok) { cc.save(); cc.beginPath(); cc.arc(0, 0, 122, 0, 7); cc.clip(); const k = 170 / Math.max(tiktok.width, tiktok.height); cc.drawImage(tiktok, -tiktok.width * k / 2, -tiktok.height * k / 2, tiktok.width * k, tiktok.height * k); cc.restore(); return; }
+      cc.fillStyle = ICE;
+      cc.beginPath(); cc.moveTo(-60, 18); cc.quadraticCurveTo(-70, -12, -40, -18); cc.lineTo(10, -18); cc.lineTo(80, -2); cc.lineTo(80, 8); cc.lineTo(-10, 22); cc.closePath(); cc.fill();
+      cc.fillRect(-55, -30, 95, 12);
+      cc.beginPath(); cc.moveTo(60, -2); cc.lineTo(78, -42); cc.lineTo(92, -42); cc.lineTo(86, 2); cc.closePath(); cc.fill();
+      cc.fillRect(-74, -40, 6, 68);
+      cc.beginPath(); cc.arc(-30, 42, 13, 0, 7); cc.arc(20, 42, 13, 0, 7); cc.fill();
+      cc.fillRect(-32, 18, 4, 18); cc.fillRect(18, 18, 4, 18);
+    });
+    panelBg(c, h);
+    c.font = '800 112px Montserrat, Arial'; c.textBaseline = 'alphabetic'; c.textAlign = 'left';
+    const a = c.measureText('Tak').width, b = c.measureText('4').width, d = c.measureText('Fly').width, x0 = 650 - (a + b + d) / 2, y = h / 2 + 38;
+    c.fillStyle = ICE; c.fillText('Tak', x0, y); c.fillStyle = CYAN; c.fillText('4', x0 + a, y); c.fillStyle = ICE; c.fillText('Fly', x0 + a + b, y);
+  });
+  for (const [s, m] of [[-1, leftM], [1, rightM]]) {
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 1.06), m);
+    p.rotation.x = -Math.PI / 2; p.position.set(s * 2.55, 1.815, 0.45);
+    // il testo si legge guardando l'ala da dietro, dal bordo d'uscita verso il muso
+    p.rotation.z = Math.PI; g.add(p);
+  }
+
+  // adagiato sul fondo: ruote affondate nella sabbia, il carrello destro ceduto, muso un po' giù
+  const x = P.x, z = P.z, b = heightAt(x, z);
+  g.position.set(x, b - 0.18, z); g.rotation.set(0.05, P.rot, -0.06);
+  shade(g); scene.add(g);
+  g.updateMatrixWorld(true);
+  const col = (lx, ly, lz, sx, sy, sz) => world.colliders.push({ c: g.localToWorld(new THREE.Vector3(lx, ly, lz)), s: new THREE.Vector3(sx, sy, sz), rot: P.rot });
+  col(0, 1.0, 0.5, 0.65, 0.75, 1.7); col(0, 1.15, -2.6, 0.35, 0.4, 1.6);
+  for (const s of [-1, 1]) for (const d of [1.4, 3.4]) col(s * d, 1.74, 0.45, 1.05, 0.15, 0.8);
+  return g;
+}
+
+// ======================================================================================
+// PONTE DI SABBIA sul bordo del mondo, chiuso da un cancello: "MISSIONE 2 · A PRESTO"
+// ======================================================================================
+export async function buildGate(scene, world, tex, P, texts) {
+  try { await document.fonts.load('800 40px Montserrat'); await document.fonts.load('600 20px Montserrat'); } catch (_) { /* font di riserva */ }
+  const logo = await loadImg('/img/logo-casco.png');
+  const ang = P.ang, dir = new THREE.Vector3(Math.cos(ang), 0, Math.sin(ang)), side = new THREE.Vector3(-dir.z, 0, dir.x);
+  const yaw = Math.atan2(-dir.z, dir.x);    // gruppo con l'asse +x verso il largo
+  const r0 = P.r, gx = dir.x * r0, gz = dir.z * r0, b = heightAt(gx, gz);
+  const g = new THREE.Group(); g.position.set(gx, b, gz); g.rotation.y = yaw; scene.add(g);
+
+  // il ponte: striscia di terra stretta (2,6 m) che parte dal fondale e attraversa l'abisso oltre la scarpata;
+  // i fianchi scendono ripidi nel blu. Il cancello sta in fondo, alla fine del ponte, e blocca il passaggio.
+  const len = P.len;
+  const sand = new THREE.MeshStandardMaterial({ map: tex.sand.map, normalMap: tex.sand.normalMap, roughness: 1 });
+  const rockM = new THREE.MeshStandardMaterial({ map: tex.rock.map, normalMap: tex.rock.normalMap, roughness: 1, color: 0x9a968c });
+  const sec = new THREE.Shape(); sec.moveTo(-1.3, 0); sec.quadraticCurveTo(0, 0.25, 1.3, 0); sec.lineTo(2.2, -3); sec.lineTo(3.6, -30); sec.lineTo(-3.6, -30); sec.lineTo(-2.2, -3); sec.closePath();
+  const ridge = new THREE.ExtrudeGeometry(sec, { depth: len + 6, bevelEnabled: false, steps: Math.round(len) }).rotateY(Math.PI / 2).translate(-4, 0, 0);
+  // irregolarità dei fianchi, come roccia franata
+  const pa = ridge.attributes.position;
+  for (let i = 0; i < pa.count; i++) { const y = pa.getY(i); if (y < -0.2) { const x = pa.getX(i); pa.setZ(i, pa.getZ(i) * (1 + Math.sin(x * 1.3 + y * 0.7) * 0.12 + Math.sin(x * 3.1 - y) * 0.06)); } }
+  ridge.computeVertexNormals();
+  const uv = ridge.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, pa.getX(i) / 2, pa.getZ(i) / 2 + pa.getY(i) / 2);
+  // sopra sabbia, sui fianchi roccia: due materiali sulla stessa forma (faccia superiore = gruppo 0 dell'estrusione)
+  const deck = new THREE.Mesh(ridge, [rockM, rockM]); deck.position.y = 0.02; deck.receiveShadow = deck.castShadow = true; g.add(deck);
+  const top = new THREE.Mesh(new THREE.PlaneGeometry(len + 6, 2.5, Math.round(len + 6), 2).rotateX(-Math.PI / 2).translate(len / 2 - 1, 0.2, 0), sand);
+  { const tp = top.geometry.attributes.position; for (let i = 0; i < tp.count; i++) { const z = tp.getZ(i); tp.setY(i, 0.2 - z * z * 0.06 + Math.sin(tp.getX(i) * 1.7) * 0.03); } top.geometry.computeVertexNormals(); }
+  top.receiveShadow = true; g.add(top);
+  // sassi sul bordo del ponte
+  for (let i = 0; i < 14; i++) { const r = new THREE.Mesh(new THREE.DodecahedronGeometry(0.2 + Math.random() * 0.25, 0), rockM); const sd = Math.random() < 0.5 ? -1 : 1; r.position.set(-2 + Math.random() * (len + 3), 0.05, sd * (1.1 + Math.random() * 0.3)); r.rotation.set(Math.random() * 3, Math.random() * 3, 0); r.scale.y = 0.6; g.add(r); }
+  const gt = new THREE.Group(); gt.position.x = len; g.add(gt);   // il cancello, in fondo al ponte
+
+  // cancello: due pilastri in pietra, due ante a sbarre in ferro arrugginito chiuse da una catena
+  const stone = new THREE.MeshStandardMaterial({ map: tex.rock.map, normalMap: tex.rock.normalMap, color: 0xa29d92, roughness: 1 });
+  const iron = new THREE.MeshStandardMaterial({ map: tex.rust.map, normalMap: tex.rust.normalMap, roughness: 0.85, metalness: 0.6 });
+  for (const s of [-1, 1]) {
+    const p = new THREE.Mesh(new THREE.BoxGeometry(0.7, 3.2, 0.7), stone); p.position.set(0, 1.6, s * 1.6); gt.add(p);
+    const cap = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.2, 0.85), stone); cap.position.set(0, 3.3, s * 1.6); gt.add(cap);
+  }
+  for (const s of [-1, 1]) {
+    const leaf = new THREE.Group(); leaf.position.set(0, 0, s * 1.25); gt.add(leaf);
+    for (const y of [0.25, 1.4, 2.6]) { const r = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 1.2), iron); r.position.set(0, y, -s * 0.6); leaf.add(r); }
+    for (let k = 0; k < 5; k++) { const r = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 2.75, 6), iron); r.position.set(0, 1.42, -s * (0.1 + k * 0.23)); leaf.add(r); const tip = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.16, 6), iron); tip.position.set(0, 2.86, -s * (0.1 + k * 0.23)); leaf.add(tip); }
+  }
+  // catena e lucchetto al centro
+  for (let k = 0; k < 7; k++) { const l = new THREE.Mesh(new THREE.TorusGeometry(0.06, 0.016, 5, 10), iron); l.position.set(0.06, 1.75 - k * 0.09, (k % 2 ? 0.03 : -0.03)); l.rotation.set(0, k % 2 ? Math.PI / 2 : 0, 0); gt.add(l); }
+  const lock = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.16, 0.13), new THREE.MeshStandardMaterial({ color: 0x7d6a45, metalness: 0.8, roughness: 0.5 })); lock.position.set(0.08, 1.08, 0); gt.add(lock);
+
+  // cartello appeso alle sbarre: MISSIONE 2 · A PRESTO (nella lingua del gioco)
+  const sign = canvasTex(1024, 640, (c, w, h) => {
+    c.fillStyle = NAVY; c.fillRect(0, 0, w, h);
+    c.strokeStyle = 'rgba(220,239,245,.55)'; c.lineWidth = 8; c.strokeRect(26, 26, w - 52, h - 52);
+    c.textAlign = 'center'; c.fillStyle = CYAN; c.font = '800 150px Montserrat, Arial'; c.fillText(texts.title, w / 2, 260);
+    c.fillStyle = ICE; c.font = '600 72px Montserrat, Arial'; c.fillText(texts.sub, w / 2, 380);
+    c.fillStyle = CYAN; c.fillRect(140, 450, w - 280, 5);
+    wordmark(c, w / 2, 560, 64, 'center');
+    grime(c, w, h, 2.2, 0.22);
+  });
+  const sm = new THREE.MeshStandardMaterial({ map: sign, roughness: 0.8, metalness: 0.05, color: 0xc3ccd0 });
+  const back = new THREE.MeshStandardMaterial({ color: 0x40494d, roughness: 0.8 });
+  // facce del box: +x, -x, +y, -y, +z, -z; la -x guarda verso il centro del mondo, da dove arriva il sub
+  const panel = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.9, 1.4), [back, sm, back, back, back, back]);
+  panel.position.set(-0.08, 2.0, 0); panel.rotation.x = 0.03; gt.add(panel);
+
+  // targa in ottone ANFIBIASUB sul pilastro sinistro
+  const brass = canvasTex(512, 512, (c, w, h) => {
+    const lg = c.createLinearGradient(0, 0, w, h); lg.addColorStop(0, '#b8925a'); lg.addColorStop(1, '#7a5d35');
+    c.fillStyle = lg; c.fillRect(0, 0, w, h);
+    c.strokeStyle = 'rgba(40,26,10,.8)'; c.lineWidth = 10; c.strokeRect(20, 20, w - 40, h - 40);
+    if (logo) { c.save(); c.globalAlpha = 0.9; c.beginPath(); c.arc(w / 2, 190, 120, 0, 7); c.clip(); c.drawImage(logo, w / 2 - 120, 70, 240, 240); c.restore(); }
+    c.fillStyle = 'rgba(40,26,10,.95)'; c.textAlign = 'center'; c.font = '800 72px Montserrat, Arial'; c.fillText('ANFIBIASUB', w / 2, 400);
+    c.font = '600 26px Montserrat, Arial'; c.fillText('LAVORI SUBACQUEI', w / 2, 450);
+    for (let i = 0; i < 300; i++) { c.fillStyle = `rgba(50,${90 + Math.random() * 40},70,${Math.random() * 0.3})`; c.beginPath(); c.arc(Math.random() * w, Math.random() * h, 2 + Math.random() * 6, 0, 7); c.fill(); }
+  });
+  const plate = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.55), new THREE.MeshStandardMaterial({ map: brass, metalness: 0.75, roughness: 0.45 }));
+  plate.position.set(-0.36, 1.9, -1.6); plate.rotation.y = -Math.PI / 2; gt.add(plate);
+
+  shade(g);
+  g.updateMatrixWorld(true);
+  // il ponte si percorre (pavimento fatto di ellissoidi lungo la cresta); il cancello in fondo non si attraversa
+  for (let x = -2; x <= len + 1; x += 2) world.colliders.push({ c: g.localToWorld(new THREE.Vector3(x, -1.25, 0)), s: new THREE.Vector3(1.6, 1.45, 1.35), rot: yaw });
+  for (const s of [-1, 0, 1]) world.colliders.push({ c: g.localToWorld(new THREE.Vector3(len, 1.5, s * 1.1)), s: new THREE.Vector3(0.45, 1.7, 0.8), rot: yaw });
+  return g;
+}
+
+// ======================================================================================
+// IN PRIMA PERSONA: mano guantata con l'erogatore (getto d'aria) e fiocina
+// ======================================================================================
+// materiale "matcap": la mano e la fiocina non dipendono dalle luci della scena (la torcia da vicino le bruciava)
+let MC = {};
+function matcapTex(shine) {
+  const k = Math.round(shine * 10); if (MC[k]) return MC[k];
+  const t = canvasTex(256, 256, (c, w, h) => {
+    const g = c.createRadialGradient(w * 0.38, h * 0.3, 4, w / 2, h / 2, w / 2);
+    g.addColorStop(0, `rgb(${200 + 55 * shine},${200 + 55 * shine},${200 + 55 * shine})`);
+    g.addColorStop(0.18 + 0.2 * (1 - shine), 'rgb(150,155,160)'); g.addColorStop(0.75, 'rgb(70,78,86)'); g.addColorStop(1, 'rgb(20,28,36)');
+    c.fillStyle = g; c.fillRect(0, 0, w, h);
+  });
+  return (MC[k] = t);
+}
+const mc = (color, shine) => { const m = new THREE.MeshMatcapMaterial({ matcap: matcapTex(shine), color }); m.fog = false; m.userData.noCaustics = true; return m; };
+
+export function buildViewModels(camera) {
+  const glove = mc(0x3a3f45, 0.35), seam = mc(0x50575d, 0.3), black = mc(0x2a2e32, 0.8), chrome = mc(0xd5dde0, 1), yellow = mc(0xe0ab18, 0.7);
+
+  // ---- mano sinistra con il secondo stadio (octopus giallo) tenuto davanti: il pollice preme il pulsante di spurgo ----
+  const hand = new THREE.Group(); camera.add(hand);
+  const reg = new THREE.Group(); hand.add(reg);
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.046, 0.046, 0.04, 28).rotateX(Math.PI / 2), black); reg.add(body);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.046, 0.006, 8, 28), yellow); ring.position.z = -0.02; reg.add(ring);
+  const purge = new THREE.Mesh(new THREE.CylinderGeometry(0.036, 0.038, 0.012, 24).rotateX(Math.PI / 2), black); purge.position.z = -0.026; reg.add(purge);
+  for (let k = 0; k < 4; k++) { const r = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.004, 0.004), seam); r.position.set(0, -0.015 + k * 0.01, -0.033); reg.add(r); }
+  const tee = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.03, 0.03), black); tee.position.set(0, -0.045, 0.004); reg.add(tee);
+  const mouth = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.016, 0.03, 12).rotateX(Math.PI / 2), black); mouth.position.set(0, 0, 0.032); reg.add(mouth);
+  const swivel = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.03, 10), chrome); swivel.position.set(0.05, 0, 0.004); swivel.rotation.z = Math.PI / 2; reg.add(swivel);
+  // frusta gialla che scende verso la bombola
+  const hose = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(0.065, 0, 0.004), new THREE.Vector3(0.12, -0.04, 0.05), new THREE.Vector3(0.14, -0.2, 0.12), new THREE.Vector3(0.1, -0.45, 0.2)]), 20, 0.009, 8), yellow); reg.add(hose);
+  // guanto: dorso, dita intorno al corpo, pollice sul pulsante
+  const palm = new THREE.Mesh(new THREE.SphereGeometry(0.05, 16, 10).scale(1, 0.42, 1.1), glove); palm.position.set(-0.035, -0.035, 0.03); palm.rotation.set(0.2, 0, 0.9); hand.add(palm);
+  const cuff = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.04, 0.11, 14), glove); cuff.position.set(-0.062, -0.075, 0.075); cuff.rotation.set(0.9, 0, 0.6); hand.add(cuff);
+  for (let k = 0; k < 4; k++) {
+    const f = new THREE.Mesh(new THREE.CapsuleGeometry(0.0105, 0.045, 4, 8), glove);
+    const a = -0.9 + k * 0.42;
+    f.position.set(Math.cos(a) * 0.05 + 0.005, Math.sin(a) * 0.05 - 0.005, 0.006 - k * 0.002); f.rotation.z = a; hand.add(f);
+  }
+  const thumb = new THREE.Mesh(new THREE.CapsuleGeometry(0.012, 0.05, 4, 8), glove); hand.add(thumb);
+  const thumbUp = () => { thumb.position.set(-0.012, 0.012, -0.05); thumb.rotation.set(1.3, 0, -0.5); };
+  thumbUp();
+  hand.visible = false;
+
+  // ---- fiocina (arbalete): fusto in alluminio, impugnatura, elastici, asta con la punta ----
+  const gun = new THREE.Group(); camera.add(gun);
+  const alu = mc(0x7d868b, 0.9), rub = mc(0x9a4220, 0.4), steel = mc(0xc9d2d6, 1);
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.85, 14).rotateX(Math.PI / 2), alu); barrel.position.z = -0.42; gun.add(barrel);
+  const muzzle = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.018, 0.06, 14).rotateX(Math.PI / 2), black); muzzle.position.z = -0.86; gun.add(muzzle);
+  const grip = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.12, 0.05), black); grip.position.set(0, -0.07, 0.02); grip.rotation.x = -0.25; gun.add(grip);
+  const trig = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.03, 0.012), steel); trig.position.set(0, -0.03, -0.03); gun.add(trig);
+  const butt = new THREE.Mesh(new THREE.BoxGeometry(0.032, 0.035, 0.12), black); butt.position.set(0, -0.005, 0.07); gun.add(butt);
+  const spear = new THREE.Group(); gun.add(spear);
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.0035, 0.0035, 1.0, 6).rotateX(Math.PI / 2), steel); shaft.position.set(0, 0.022, -0.5); spear.add(shaft);
+  const tip = new THREE.Mesh(new THREE.ConeGeometry(0.008, 0.05, 8).rotateX(-Math.PI / 2), steel); tip.position.set(0, 0.022, -1.02); spear.add(tip);
+  const bands = [];
+  for (const s of [-1, 1]) {
+    const band = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(s * 0.016, 0.0, -0.84), new THREE.Vector3(s * 0.03, 0.015, -0.55), new THREE.Vector3(s * 0.012, 0.024, -0.3)]), 12, 0.006, 6), rub);
+    gun.add(band); bands.push(band);
+  }
+  const slack = []; for (const s of [-1, 1]) { const band = new THREE.Mesh(new THREE.TorusGeometry(0.02, 0.006, 6, 12, Math.PI), rub); band.position.set(s * 0.02, 0, -0.84); band.rotation.set(0, Math.PI / 2, s * 0.5); band.visible = false; gun.add(band); slack.push(band); }
+  gun.visible = false;
+
+  const V = { hand, gun, k: 0, gk: 0, reload: 0, recoil: 0, pressed: false };
+  const tmp = new THREE.Vector3();
+  // posizione dell'uscita delle bolle (fronte dell'erogatore) in coordinate del mondo
+  V.nozzle = (out) => reg.localToWorld(out.set(0, 0, -0.04));
+  V.muzzle = (out) => gun.localToWorld(out.set(0, 0.022, -1.0));
+  V.setGunReady = (v) => { spear.visible = v; bands.forEach((b) => { b.visible = v; }); slack.forEach((b) => { b.visible = !v; }); };
+  V.update = (dt, t, blasting, hasGun, aspect) => {
+    // la mano entra dal basso quando si preme il getto d'aria
+    V.k += ((blasting ? 1 : 0) - V.k) * Math.min(1, dt * 10);
+    hand.visible = V.k > 0.02;
+    const nx = Math.min(1, aspect / 1.6);    // sullo schermo stretto la tengo più al centro
+    const sx = hasGun ? -0.13 * nx : 0.1 * nx;
+    hand.position.set(sx, -0.085 - (1 - V.k) * 0.25 + Math.sin(t * 14) * 0.002 * V.k, -0.3);
+    hand.rotation.set(0.35, -0.75, (hasGun ? 1 : -1) * 0.25);
+    if (blasting) { thumb.position.set(-0.008, 0.006, -0.042); thumb.rotation.set(1.45, 0, -0.45); } else thumbUp();
+    // fiocina a destra, sempre in mano dopo la missione
+    gun.visible = hasGun;
+    if (hasGun) {
+      V.gk = Math.min(1, V.gk + dt * 2);
+      V.recoil = Math.max(0, V.recoil - dt * 4);
+      gun.position.set(0.17 * nx, -0.2 - (1 - V.gk) * 0.3 + Math.sin(t * 1.1) * 0.004, -0.12 + V.recoil * 0.06);
+      gun.rotation.set(0.04 + V.recoil * 0.15, -0.03, 0);
+      if (V.reload > 0) { V.reload -= dt; if (V.reload <= 0) V.setGunReady(true); }
+    } else V.gk = 0;
+    return tmp;
+  };
+  return V;
+}
+
+// arpione: vola dritto, rallenta, e si pianta nel fondale; colpisce palloni e squalo
+export function createSpear(scene) {
+  const steel = new THREE.MeshStandardMaterial({ color: 0xb8c1c5, roughness: 0.3, metalness: 1 }); steel.userData.noCaustics = true;
+  const m = new THREE.Group();
+  { const s = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 1.2, 6).rotateX(Math.PI / 2), steel); m.add(s); const t = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.09, 8).rotateX(-Math.PI / 2), steel); t.position.z = -0.64; m.add(t); }
+  m.visible = false; scene.add(m);
+  const S = { m, on: false, stuck: 0, pos: new THREE.Vector3(), vel: new THREE.Vector3(), dist: 0 };
+  const prev = new THREE.Vector3();
+  S.fire = (from, dir) => { S.on = true; S.stuck = 0; S.dist = 0; S.pos.copy(from); S.vel.copy(dir).multiplyScalar(24); m.visible = true; m.position.copy(from); m.lookAt(from.clone().sub(dir)); };
+  // onHit(prev, pos) -> true se ha colpito qualcosa e l'arpione si ferma
+  S.update = (dt, onHit) => {
+    if (S.stuck > 0) { S.stuck -= dt; if (S.stuck <= 0) { m.visible = false; } return; }
+    if (!S.on) return;
+    prev.copy(S.pos);
+    S.vel.multiplyScalar(Math.exp(-dt * 0.9)); S.vel.y -= dt * 0.6;
+    S.pos.addScaledVector(S.vel, dt); S.dist += S.vel.length() * dt;
+    m.position.copy(S.pos); m.lookAt(S.pos.clone().sub(S.vel));
+    if (onHit(prev, S.pos)) { S.on = false; S.stuck = 0.01; m.visible = false; return; }
+    const ground = heightAt(S.pos.x, S.pos.z);
+    if (S.pos.y < ground + 0.05) { S.pos.y = ground + 0.05; m.position.copy(S.pos); S.on = false; S.stuck = 8; return; }
+    if (S.dist > 32 || S.vel.length() < 2) { S.on = false; S.stuck = 0.01; m.visible = false; }
+  };
+  S.clear = () => { S.on = false; S.stuck = 0; m.visible = false; };
+  return S;
+}
+

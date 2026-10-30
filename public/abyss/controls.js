@@ -25,6 +25,7 @@ export function createControls(canvas, root, on) {
     if (e.code === 'KeyE') on.interact();
     if (e.code === 'KeyQ') C.blast = true;
     if (e.code === 'KeyF') on.torch();
+    if (e.code === 'KeyR' && on.fire) on.fire();
     if (e.code === 'KeyI' || e.code === 'Tab') { e.preventDefault(); on.inventory(); }
   });
   addEventListener('keyup', (e) => { keys.delete(e.code); upd(); if (e.code === 'KeyQ') C.blast = false; });

@@ -1,7 +1,8 @@
 // Presenza di Anfibiasub nel mondo di gioco: elementi realistici di un vero cantiere subacqueo,
 // niente cartelloni pubblicitari. Il marchio compare come comparirebbe su attrezzatura vera.
 import * as THREE from '../vendor/three/three.module.min.js';
-import { heightAt } from './world.js?v=efbb9fac';
+import { heightAt } from './world.js?v=197ca967';
+import { makeLiftBag } from './extras.js?v=197ca967';
 
 const NAVY = '#071D30', CYAN = '#3CC6F5', ICE = '#DCEFF5';
 
@@ -54,28 +55,8 @@ export async function buildAds(scene, wreck, tex, P) {
 
   // ---------- B. Pallone di sollevamento giallo (recupero in corso) sopra una cassa ----------
   {
-    // la scritta del pallone va su fondo giallo: ridisegno il wordmark in blu notte
-    const t2 = canvasTex(1024, 512, (g, w, h) => {
-      g.fillStyle = '#e3ad1a'; g.fillRect(0, 0, w, h);
-      g.font = '800 54px Montserrat, Arial'; g.textAlign = 'center';
-      for (let k = 0; k < 3; k++) { g.fillStyle = NAVY; g.fillText('ANFIBIASUB', k * 341 + 170, h * 0.55); }
-      g.fillStyle = 'rgba(0,0,0,.22)'; for (let k = 0; k < 8; k++) g.fillRect(k * 128, 0, 3, h);
-      grime(g, w, h, 0.5);
-    });
-    const bagM = new THREE.MeshStandardMaterial({ map: t2, roughness: 0.55 });
-    const g = new THREE.Group();
-    const bag = new THREE.Mesh(new THREE.SphereGeometry(0.75, 32, 20).scale(1, 1.35, 1), bagM); bag.position.y = 0; g.add(bag);
-    const cone = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.5, 24, 1, true), bagM); cone.position.y = -1.1; cone.rotation.x = Math.PI; g.add(cone);
-    const rope = new THREE.MeshStandardMaterial({ color: 0xd8d0b8, roughness: 1 });
-    const L = 3.2;
-    for (const [dx, dz] of [[-0.3, -0.25], [0.3, -0.25], [-0.3, 0.25], [0.3, 0.25]]) {
-      const c = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, L, 5), rope);
-      c.position.set(dx / 2, -1.35 - L / 2, dz / 2); c.rotation.set(dz * 0.2, 0, -dx * 0.2); g.add(c);
-    }
-    const crate = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.5, 0.6), new THREE.MeshStandardMaterial({ map: tex.rust.map, normalMap: tex.rust.normalMap, roughness: 0.9, metalness: 0.5 }));
-    crate.position.y = -1.35 - L - 0.25; g.add(crate);
-    const x = P.bx, z = P.bz; g.position.set(x, heightAt(x, z) + 1.35 + L + 0.5, z);
-    g.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+    const g = makeLiftBag(tex, 3.2);
+    const x = P.bx, z = P.bz; g.position.set(x, heightAt(x, z) + g.userData.h0, z);
     scene.add(g); out.pallone = g;
   }
 

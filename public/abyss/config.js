@@ -38,6 +38,15 @@ export const CFG = {
     { x: -15, z: 66 }, { x: 40, z: -55 }, { x: -62, z: 36 }, { x: 62, z: -32 }, { x: -40, z: -56 },
   ],
 
+  // palloni di sollevamento sparsi (oltre a quello del cantiere): L = lunghezza delle cime
+  liftBags: [
+    { x: -14, z: -20, L: 4.5 }, { x: 26, z: -22, L: 3 }, { x: -36, z: 30, L: 5 }, { x: 46, z: 2, L: 2.8 }, { x: -44, z: -12, L: 3.6 }, { x: 18, z: 52, L: 4 },
+  ],
+  // aereo ultraleggero affondato vicino al relitto
+  plane: { x: -4, z: 19, rot: 0.9, tiktok: null },   // tiktok: nome del file ufficiale del simbolo in abyss/tex/ (es. 'tiktok.png')
+  // ponte di sabbia con il cancello della Missione 2, sul bordo del mondo (angolo da est, distanza dal centro)
+  gate: { ang: -0.14, r: 74, len: 15 },   // il ponte parte a 74 m dal centro, è lungo 15 m; il cancello è in fondo
+
   // ordine delle ghiere sulla botola = ordine delle cifre del codice
   dials: ['rosa', 'ancora', 'chiave'],
 
@@ -82,6 +91,13 @@ export const CFG = {
   // Modelli GLB definitivi (opzionali): stesso principio.
   models: { bussola: null, targhetta: null, chiave: null, elmo: null, cofanetto: null },
 };
+
+// sul ponte del cancello (sopra l'abisso) lo squalo non attacca: è la strada per la Missione 2
+export function onBridge(x, z) {
+  const G = CFG.gate, c = Math.cos(G.ang), s = Math.sin(G.ang);
+  const along = x * c + z * s, across = -x * s + z * c;
+  return along > G.r - 2 && along < G.r + G.len + 1 && Math.abs(across) < 2.6;
+}
 
 export const CODE = CFG.dials.map((s) => CFG.artifacts.find((a) => a.symbol === s).digit);
 

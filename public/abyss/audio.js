@@ -76,5 +76,12 @@ export function createAudio() {
   // pericolo: due note basse che si ripetono (stile documentario, non arcade)
   A.danger = () => { [0, 0.6, 1.2, 1.8].forEach((t, i) => tone(i % 2 ? 98 : 92, 0.5, 0.12, 'triangle', t)); };
   A.hit = () => { noiseHit(0.8, 120, 0.8, 0.6, 'lowpass', 0.005); tone(60, 1.2, 0.2, 'sawtooth', 0, 0.5); };
+  // fiocina: scatto secco degli elastici
+  A.shot = () => { noiseHit(0.12, 1800, 1.2, 0.35, 'bandpass', 0.003); tone(240, 0.18, 0.12, 'triangle', 0, 0.5); };
+  // pallone che esplode: tonfo profondo e gorgoglio di bolle
+  A.boom = () => {
+    noiseHit(2.2, 70, 0.6, 1.0, 'lowpass', 0.004); tone(42, 1.8, 0.35, 'sine', 0, 0.6);
+    for (let i = 0; i < 40; i++) tone(180 + Math.random() * 800, 0.08 + Math.random() * 0.1, 0.05, 'sine', 0.1 + Math.random() * 1.6, 1.8 + Math.random());
+  };
   return A;
 }

@@ -3,7 +3,7 @@
 // fessure branchiali, occhi; colori a controombreggiatura (dorso grigio-blu, ventre bianco); nuoto ondulato nel vertex shader.
 import * as THREE from '../vendor/three/three.module.min.js';
 import { mergeGeometries } from '../vendor/three/BufferGeometryUtils.js';
-import { CFG } from './config.js?v=efbb9fac';
+import { CFG, onBridge } from './config.js?v=197ca967';
 
 const L = 3.1;                 // lunghezza (m)
 const TOP = new THREE.Color(0x3d4c58), BELLY = new THREE.Color(0xe4e8ea), FIN = new THREE.Color(0x34424d);
@@ -137,7 +137,7 @@ export function buildShark(scene) {
   function update(dt, t, player, ev) {
     time.value = t; S.t += dt; if (S.cool > 0) S.cool -= dt;
     const pr = Math.hypot(player.x, player.z);
-    const outside = pr > CFG.cliff;
+    const outside = pr > CFG.cliff && !onBridge(player.x, player.z);
     if (S.mode === 'idle') {
       // pattuglia lenta a cerchio, oltre il bordo e più in basso: una sagoma che si intravede nel blu
       S.ang += dt * 0.045;
@@ -189,5 +189,10 @@ export function buildShark(scene) {
     if (d < 10 && tmp.normalize().dot(dir) > 0.35) { S.mode = 'flee'; S.t = 0; S.cool = 120; S.vel.copy(tmp).multiplyScalar(6); return true; }
     return false;
   }
-  return { group, update, blast, reset, state: S };
+  // colpito dall'arpione: scappa come col getto d'aria (anche se è solo di passaggio)
+  function scare() {
+    if (S.mode === 'flee') return false;
+    tmp.set(S.pos.x, 0, S.pos.z).normalize(); S.mode = 'flee'; S.t = 0; S.cool = 120; S.vel.copy(tmp).multiplyScalar(7); return true;
+  }
+  return { group, update, blast, scare, reset, state: S };
 }
